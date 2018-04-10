@@ -9,8 +9,9 @@
 
 See full details: https://github.com/rsvp/fecon235/issues/9
 
-The **develop** branch is experimental, while the **master** branch
-will be available via `pip` and `conda` by 2020-01-01 deadline.
+The **develop** branch is experimental where pull requests are currently directed.
+The **master** branch is protected and will be released via 
+`pip` and `conda` before the 2020-01-01 deadline.
 
 The home for our ***Jupyter notebooks*** shall remain at
 [fecon235](https://github.com/rsvp/fecon235) due to their bulky size.
