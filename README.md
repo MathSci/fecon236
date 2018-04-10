@@ -1,6 +1,6 @@
 ## fecon236 : Computational tools for financial economics
 
-[![Gitter](https://badges.gitter.im/MathSci/fecon236.svg)](https://gitter.im/MathSci/fecon236?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) / master [![Build Status](https://travis-ci.org/MathSci/fecon236.svg?branch=master)](https://travis-ci.org/MathSci/try_repo) / develop [![Build Status](https://travis-ci.org/MathSci/fecon236.svg?branch=develop)](https://travis-ci.org/MathSci/try_repo)
+[![Gitter](https://badges.gitter.im/MathSci/fecon236.svg)](https://gitter.im/MathSci/fecon236?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) / master [![Build Status](https://travis-ci.org/MathSci/fecon236.svg?branch=master)](https://travis-ci.org/MathSci/fecon236) / develop [![Build Status](https://travis-ci.org/MathSci/fecon236.svg?branch=develop)](https://travis-ci.org/MathSci/fecon236)
 
 
 ### Currently in development: ALPHA status
