@@ -1,10 +1,10 @@
-#  Python Module for import                           Date : 2017-05-15
+#  Python Module for import                           Date : 2018-04-21
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  system.py :: system and date functions including specs.
 
-Code in this module must be compatible with both Python 2 and 3.
-It is a bridge and a guardian between the two Pythons.
+Code in this module should be compatible with both Python 2 and 3
+until 2019-01-01, thereafter only python3.
 
 For example, it is used in the preamble of fecon235 Jupyter notebooks.
 
@@ -17,29 +17,19 @@ REFERENCES:
         Single file source: https://bitbucket.org/gutworth/six
 
 
-CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
-2017-05-15  Add timestamp() per strict RFC-3339 standard.
-                Also include scipy and sympy in specs().
-2017-03-16  Revise: minimumPandas = 18.0
-2016-04-28  Use version('jupyter_core') instead of version('jupyter').
-                Update to PREAMBLE-p6.16.0428
-2015-12-29  For errf in gitinfo(), our dev_null instead of os.devnull
-                Add minimumPandas variable esp. for tests.
-2015-12-27  Get jupyter version among specs().
-                Fix run command to accept errf argument.
-                For specs(), move gitinfo try clause therein.
-2015-12-23  Add run command and gitinfo functions.
-                Update to PREAMBLE-p6.15.1223
-2015-12-19  python3 compatible: absolute_import
-2015-12-03  First version.
+CHANGE LOG  For latest version, see https://git.io/fecon236
+2018-04-21  yi_0sys module from fecon235 renamed to system.
+                Major flake8 fixes. Move notebook preamble to docs.
 '''
 
+# py2rm
 from __future__ import absolute_import, print_function
 #    __future__ for Python 2 and 3 compatibility; must be first in file.
+
 import sys
 import os
 import time
-from subprocess import check_output, STDOUT
+from subprocess import check_output, CalledProcessError
 #                      ^for Python 2.7 and 3+
 
 
@@ -129,10 +119,11 @@ def versionstr(module="IPython"):
         return str(ver[0]) + '.' + str(ver[1]) + '.' + str(ver[2])
     else:
         try:
+            vermod = None
             exec("import " + module)
             exec("vermod = " + module + ".__version__")
             return vermod
-        except:
+        except Exception:
             return None
 
 
@@ -142,9 +133,9 @@ def versiontup(module="IPython"):
     try:
         v = [int(k) for k in s.split('.')]
         return tuple(v)
-    except:
+    except Exception:
         #  e.g. if not installed or not convertible to integers...
-        if s == None:
+        if s is None:
             return (0,  0,  0)
         else:
             return (-9, -9, -9)
@@ -171,7 +162,7 @@ def run(command, xnl=True, errf=None):
     '''RUN **quote and space insensitive** SYSTEM-LEVEL command.
        OTHERWISE: use check_output directly and list component
        parts of the command, e.g.
-        check_output(["git", "describe", "--abbrev=0"])
+           check_output(["git", "describe", "--abbrev=0"])
        then generally use our utf() since check_output
        usually does not return utf-8, so be prepared to
        receive bytes and also new line.
@@ -224,67 +215,22 @@ def specs():
     print(" ::  Timestamp:", timestamp())
 
 
-if pythontup() < (3, 0, 0):
-    '''ROSETTA STONE FUNCTIONS approximately bridging Python 2 and 3.
-    e.g.       answer = get_input("Favorite animal? ")
-               print(answer)
-    '''
-    get_input = raw_input
-else:
-    get_input = input
-    #           ^beware of untrustworthy arguments!
-
-
 def endmodule():
     '''Procedure after __main__ conditional in modules.'''
     die("is a MODULE for import, not for direct execution.", 113)
 
 
+# py2rm
+'''ROSETTA STONE FUNCTIONS approximately bridging Python 2 and 3.
+   e.g.    answer = get_input("Favorite animal? ")
+           print(answer)
+'''
+if pythontup() < (3, 0, 0):
+    get_input = raw_input
+else:
+    #   But beware of untrustworthy arguments!
+    get_input = input
+
+
 if __name__ == "__main__":
     endmodule()
-
-
-'''
-_______________ Appendix 1: PREAMBLE for Jupyter NOTEBOOKS
-                            Input cell for settings and system details:
-
-CHANGE LOG
-2016-04-28  Remove old LaTeX warnings:
-            #  Beware, for MATH display, use %%latex, NOT the following:
-            #                   from IPython.display import Math
-            #                   from IPython.display import Latex
-
-
-#  PREAMBLE-p6.16.0428 :: Settings and system details
-from __future__ import absolute_import, print_function
-system.specs()
-pwd = system.getpwd()   # present working directory as variable.
-print(" ::  $pwd:", pwd)
-#  If a module is modified, automatically reload it:
-%load_ext autoreload
-%autoreload 2
-#       Use 0 to disable this feature.
-
-#  Notebook DISPLAY options:
-#      Represent pandas DataFrames as text; not HTML representation:
-import pandas as pd
-pd.set_option('display.notebook_repr_html', False)
-from IPython.display import HTML # useful for snippets
-#  e.g. HTML('<iframe src=http://en.mobile.wikipedia.org/?useformat=mobile
-#            width=700 height=350></iframe>')
-from IPython.display import Image
-#  e.g. Image(filename='holt-winters-equations.png', embed=True)
-#                  url= Also works instead of filename.
-from IPython.display import YouTubeVideo
-#  e.g. YouTubeVideo('1j_HxD4iLn8', start='43', width=600, height=400)
-from IPython.core import page
-get_ipython().set_hook('show_in_pager', page.as_hook(page.display_page), 0)
-#  Or equivalently in config file: "InteractiveShell.display_page = True",
-#  which will display results in secondary notebook pager frame in a cell.
-
-#  Generate PLOTS inside notebook, "inline" generates static png:
-%matplotlib inline
-#          "notebook" argument allows interactive zoom and resize.
-
-
-'''
