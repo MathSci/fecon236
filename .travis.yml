@@ -1,6 +1,11 @@
 #  .travis.yml     python 27 to 3, with Miniconda             Date : 2018-04-25
 #  FEATURES: pytest, flake8, pandas, pip and conda.           fecon236
 
+#  By default, Travis uses PIP to manage Python dependencies.
+#  ___ATTN___ If you have a requirements.txt file, Travis runs 
+#      pip install -r requirements.txt
+#  during the install phase of the build.
+
 #  Check the BUILD STATUS page to see if your build passes or fails:
 #            For PUBLIC  repositories:  https://travis-ci.org/auth
 #            For PRIVATE repositories:  https://travis-ci.com/auth
@@ -13,7 +18,6 @@
 #  are ignored by Travis CI. When multiple commits are pushed together, that
 #  takes effect only if present in the HEAD commit.
 
-
 #  REFERENCES
 #        trusty:= Ubuntu 14.04 distribution.
 #  Python setup: https://docs.travis-ci.com/user/languages/python
@@ -25,8 +29,6 @@
 
 #  CHANGE LOG
 #  2018-04-25  First version from try_repo
-
-
 # ==============================================================================
 
 sudo: false
