@@ -1,0 +1,167 @@
+#  .travis.yml     python 27 to 3, with Miniconda             Date : 2018-04-25
+#  FEATURES: pytest, flake8, pandas, pip and conda.           fecon236
+
+#  Check the BUILD STATUS page to see if your build passes or fails:
+#            For PUBLIC  repositories:  https://travis-ci.org/auth
+#            For PRIVATE repositories:  https://travis-ci.com/auth
+
+#  PHASE - the sequential steps of a job. 
+#      For example, the install phase, comes before the script phase, 
+#      which comes before the optional deploy phase.
+
+#  Commits that have [ci skip] or [skip ci] anywhere in the commit messages
+#  are ignored by Travis CI. When multiple commits are pushed together, that
+#  takes effect only if present in the HEAD commit.
+
+
+#  REFERENCES
+#        trusty:= Ubuntu 14.04 distribution.
+#  Python setup: https://docs.travis-ci.com/user/languages/python
+#  Install dependencies: https://docs.travis-ci.com/user/installing-dependencies
+#  Customization: https://docs.travis-ci.com/user/customizing-the-build
+#  Notifications: https://docs.travis-ci.com/user/notifications
+#  Newbie: https://docs.travis-ci.com/user/for-beginners
+
+
+#  CHANGE LOG
+#  2018-04-25  First version from try_repo
+
+
+# ==============================================================================
+
+sudo: false
+
+     #  "false" implies CONTAINER-BASED, default for new projects. 
+     #  Linux Ubuntu environment running in a container. 
+     #  Does NOT support the use of sudo, setuid, or setgid.
+     #
+     #  SUDO-ENABLED runs on full virtual machine. It starts a little slower, 
+     #  but it has more computational resources, and 
+     #  supports the use of sudo, setuid, and setgid.
+     #  Setting is "sudo: enabled"
+
+language: python
+
+env:
+  global:
+    #  DOCTR deploy key: automatically deploying docs from Travis CI 
+    #  to GitHub pages. Doctr requires python >=3.5
+    #  Ref: https://github.com/drdoctr/doctr
+    - secure: "foo_long_string"
+
+
+matrix:
+  fast_finish: true
+  #            ^Marks the build as finished ASAP.
+
+  include:
+  #  - dist: trusty
+  #    env:
+  #      - PYTHON=3.6 PANDAS=0.22 DOCBUILD=true
+  #  - dist: trusty
+  #    env:
+  #      - PYTHON=3.6 PANDAS="MASTER"
+  - dist: trusty
+    env:
+      - PYTHON=3.6 PANDAS=0.22
+  # Must repeat exactly in "allow failures:" section...
+  - dist: trusty
+    env:
+      - PYTHON=2.7 PANDAS=0.22
+  allow_failures:
+  - dist: trusty
+    env:
+      - PYTHON=2.7 PANDAS=0.22
+      #  By 2020-01-01, we pledge to deprecate straddling code.
+
+
+install:
+  #  #  Use conda to install instead, since flake8 is python-version dependent:
+  #  #      http://flake8.pycqa.org/en/latest/
+  #  - pip install -qq flake8
+  #
+  #    Periodically update conditional, although conda update line
+  #    will keep everything up-to-date:
+  - if [[ "$PYTHON" == "2.7" ]]; then
+      wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
+    else
+      wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    fi
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  #      Q: What is hash for?  TODO
+  - conda config --set always_yes yes --set changeps1 no
+  - conda config --add channels pandas
+  - conda update -q conda
+  - conda info -a
+  #       ^useful for debugging any issues with conda.
+  - conda create -q -n test-environment python=$PYTHON coverage setuptools html5lib lxml pytest pytest-cov wrapt
+  - source activate test-environment
+  - if [[ "$PANDAS" == "MASTER" ]]; then
+      conda install numpy pytz python-dateutil;
+      PRE_WHEELS="https://7933911d6844c6c53a7d-47bd50c35cd79bd838daf386af554a83.ssl.cf2.rackcdn.com";
+      pip install --pre --upgrade --timeout=60 -f $PRE_WHEELS pandas;
+    else
+      conda install pandas=$PANDAS;
+    fi
+  #  - if [[ $DOCBUILD ]]; then
+  #      conda install sphinx ipython matplotlib;
+  #      pip install sphinx_rtd_theme doctr;
+  #    fi
+  #  - pip install beautifulsoup4
+  #  - pip install coveralls --quiet
+  #  #             ^for "after success:" section below.
+  - conda install flake8
+  - conda list
+  - python setup.py install
+
+
+script:
+    #  - export ENIGMA_API_KEY=$ENIGMA_API_KEY
+    #  - pytest -s -r xX --cov-config .coveragerc --cov=pandas_datareader --cov-report xml:/tmp/cov-datareader.xml --junitxml=/tmp/datareader.xml
+    - pytest -s -r xX --doctest-modules --ignore=setup.py tests
+    #           -r xX means show extra test summary info as specified by chars
+    #                                  for (x)failed, (X)passed.
+    #        -s means --capture=no for per-test capturing method: fd|sys|no.
+    #        Note we skip options pytest-cov plugin for code coverage. 
+    - flake8 --version
+    - flake8 fecon236
+    #        ^package directory
+    #  - flake8 pandas_datareader
+
+
+# ============================================================ ENDNOTES ========
+
+
+#  _______________ 2018-04-06  pandas_datareader
+#  
+#  after_success:
+#    - |
+#      if [[ ${DOCBUILD} ]]; then
+#        cd docs
+#        make html && make html
+#        cd ..
+#        doctr deploy devel --build-tags
+#        if [[ -z ${TRAVIS_TAG} ]]; then
+#          echo "Not a tagged build."
+#        else
+#          doctr deploy stable --build-tags
+#        fi
+#      fi
+#    - coveralls
+#    #   See https://coveralls.io/features for COVERALLS
+
+
+#       __________ pytest-cov plugin and Coveralls
+#  
+#       Coverage.py is a tool to measure the code coverage of Python programs. In
+#       the context of testing, it can be used to measure the code coverage when
+#       running pytest, which effectively translate code coverage to test
+#       coverage. Here we use the pytest-cov plugin to call this tool during test
+#       so that we translate the code coverage to test coverage. 
+#  
+#       Coveralls is a web service that displays the code coverage information
+#       generated by the Coverage.py tool.  The coveralls package can be
+#       installed in Travis. The coveralls command will publish the coverage
+#       information to http://coveralls.io.
