@@ -35,7 +35,7 @@ def test_minimumPandas_system_fecon236_vSlow():
     if s is not None:
         s = s.replace('.', '', 1)
         #     ^only one replace: e.g. 0.17.1 -> 017.1
-    assert float(s) >= system.minimumPandas
+        assert float(s) >= system.minimumPandas
 
 
 def test_gitinfo_system_fecon236_oLocal():
