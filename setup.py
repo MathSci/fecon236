@@ -55,7 +55,7 @@ setup(
     version=__version__,
     description='Computational tools for financial economics',
     long_description=readme,
-    author='Mathematical Science Group',
+    author='Mathematical Sciences Group',
     author_email='MathSci-github@googlegroups.com',
     python_requires='>=2.7.0',
     url='https://github.com/MathSci/'+PROJECT,
