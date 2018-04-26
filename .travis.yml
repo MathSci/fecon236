@@ -29,6 +29,7 @@
 
 #  CHANGE LOG
 #  2018-04-25  First version from try_repo
+#                  Exclude "oLocal" Only Local tests by pytest.
 # ==============================================================================
 
 sudo: false
@@ -122,7 +123,7 @@ install:
 script:
     #  - export ENIGMA_API_KEY=$ENIGMA_API_KEY
     #  - pytest -s -r xX --cov-config .coveragerc --cov=pandas_datareader --cov-report xml:/tmp/cov-datareader.xml --junitxml=/tmp/datareader.xml
-    - pytest -s -r xX --doctest-modules --ignore=setup.py tests
+    - pytest -s -r xX --doctest-modules -k 'not oLocal' tests
     #           -r xX means show extra test summary info as specified by chars
     #                                  for (x)failed, (X)passed.
     #        -s means --capture=no for per-test capturing method: fd|sys|no.
