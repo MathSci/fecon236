@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-04-21
+#  Python Module for import                           Date : 2018-04-25
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  system.py :: system and date functions including specs.
@@ -18,6 +18,7 @@ REFERENCES:
 
 
 CHANGE LOG  For latest version, see https://git.io/fecon236
+2018-04-25  Ignore "raw_input" < python3 flake8.
 2018-04-21  yi_0sys module from fecon235 renamed to system.
                 Major flake8 fixes. Move notebook preamble to docs.
 '''
@@ -226,7 +227,7 @@ def endmodule():
            print(answer)
 '''
 if pythontup() < (3, 0, 0):
-    get_input = raw_input
+    get_input = raw_input   # noqa
 else:
     #   But beware of untrustworthy arguments!
     get_input = input

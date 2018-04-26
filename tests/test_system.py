@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-04-22
+#  Python Module for import                           Date : 2018-04-25
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  test_system.py :: Test fecon236 system module.
@@ -11,6 +11,8 @@ REFERENCE:  py.test   https://pytest.org/latest/getting-started.html
             or PDF at http://pytest.org/latest/pytest.pdf
 
 CHANGE LOG  For latest version, see https://git.io/fecon236
+2018-04-25  Fix Travis 16.1 fail.
+                Use "oLocal" to mean Only Local testing.
 2018-04-22  Refactor from fecon235.
 '''
 
@@ -30,12 +32,13 @@ def test_minimumPython_system_fecon236():
 def test_minimumPandas_system_fecon236_vSlow():
     '''Test minimum Pandas version for fecon236.'''
     s = system.versionstr("pandas")
-    s = s.replace('.', '', 1)
-    #     ^only one replace: e.g. 0.17.1 -> 017.1
+    if s is not None:
+        s = s.replace('.', '', 1)
+        #     ^only one replace: e.g. 0.17.1 -> 017.1
     assert float(s) >= system.minimumPandas
 
 
-def test_gitinfo_system_fecon236():
+def test_gitinfo_system_fecon236_oLocal():
     '''Test gitinfo() which obtains repo info by running git.'''
     repo, tag, bra = system.gitinfo()
     #  Only repo has a response known here in advance:
