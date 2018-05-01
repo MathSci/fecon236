@@ -1,5 +1,5 @@
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-#  Python package installation                        Date : 2018-04-25
+#  Python package installation                        Date : 2018-05-01
 '''
 _______________|  fecon236/__init__.py :: Top installation goods.
 
@@ -14,6 +14,7 @@ References:  https://github.com/kennethreitz/samplemod
              https://github.com/kennethreitz/setup.py
 
 CHANGE LOG  For latest version, see https://git.io/fecon236
+2018-05-01  Clarify use of hand-coded __version__.
 2018-04-25  Hand-code __version__. First pass tests: Travis build 18.
 2018-04-23  First version.
 '''
@@ -24,5 +25,8 @@ from __future__ import absolute_import, print_function
 from .util import system                        # noqa
 from .core import hellocore                     # noqa
 
-__version__ = '10.6.18b'
-#             ^HAND-CODE this string on MAJOR releases.
+__version__ = '10.6a18.post180501'
+#             ^HAND-CODE this string on MAJOR.MINOR releases.
+#              The alpha tag is based on Travis build number.
+#              The .post handle here is date-based.
+#  For current installed VERSION, use: "pip show fecon236"
