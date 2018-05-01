@@ -1,4 +1,4 @@
-#  .travis.yml     python 27 to 3, with Miniconda             Date : 2018-04-25
+#  .travis.yml     python 27 to 3, with Miniconda             Date : 2018-05-01
 #  FEATURES: pytest, flake8, pandas, pip and conda.           fecon236
 
 #  By default, Travis uses PIP to manage Python dependencies.
@@ -28,6 +28,7 @@
 
 
 #  CHANGE LOG
+#  2018-05-01  Lower 3.6 env to 3.4.
 #  2018-04-25  First version from try_repo
 #                  Exclude "oLocal" Only Local tests by pytest.
 # ==============================================================================
@@ -66,7 +67,7 @@ matrix:
   #      - PYTHON=3.6 PANDAS="MASTER"
   - dist: trusty
     env:
-      - PYTHON=3.6 PANDAS=0.22
+      - PYTHON=3.4 PANDAS=0.22
   # Must repeat exactly in "allow failures:" section...
   - dist: trusty
     env:
