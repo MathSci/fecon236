@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-#  Python package installation                        Date : 2018-04-30
+#  Python package installation                        Date : 2018-05-01
 '''
 _______________|  fecon236/setup.py :: Installation via setuptools.
 
                   Essential install config file, esp. for pip.
 
+VERSION in play:  Use "pip show fecon236"
+
            Rant:  pip CANNOT properly resolve dependencies!
                   Setting up installation is frustrating in the
-                  Python ecosystem with complex and magical incantations.
+                  complex Python ecosystem with magical incantations.
 
       Templates:  https://github.com/kennethreitz/samplemod
                   https://github.com/kennethreitz/setup.py
@@ -22,16 +24,18 @@ _______________|  fecon236/setup.py :: Installation via setuptools.
      https://packaging.python.org/specifications -- PyPA SPECS.
 
        For PyPI:  - Distinguish between "Universal" and "Pure" wheels.
-                  - Create your distribution (wheels):
+                  - Create distribution wheels by:
                         pythonN setup.py bdist_wheel [--universal]
                   - dist/ will be under your project’s root directory.
+                      - build/ and PROJECT.egg-info/ as well.
                   - To upload to PyPI:
                         twine upload dist/*
-                  - Check https://pypi.org/project/<PROJECT>
+                  - Check up at https://pypi.org/project/PROJECT
 
      CLASSIFERS:  https://pypi.python.org/pypi?%3Aaction=list_classifiers
 
 CHANGE LOG  For latest version, see https://git.io/fecon236
+2018-05-01  Eliminate attempt at __version__ here.
 2018-04-30  Additional directives, requirements.txt comparison.
 2018-04-23  First version.
 '''
@@ -87,12 +91,10 @@ with open('VERSION') as f:
     #  Read top-level file as pure string, deleting line return:
     versioned = f.read().strip().replace(os.linesep, '')
 
-__version__ = versioned
-
 
 setup(
     name=PROJECT,
-    version=__version__,
+    version=versioned,
     description='Computational tools for financial economics',
     long_description=readme,
     author='Mathematical Sciences Group',
