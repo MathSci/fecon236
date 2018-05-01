@@ -5,7 +5,27 @@ within itself. This file simply gives a grand overview of such details
 and the annotations in the commits and tags.*
 
 
-### 2018-04-25  (tag: 10.6.18b)
+### 2018-05-01  (tag: 10.6a19)
+
+MathSci joins new PyPI site https://pypi.org/user/MathSci and
+establishes the **pip release of the master branch of fecon236**
+via https://pypi.org/project/fecon236 (to be done manually by the
+maintainers from the git repository using `twine`).
+
+Current alpha version passed Travis build 19 with python27 and python34 env.
+Version 10 will support straddling code.
+Version 11, expected before 2019-01-01, will drop python27 support
+(like upstream numpy and pandas).
+
+The module `fecon236/__init__.py` will contain the hand-coded
+string variable `__version__` which approximates the
+VERSION file read in by setup.py.
+
+Add docs/fe-10-install.md to help the fecon236 user optimally
+install the project.
+
+
+### 2018-04-25
 
 Add .old/235 which is fecon235 v5.18.0312 --
 so bump fecon236 VERSION to 10.05.180312 to signal transition.
