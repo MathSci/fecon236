@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+#              bash 4.3.11(1)   Linux 3.13.0 Ubuntu 14.04.3   Date : 2018-05-01
+#
+# _______________|  up-pypi :: Create and upload dist wheel to PyPI.org
+#
+#           Usage:  $ ./bin/up-pypi  [optional: versioned]
+#                   # ^MUST BE EXECUTED from project's ROOT directory !!
+#
+#         Example:  $ ./bin/up-pypi 10.6a21
+#
+#    Dependencies:  python2 or python3: Pick in "Create wheel" section.
+#                   setup.py file
+#                   VERSION  file
+#                   twine >= 1.09
+#
+#           Notes:  twine will create three directories:
+#                       build, dist, and PROJECT.egg-info
+#
+#  CHANGE LOG  LATEST version available: https://git.io/fecon236
+#  2018-05-01  First version.
+
+
+#           _____ PREAMBLE_v3: settings, variables, and error handling.
+#
+LC_ALL=POSIX
+#      locale means "ASCII, US English, no special rules, 
+#      output per ISO and RFC standards." 
+#      Esp. use ASCII encoding for glob and sorting characters. 
+shopt -s   extglob
+#     ^set extended glob for pattern matching.
+shopt -s   failglob
+#         ^failed pattern matching signals error.
+set -e
+#   ^errors checked: immediate exit if a command has non-zero status. 
+set -o pipefail
+#   ^exit status on fail within pipe, not (default) last command.
+set -u
+#   ^unassigned variables shall be errors.
+#    Example of default VARIABLE ASSIGNMENT:  arg1=${1:-'foo'}
+
+versioned=${1:-'0'}
+
+program=${0##*/}   #  similar to using basename
+memf=$( mktemp /dev/shm/88_${program}_tmp.XXXXXXXXXX )
+errf=$( mktemp /dev/shm/88_${program}_tmp.XXXXXXXXXX )
+
+
+cleanup () {
+     #  Delete temporary files, then optionally exit given status.
+     local status=${1:-'0'}
+     rm -f $memf $errf
+     [ $status = '-1' ] ||  exit $status      #  thus -1 prevents exit.
+} #--------------------------------------------------------------------
+warn () {
+     #  Message with basename to stderr.          Usage: warn "message"
+     echo -e "\n !!  ${program}: $1 "  >&2
+} #--------------------------------------------------------------------
+die () {
+     #  Exit with status of most recent command or custom status, after
+     #  cleanup and warn.      Usage: command || die "message" [status]
+     local status=${2:-"$?"}
+     cat $errf >&2
+     cleanup -1  &&   warn "$1"  &&  exit $status
+} #--------------------------------------------------------------------
+trap "die 'SIG disruption, but cleanup finished.' 114" 1 2 3 15
+#    Cleanup after INTERRUPT: 1=SIGHUP, 2=SIGINT, 3=SIGQUIT, 15=SIGTERM
+trap "die 'unhandled ERR via trap, but cleanup finished.' 116" ERR
+#    Cleanup after command failure unless it's part of a test clause.
+#
+# _______________     ::  BEGIN  Script ::::::::::::::::::::::::::::::::::::::::
+
+PROJECT='fecon236'
+
+if [ $versioned != '0' ] ; then
+     echo "$versioned" > VERSION
+fi
+
+
+#       __________ Create wheel
+
+#  --universal refers to python2/3 straddling code:
+python2 setup.py bdist_wheel --universal  > $memf  2> $errf
+
+#  #  Pure wheel for Python 3 only:
+#  #  [ ] - Modify "python_requires" in setup.py
+#  python3 setup.py bdist_wheel  > $memf  2> $errf
+
+
+#       __________ Upload wheel to PyPI
+#       Expect PyPI prompts to provide username and password...
+warn "Bad STALL at twine. Enter PyPI username after 'Uploading' line..."
+twine upload dist/*  2>> $errf
+#                 ^lazy, since previous wheels will be uploaded.
+
+
+echo " ::  $program setup.py read VERSION as: $(cat VERSION) "
+echo " ::  Manage project https://pypi.org/manage/project/${PROJECT}/releases "
+echo " ::  $program twine DONE, confirm at https://pypi.org/project/$PROJECT "
+
+
+cleanup    #  Instead of: trap arg EXIT
+# _______________ EOS ::  END of Script ::::::::::::::::::::::::::::::::::::::::
+
+
+#  timestamp=$( date '+%Y-%m-%d %H:%M' )
+#                     ^ISO date ^24-hour local time.
+
+
+#  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=sh :
