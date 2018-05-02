@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#              bash 4.3.11(1)   Linux 3.13.0 Ubuntu 14.04.3   Date : 2018-05-01
+#              bash 4.3.11(1)   Linux 3.13.0 Ubuntu 14.04.3   Date : 2018-05-02
 #
 # _______________|  up-pypi :: Create and upload dist wheel to PyPI.org
 #
@@ -8,15 +8,16 @@
 #
 #         Example:  $ ./bin/up-pypi 10.6a21
 #
-#    Dependencies:  python2 or python3: Pick in "Create wheel" section.
-#                   setup.py file
-#                   VERSION  file
+#    Dependencies:  python2 or python3: Pick in "Create WHEEL" section.
+#                   setup.py file which reads VERSION file.
 #                   twine >= 1.09
+#                   PyPI login credentials  [PROJECT admins only]
 #
 #           Notes:  twine will create three directories:
 #                       build, dist, and PROJECT.egg-info
 #
 #  CHANGE LOG  LATEST version available: https://git.io/fecon236
+#  2018-05-02  Add sanity check and warn re --universal wheel.
 #  2018-05-01  First version.
 
 
@@ -71,14 +72,18 @@ trap "die 'unhandled ERR via trap, but cleanup finished.' 116" ERR
 
 PROJECT='fecon236'
 
+[ -e 'VERSION' ]  ||  die "No VERSION file. Perhaps wrong directory level?" 113
+
+
 if [ $versioned != '0' ] ; then
      echo "$versioned" > VERSION
 fi
 
 
-#       __________ Create wheel
+#       __________ Create WHEEL
 
-#  --universal refers to python2/3 straddling code:
+warn "Creating Universal wheel for python2/3 code, NOT Pure wheel."
+#            --universal refers to python2/3 straddling code:
 python2 setup.py bdist_wheel --universal  > $memf  2> $errf
 
 #  #  Pure wheel for Python 3 only:
@@ -86,7 +91,7 @@ python2 setup.py bdist_wheel --universal  > $memf  2> $errf
 #  python3 setup.py bdist_wheel  > $memf  2> $errf
 
 
-#       __________ Upload wheel to PyPI
+#       __________ UPLOAD wheel to PyPI
 #       Expect PyPI prompts to provide username and password...
 warn "Bad STALL at twine. Enter PyPI username after 'Uploading' line..."
 twine upload dist/*  2>> $errf
