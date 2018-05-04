@@ -1,5 +1,39 @@
 ## fecon236 docs :: Installation
 
+### Simple install
+
+Developers may prefer working with a git repository from
+https://git.io/fecon236 but the user may just want a simple install.
+(Tip: there is a non-system `pip` which is conda-aware:
+`conda install pip virtualenv`)
+
+```
+    pip install fecon236
+    pip install --upgrade fecon236
+    pip uninstall fecon236
+```
+
+Your system `pip` will also obtain fecon236 from PyPI.
+
+
+### Why is requirements.txt missing?
+
+When we do continuous integration testing, we prefer the environment
+created by conda, rather than by pip. Travis CI automatically installs
+from requirements.txt when the language is Python -- which is something
+we want to intentionally avoid for that reason. This is the developers'
+preference, but the user may have different practices.
+
+So, *require.txt is designed to be COPIED as requirements.txt*
+for the bare essentials, which excludes software optimizations
+such as MLK (Math Kernel Library) and LLVM, as well as
+Jupyter notebook and IPython console.
+
+*Translation: just get an Ana/Mini/conda distribution to fulfill
+the very complex dependencies which includes difficult binaries.*
+The truth is that `pip` is incapable of dependency resolution.
+
+
 ### Background information
 
 Here an excellent overall TUTORIAL for Python installation in general:
@@ -48,6 +82,38 @@ After 2019-01-01, our support for python27 will discontinue
 Version 11 is expected to require at least Python 3.6.
 
 
+#### Installing pre-release versions
+
+By default, pip only finds stable versions at PyPI. So to seek
+pre-release and development versions, in addition to stable versions:
+`pip install --pre fecon236`
+
+
+
+
+
+
+
+
+
+
+
+
+### On virtual environments
+
+#### conda environment is compatible with pip
+
+The must-read article here is
+http://jakevdp.github.io/blog/2016/08/25/conda-myths-and-misconceptions
+especially for those who rely on the numpy pandas stack.
+It includes a terrific comparison
+between virtualenv and conda environments.
+
+Manual for conda environment:
+https://conda.io/docs/user-guide/tasks/manage-environments.html
+
+
+
 ### References
 
 - [fecon236 at GitHub](https://github.com/MathSci/fecon236)
@@ -58,4 +124,4 @@ Version 11 is expected to require at least Python 3.6.
 
 ---
 
-Last update : 2018-05-01
+Last update : 2018-05-04
