@@ -1,0 +1,59 @@
+#  require.txt :: mock requirements.txt for fecon236          Date : 2018-05-04
+#    "$ pip install -r requirements.txt"
+#
+#  When we do continuous integration testing, we prefer the environment
+#  created by conda, rather than by pip. Travis CI automatically installs
+#  from requirements.txt when the language is Python -- which is something
+#  we want to intentionally avoid for that reason. This is the developers'
+#  preference, but the user may have different practices. So...
+#  
+#       =>  require.txt is designed to be COPIED as requirements.txt
+#
+#       for the bare essentials, which excludes software optimizations
+#       such as MLK (Math Kernel Library) and LLVM, as well as
+#       Jupyter notebook and IPython console.
+#  
+#  Please FORGET this file, if you already using the Anaconda distribution
+#  for the numpy pandas stack -- those optimizations are included effortlessly.
+#  Take a glance at the bottom of this file, if you need to supplement your
+#  Miniconda distribution. And remember to get pip from conda:
+#  
+#       conda install pip virtualenv
+$
+#       pip install fecon236
+#       pip install --upgrade fecon236
+#       pip uninstall fecon236
+#  
+#
+#  _______________ Background
+#  
+#  Whereas "install_requires" requirements in setup.py are Abstract,
+#  i.e. not associated with any particular index,
+#  requirements files often contain pip options like --index-url
+#  or --find-links to make requirements Concrete, i.e.
+#  associated with a particular index or directory of packages.
+#  Whereas "install_requires" metadata in setup.py is automatically
+#  analyzed by pip during an install, requirements files are NOT,
+#  and only are used when a user specifically installs them
+#  using "pip install -r requirements.txt".
+#
+#            _____ References
+#
+#  => https://pip.readthedocs.io/en/1.1/requirements.html
+#  
+#  Donald Stufft, 2013, "setup.py vs requirements.txt"
+#  https://caremad.io/posts/2013/07/setup-vs-requirement
+#
+#       #  E.g. IMPLICIT value for concreteness:
+#       --index-url https://pypi.python.org/simple/
+#       #  But compare to --extra-index-url
+#  
+#       #  E.g. Installing the bar library from 
+#       #      https://github.com/foo/bar.git,
+#       #  making it equal to the name "bar":
+#       -e https://github.com/foo/bar.git#egg=bar
+#  
+# ===================================================== requirements.txt ======
+
+alice==1.0
+bob~=1.2.0
