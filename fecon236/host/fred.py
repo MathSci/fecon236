@@ -1,87 +1,31 @@
-#  Python Module for import                           Date : 2018-03-11
+#  Python Module for import                           Date : 2018-05-09
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
-_______________|  yi_fred.py: Access FRED with pandas for plots, etc.
+_______________|  fred.py :: FRED database into pandas.
 
-We define procedures to access data from the St. Louis Federal Reserve Bank.
-Each economic time series and its frequency has its own "fredcode" which
-is freely available at their site: http://research.stlouisfed.org/fred2/
+Functions access data from the Federal Reserve Bank, St. Louis.
+Each economic time series and its frequency has its own "fredcode"
+which is freely available from https://fred.stlouisfed.org
 
         Usage:  df = getfred(fredcode)
-                #             ^Favorites are named d4*, m4*, q4*.
+                #    fredcode favorites are variables named d4*, m4*, q4*
 
-                plotfred(dataframe or fredcode)
+                plot(df)
 
-                holtfred(dataframe or fredcode)
-                #  Holt-Winters forecast for FRED.
+REFERENCES:
 
-References:
+- pandas, http://pandas.pydata.org/pandas-docs/stable/computation.html
 
-- Computational tools for pandas
-       http://pandas.pydata.org/pandas-docs/stable/computation.html
-
-- Wes McKinney, 2013, _Python for Data Analysis_.
+- Wes McKinney, 2013, Python for Data Analysis.
 
 - Mico Loretan, Federal Reserve Bulletin, Winter 2005,
        "Indexes of the Foreign Exchange Value of the Dollar",
        http://www.federalreserve.gov/pubs/bulletin/2005/winter05_index.pdf
 
 
-CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
-2018-03-11  holtfred() superceded by foreholt(), yet moved to fecon235 module.
-2017-01-06  Add USDCNY daily series, Chinese Yuan from FRB H-10.
-2016-12-21  Add Fed Funds and its "30-day" ema as d4ff and d4ff30.
-2016-11-06  New resample_main() fixes #6 deprecations, and is used to
-            rewrite daily(), monthly(), quarterly().
-2016-11-05  New index_delta_secs() to infer index frequency in seconds.
-2016-01-20  Logical move of plotdf() to yi_plot module.
-2015-12-20  python3 compatible: lib import fix.
-2015-12-17  python3 compatible: use absolute_import.
-2015-12-05  python3 compatible: use yi_0sys module and fix print.
-            Modify import style for urlopen.
-2015-12-04  Remedy deprecated convert_objects for pd > 0.16.
-2015-11-12  Add m4nfp for US Nonfarm Payroll workers.
-2015-02-05  Add m4unempfr for France unemployment.
-2014-10-17  Remedy wild import of functions from our modules.
-2014-10-15  Add d4gas via weekly DoE gasoline survey, $/gal w/tax NSA.
-2014-10-08  Add synthetic d4oil by averaging d4wti and d4brent.
-2014-09-28  Save plotdf file only if title is actually given.
-2014-09-21  Modify m4gdpusr from 2009 to current dollars.
-            Add stats from Eurozone (FRED key phrase "Euro Area"):
-            m4infleu, m4defleu, q4gdpeu, m4gdpeur.
-2014-09-15  Change alpha and beta defaults for holtfred, see yi_timeseries.
-2014-09-11  Add m4housing for starts and m4homepx for Case-Shiller 20-city.
-2014-09-03  Add m4baseus for US Adjusted Monetary Base.
-2014-08-28  Change symbols uniformly from "gold"  to "xau",
-                                     from "sp500" to "spx".
-            New series: m4xaueur, m4xaujpy, d4zero10, m4zero10.
-2014-08-24  Add getm4eurusd which will combine synthetic EURUSD
-            from 1971-2002 obtained by averaging DEM and FRF.
-            Series m4usdjpy and synthetic m4eurjpy derived.
-            Add writefile for converting to CSV file. [moved yi_1tools]
-2014-08-19  Add m4inflbei to average inflation with BEI.
-            Add m4usdrtb, m4xaurtb, m4spxrtb as indexes.
-            Use syntax from holtfred to broaden plotfred.
-2014-08-16  Add m4pop, m4emppop, m4workers for population studies.
-            m4defl is effectively the inverse of aggregrated m4infl.
-            Improve holtfred to handle both fredcode and dataframe arg.
-2014-08-14  Add interpolate() for upsampling: daily, monthly, quarterly.
-            Add holtfred for quick Holt-Winters forecast.
-            Add getinflations to average inflation measures.
-            Sort fredcodes and getfred subroutines.
-2014-08-13  Add d4vix, synthetics: d4eurjpy, d4curve and d4bei.
-2014-08-11  Rename getdataframe to getdata_fred, so getfred() is governing.
-            Add synthetic m4defl as deflator dataframe.
-2014-08-10  Add some fredcodes, mostly rates and forex. Revise list names.
-            Add quarterly() to conform with FRED-style indexing.
-2014-08-08  Add dpi for saving image files.
-2014-08-06  Clarify title for plotdf.
-2014-08-05  Improve plotdf to produce png file.
-2014-08-02  Abstract readdataframe from getdataframe.
-2014-08-01  Split off utilities to yi_1tools.py
-2014-07-30  Add correlation for functional clarity.
-2014-07-29  Substantial revisions based on fred-inflation.ipynb
-2014-07-24  First version converted from fred-plot.ipynb
+CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-09  fred.py, fecon236 fork. Pass flake8.
+2018-03-11  yi_fred.py, fecon235 v5.18.0312, https://git.io/fecon235
 '''
 
 from __future__ import absolute_import, print_function
@@ -279,7 +223,7 @@ def readfile(filename, separator=',', compress=None):
     try:
         dataframe['Y'] = pd.to_numeric(dataframe['Y'], errors='coerce')
         #  'coerce' gives NaN if particular parsing is invalid.
-    except:
+    except Exception:
         #  convert_objects deprecated, but courtesy for pd < 0.17:
         dataframe['Y'] = dataframe['Y'].convert_objects(convert_numeric=True)
         #                              ^non-convertibles become NaN
@@ -424,7 +368,7 @@ def getm4eurusd(fredcode=d4eurusd):
         eurall = eurold.combine_first(eurnow)
         #               ^appends dataframe
         print(' ::  EURUSD synthetically goes back monthly to 1971.')
-    except:
+    except Exception:
         eurall = eurnow
         print(' ::  EURUSD monthly without synthetic 1971-2002 archive.')
     return eurall
@@ -440,7 +384,7 @@ def getspx(fredcode=d4spx):
         spall = spold.combine_first(spnow)
         #             ^appends dataframe
         print(' ::  S&P 500 prepend successfully goes back to 1957.')
-    except:
+    except Exception:
         spall = spnow
         print(' ::  S&P 500 for last 10 years (1957-archive not found).')
     return spall
@@ -461,7 +405,7 @@ def gethomepx(fredcode=m4homepx):
         hpall = hpold.combine_first(hpnow)
         #             ^appends dataframe
         print(' ::  Case-Shiller prepend successfully goes back to 1987.')
-    except:
+    except Exception:
         hpall = hpnow
         print(' ::  Case-Shiller since 2000 (1987-archive not found).')
     #  Case-Shiller is not dollar based, so we use:
