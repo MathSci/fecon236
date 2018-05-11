@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-10
+#  Python Module for import                           Date : 2018-05-11
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  holtwinters.py :: Holt-Winters time-series functions.
@@ -35,6 +35,7 @@ REFERENCES:
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-11  Fix imports.
 2018-05-10  holtwinters.py, fecon236 fork. Pass flake8.
 2016-12-20  yi_timeseries.py, fecon235 v5.18.0312, https://git.io/fecon235
 2016-12-14  Fix initial guess of b[0] for holt_winters_growth(),
@@ -43,12 +44,9 @@ CHANGE LOG  For LATEST version, see https://git.io/fecon236
 
 from __future__ import absolute_import, print_function
 
-#  import matplotlib.pyplot as plt   # Unused as of 2018-05-10.
-#  import pandas as pd               # Unused as of 2018-05-10.
-
 import numpy as np
-from . import yi_0sys as system
-from .yi_1tools import todf
+from ..util import system
+from ...tool import todf
 
 
 #  Holt-Winters DEFAULT parameters:
