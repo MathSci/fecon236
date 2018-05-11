@@ -1,38 +1,37 @@
-#  Python Module for import                           Date : 2016-11-06
-#  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per Python PEP 0263 
-''' 
-_______________|  test_fred : Test fecon235 yi_fred module.
+#  Python Module for import                           Date : 2018-05-10
+#  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
+'''
+_______________|  test_fred.py :: Test fecon236 fred module.
 
-- Include test of index_delta_secs() 
+- Include test of index_delta_secs()
 - Indirect test of resample_main() via rewritten functions:
-     daily(), monthly(), and quarterly().
+    daily(), monthly(), and quarterly().
 
-Testing: As of fecon235 v4, we favor pytest over nosetests, so e.g. 
+Testing: We favor pytest over nosetests, so e.g.
     $ py.test --doctest-modules
 
 REFERENCE
    pytest:  https://pytest.org/latest/getting-started.html
-               or PDF at http://pytest.org/latest/pytest.pdf
+            or PDF at http://pytest.org/latest/pytest.pdf
 
-CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
-2016-11-06  First version to verify fix #6.
+CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-10  fecon236 fork. Pass flake8.
+2016-11-06  fecon235 v5.18.0312, https://git.io/fecon235
 '''
 
 from __future__ import absolute_import, print_function
 
-import numpy as np
-import pandas as pd
 from fecon235.lib import yi_0sys as system
 from fecon235.lib import yi_fred as fred
 from fecon235.lib import yi_1tools as tools
 #
-#  N.B. -  in this tests directory without __init__.py, 
-#          we use absolute import as if outside the fecon235 package,
-#          not relative import (cf. modules within lib).
+#  N.B. -  In this tests directory without __init__.py,
+#          we use absolute import as if outside the fecon236 package,
+#          not relative import.
 
 #  #  Show the CSV file zdata-xau-13hj-c30.csv:
 #  #                    ^created in Linux environment...
-#  
+#
 #       T,XAU
 #       2013-03-08,1581.75
 #       2013-03-11,1579.0
@@ -66,48 +65,48 @@ from fecon235.lib import yi_1tools as tools
 #       2013-04-18,1393.75
 
 
-def test_yi_fred_fecon235_Read_CSV_file():
+def test_fred_fecon236_Read_CSV_file():
     '''Read CSV file then check values.'''
     df = fred.readfile('zdata-xau-13hj-c30.csv')
     #         readfile disregards XAU column name:
-    assert [ col for col in df.columns ] == ['Y']
+    assert [col for col in df.columns] == ['Y']
     assert df.shape == (30, 1)
     return df
 
 
-xau = test_yi_fred_fecon235_Read_CSV_file()
-xau = tools.todf( xau, 'XAU' )
+xau = test_fred_fecon236_Read_CSV_file()
+xau = tools.todf(xau, 'XAU')
 #           todf used to rename column.
 
 
-def test_yi_fred_fecon235_check_xau_DataFrame():
+def test_fred_fecon236_check_xau_DataFrame():
     '''Check xau dataframe.'''
-    assert [ col for col in xau.columns ] == ['XAU']
-    assert tools.tailvalue( xau ) == 1393.75
+    assert [col for col in xau.columns] == ['XAU']
+    assert tools.tailvalue(xau) == 1393.75
 
 
-def test_yi_fred_fecon235_check_xau_frequency():
+def test_fred_fecon236_check_xau_frequency():
     '''Check xau dataframe frequency.'''
-    assert fred.index_delta_secs( xau ) == 86400.0
+    assert fred.index_delta_secs(xau) == 86400.0
     #      Expect min daily frequency in seconds.
 
 
-def test_yi_fred_fecon235_check_xau_resample_main():
+def test_fred_fecon236_check_xau_resample_main():
     '''Check daily xau converted by monthly(), then daily().
        Demonstrates downsampling, then upsampling --
        thus validating fred.resample_main().
        Check dates produced from quarterly().
-    >>> xaumon = fred.monthly( xau )
+    >>> xaumon = fred.monthly(xau)
     >>> xaumon
                     XAU
-    T                  
+    T
     2013-03-01  1598.25
     2013-04-01  1566.50
-    >>> xaumondaily = fred.daily( xaumon )
+    >>> xaumondaily = fred.daily(xaumon)
     >>> xaumondaily = xaumondaily.round(2)  # for sys independence.
     >>> xaumondaily  # expect linear interpolation.
                     XAU
-    T                  
+    T
     2013-03-01  1598.25
     2013-03-04  1596.74
     2013-03-05  1595.23
@@ -130,16 +129,15 @@ def test_yi_fred_fecon235_check_xau_resample_main():
     2013-03-28  1569.52
     2013-03-29  1568.01
     2013-04-01  1566.50
-    >>> xauq = fred.quarterly( xau )
+    >>> xauq = fred.quarterly(xau)
     >>> xauq  # verify if dates are quarterly.
                     XAU
-    T                  
+    T
     2013-01-01  1598.25
     2013-04-01  1566.50
     '''
     pass
 
 
-
 if __name__ == "__main__":
-     system.endmodule()
+    system.endmodule()
