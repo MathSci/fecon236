@@ -1,7 +1,7 @@
-#  Python Module for import                           Date : 2018-05-09
+#  Python Module for import                           Date : 2018-05-11
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
-_______________|  tools.py :: Fundamental tools for data analysis.
+_______________|  tool.py :: Fundamental tools for data analysis.
 
 REFERENCES:
 
@@ -18,25 +18,17 @@ causing problems upon: from numpy import *
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-11  Rename to tool.py, fix imports.
 2018-05-09  tools.py, fecon236 fork. Pass flake8.
 2017-06-20  yi_1tools.py, fecon235 v5.18.0312, https://git.io/fecon235
 '''
 
 from __future__ import absolute_import, print_function, division
 
-import numpy as np                # for numerical work.
-import pandas as pd               # for data munging.
-#  import matplotlib.pyplot as plt   # for standard plots, but unused.
-
+import numpy as np
+import pandas as pd
 import statsmodels.formula.api as smf
-
-#  #  2016-04-28  DEPRECATED as of pandas 0.18
-#  #  ols:= Ordinary Least Squares, aka Linear Regression,
-#  #         pandas can handle multiple dependent variables.
-#  from pandas.stats.api import ols
-#  #    See https://github.com/pydata/pandas/blob/master/pandas/stats/ols.py
-
-from . import yi_0sys as system
+from .util import system
 
 
 def nona(df):
@@ -180,22 +172,6 @@ def zeroprice(rate, duration=9, yearly=2, face=100):
     periodrate = rate / float(yearly * 100)
     periods = duration * yearly
     return float(face) / ((1 + periodrate) ** periods)
-
-
-#  #       As of pandas 0.18, pd.ewma() is DEPRECATED.
-#  #       Thus our ema() will be modified in the yi_timeseries module.
-#  #       See issue #5 for details.
-#
-#  #  SMOOTH out data using EWMA, exponential weighted moving average,
-#  #  where alpha=2/(span+1) where alpha is weight on the most recent point.
-#  #  The popular jargon is "span-day EW moving average."
-#
-#  def ema(y, alpha=0.20):
-#       '''EXPONENTIAL MOVING AVERAGE using traditional weight arg.'''
-#       #  y could be a dataframe.
-#       s = (2 / float(alpha)) - 1
-#       #  Thus default alpha has span of 9, i.e. "9-period EWMA."
-#       return pd.ewma(y, span=s)
 
 
 def normalize(dfy):
@@ -520,7 +496,7 @@ def diflog(data, lags=1):
     return todf(lagged['Y_0'] - lagged['Y_'+str(lags)])
 
 
-def writefile(dataframe, filename='tmp-yi_1tools.csv', separator=','):
+def writefile(dataframe, filename='tmp-fe-tool.csv', separator=','):
     '''Write dataframe to disk file using UTF-8 encoding.'''
     #  For tab delimited, use '\t' as separator.
     dataframe.to_csv(filename, sep=separator, encoding='utf-8')
