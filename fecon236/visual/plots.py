@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2017-05-15
+#  Python Module for import                           Date : 2018-05-11
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  plots.py :: Plot functions.
@@ -14,25 +14,26 @@ REFERENCES:
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-11  Fix imports.
 2018-05-09  plots.py, fecon236 fork. Pass flake8.
 2017-05-15  yi_plot.py, fecon235 v5.18.0312, https://git.io/fecon235
 '''
 
 from __future__ import absolute_import, print_function
 
-import matplotlib.pyplot as plt
 #  import matplotlib.cm as colormap   # Unused, but see comments.
+import matplotlib.pyplot as plt
 import pandas as pd
 import scipy
-from . import yi_0sys as system
-from . import yi_1tools as tools
+from ..util import system
+from ... import tool
 
 dotsperinch = 140                   # DPI resolution for plot.
 
 
 def plotdf(dataframe, title='tmp'):
     '''Plot dataframe where its index are dates.'''
-    dataframe = tools.todf(dataframe)
+    dataframe = tool.todf(dataframe)
     #                ^todf must dropna(),
     #                 otherwise index of last point plotted may be wrong.
     #           Also helps if dataframe resulted from synthetic operations,
@@ -67,7 +68,7 @@ def plotn(dataframe, title='tmp'):
     '''Plot dataframe (or list) where the index is numbered (not dates).'''
     #  2014-12-13  Adapted from plotdf which uses date index.
     #  2016-01-21  With todf pre-filter, list type will be converted.
-    dataframe = tools.todf(dataframe)
+    dataframe = tool.todf(dataframe)
     #                ^todf must dropna(),
     #                 otherwise index of last point plotted may be wrong.
     #           Also helps if dataframe resulted from synthetic operations,
@@ -210,7 +211,7 @@ def scats(dataframe, title='tmp'):
 def scat(dfx, dfy, title='tmp', col=[0, 1]):
     '''Scatter plot between two pasted dataframes.'''
     #  Renaming title will result in file output.
-    scatter(tools.paste([dfx, dfy]), title, col)
+    scatter(tool.paste([dfx, dfy]), title, col)
     return
 
 
@@ -235,7 +236,7 @@ def plotqq(data, title='tmp', dist='norm', fitLS=True):
     #                   'norm' is a Gaussian distribution.
     #  The "data" plotted along the vertical y-axis.
     fig, ax = plt.subplots()
-    arr = tools.toar(data)
+    arr = tool.toar(data)
     #     ^Roundabout way guarantees a pure array needed for MAIN probplot:
     _ = scipy.stats.probplot(arr, dist=dist, fit=fitLS, plot=plt)  # noqa
     #   Ignore numerical output, just give plot object to matplotlib.
