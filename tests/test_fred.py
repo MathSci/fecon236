@@ -21,9 +21,9 @@ CHANGE LOG  For LATEST version, see https://git.io/fecon236
 
 from __future__ import absolute_import, print_function
 
-from fecon235.lib import yi_0sys as system
-from fecon235.lib import yi_fred as fred
-from fecon235.lib import yi_1tools as tools
+from fecon236 import tool
+from fecon236.util import system
+from fecon236.host import fred
 #
 #  N.B. -  In this tests directory without __init__.py,
 #          we use absolute import as if outside the fecon236 package,
@@ -75,14 +75,14 @@ def test_fred_fecon236_Read_CSV_file():
 
 
 xau = test_fred_fecon236_Read_CSV_file()
-xau = tools.todf(xau, 'XAU')
-#           todf used to rename column.
+xau = tool.todf(xau, 'XAU')
+#          todf used to rename column.
 
 
 def test_fred_fecon236_check_xau_DataFrame():
     '''Check xau dataframe.'''
     assert [col for col in xau.columns] == ['XAU']
-    assert tools.tailvalue(xau) == 1393.75
+    assert tool.tailvalue(xau) == 1393.75
 
 
 def test_fred_fecon236_check_xau_frequency():
