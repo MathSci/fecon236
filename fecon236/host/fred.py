@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-09
+#  Python Module for import                           Date : 2018-05-11
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  fred.py :: FRED database into pandas.
@@ -24,6 +24,7 @@ REFERENCES:
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-11  Fix imports. Deprecate plotfred().
 2018-05-09  fred.py, fecon236 fork. Pass flake8.
 2018-03-11  yi_fred.py, fecon235 v5.18.0312, https://git.io/fecon235
 '''
@@ -39,10 +40,9 @@ except ImportError:
 
 import numpy as np
 import pandas as pd
-from . import yi_0sys as system
-from . import yi_1tools as tools
-from . import yi_plot as plot
-from . import yi_timeseries as ts
+from ... import tool
+from ..util import system
+from ..tsa import holtwinters as hw
 
 
 #      __________ Convenient ABBREVIATIONS for less typing of quotes:
@@ -206,14 +206,14 @@ def readfile(filename, separator=',', compress=None):
     '''Read file (CSV default) as pandas dataframe.'''
     #  If separator is space, use '\s+' since regex will work.
     #  compress will take 'gzip' or 'bzip' as value.
-
+    #
     dataframe = pd.read_csv(filename, sep=separator,
                             compression=compress,
                             index_col=0, parse_dates=True,
                             header=0, names=['T', 'Y'])
     #                       Header on FRED's first line: DATE, VALUE
     #                                        replaced by:  T,  Y
-
+    #
     #  Numeric conversion is critical for math ops between dataframes!
     #        (Not necessary for plotting, seemingly auto-converted?)
     #  dtype is crucial, yet numeric conversion can be fragile
@@ -227,7 +227,6 @@ def readfile(filename, separator=',', compress=None):
         #  convert_objects deprecated, but courtesy for pd < 0.17:
         dataframe['Y'] = dataframe['Y'].convert_objects(convert_numeric=True)
         #                              ^non-convertibles become NaN
-
     #  FRED uses "." to indicate missing value.
     dataframe['Y'] = dataframe['Y'].fillna(method='pad')
     #                              ^NaN replaced by fill forward,
@@ -262,7 +261,7 @@ def index_delta_secs(dataframe):
     #  Picked min() over median() to conserve memory;      ^^^^^!
     #  also avoids missing values issue,
     #  e.g. weekend or holidays gaps for daily data.
-    secs_timedelta64 = tools.div(nanosecs_timedelta64, 1e9)
+    secs_timedelta64 = tool.div(nanosecs_timedelta64, 1e9)
     #  To avoid numerical error, we divide before converting type:
     secs = secs_timedelta64.astype(np.float32)
     if secs == 0.0:
@@ -421,10 +420,10 @@ def getinflations(inflations=ml_infl):
     #  We will take the average of indexes after their
     #  current value is set to 1 for equal weighting.
     inflsum = getdata_fred(inflations[0])
-    inflsum = inflsum / float(tools.tailvalue(inflsum))
+    inflsum = inflsum / float(tool.tailvalue(inflsum))
     for i in inflations[1:]:
         infl = getdata_fred(i)
-        infl = infl / float(tools.tailvalue(infl))
+        infl = infl / float(tool.tailvalue(infl))
         inflsum += infl
     return inflsum / len(inflations)
 
@@ -436,7 +435,7 @@ def getdeflator(inflation=m4infl):
     #  Here we set the present to 1, while past values have increasing
     #     multiplicative "returns" which will yield current dollars.
     infl = getfred(inflation)
-    lastin = tools.tailvalue(infl)
+    lastin = tool.tailvalue(infl)
     return float(lastin) / infl
     #           Think inverted inflation:-)
 
@@ -447,13 +446,13 @@ def getm4infleu():
     #  so we shall use Holt-Winters levels.
     cpiall = getdata_fred('CP0000EZ17M086NEST')
     #                        ^for 17 countries.
-    holtall = ts.holtlevel(cpiall)
-    normall = holtall / float(tools.tailvalue(holtall))
+    holtall = hw.holtlevel(cpiall)
+    normall = holtall / float(tool.tailvalue(holtall))
     return normall
     #  #   SUSPENDED since last is 2013-12-01.
     #  cpicore = getdata_fred('CPHPLA01EZM661N')
-    #  holtcore = ts.holtlevel(cpicore)
-    #  normcore = holtcore / float(tools.tailvalue(holtcore))
+    #  holtcore = hw.holtlevel(cpicore)
+    #  normcore = holtcore / float(tool.tailvalue(holtcore))
     #  #  We will take the average of indexes after their
     #  #  current value is set to 1 for equal weighting.
     #  return (normall + normcore) / 2.0
@@ -518,11 +517,11 @@ def getfred(fredcode):
         df = usdrtb * xauusd
 
     elif fredcode == d4ff30:
-        df = ts.ema(getdata_fred(d4ff), 0.0645)
+        df = hw.ema(getdata_fred(d4ff), 0.0645)
         #       exponential moving avg.   ^"30-day"
     elif fredcode == d4zero10:
         bond10 = getdata_fred(d4bond10)
-        df = tools.zeroprice(bond10, zero10dur)
+        df = tool.zeroprice(bond10, zero10dur)
     elif fredcode == m4zero10:
         df = monthly(getfred(d4zero10))
     elif fredcode == d4curve:
@@ -538,7 +537,7 @@ def getfred(fredcode):
         tips10 = getdata_fred(m4tips10)
         df = bond10 - tips10
     elif fredcode == m4inflbei:
-        inflpc = tools.pcent(getfred(m4infl), 12)  # YoY% form
+        inflpc = tool.pcent(getfred(m4infl), 12)  # YoY% form
         df = (inflpc + getfred(m4bei)) / float(2)
         #  ^average of backward and forward looking inflation!
 
@@ -572,49 +571,18 @@ def getfred(fredcode):
 
 
 def plotfred(data, title='tmp', maxi=87654321):
-    '''Plot data should be given as dataframe or fredcode.'''
-    #  maxi is an arbitrary maximum number of points to be plotted.
-    if isinstance(data, pd.DataFrame):
-        plot.plotdf(tools.tail(data, maxi), title)
-    else:
-        fredcode = data
-        df = getfred(fredcode)
-        plot.plotdf(tools.tail(df,   maxi), title)
-    return
+    '''DEPRECATED: Plot data should be given as dataframe or fredcode.'''
+    #  ^2018-05-11. Removal OK after 2020-01-01.
+    system.die("plotfred() DEPRECATED. Instead use get() and plot().")
 
 
-#  #  ** SUPERCEDED by foreholt(), but moved to fecon235 module
-#  # for backwards compatibility. **
-#  def holtfred(data, h=24, alpha=ts.hw_alpha, beta=ts.hw_beta):
-#       '''Holt-Winters forecast h-periods ahead (fredcode aware).'''
-#       #  "data" can be a fredcode, or a dataframe to be detected:
-#       if isinstance(data, pd.DataFrame):
-#            holtdf = ts.holt(data             , alpha, beta)
-#       else:
-#            fredcode = data
-#            holtdf = ts.holt(getfred(fredcode), alpha, beta)
-#            #              ^No interim results retained.
-#       #    holtdf is expensive to compute, but also not retained.
-#       #    For details, see module yi_timeseries.
-#       return ts.holtforecast(holtdf, h)
+if __name__ == "__main__":
+    system.endmodule()
 
 
-#  #      __________ save and load dataframe by pickle.
-#                    ^^^^     ^^^^ renamed recently.
-#
-#  The easiest way is to pickle it using save:
-#
-#       df.to_pickle(file_name)  # where to save it, usually as a .pkl
-#
-#  Then you can load it back using:
-#
-#       df = pd.read_pickle(file_name)
-#
-#  However, PICKLE FORMAT IS NOT GUARANTEED, and takes up 4x relative to gz.
+# ========================================================= ENDNOTES ==========
 
 
-# ## Footnotes
-#
 # - *"Two different price indexes are popular for measuring inflation: the
 # consumer price index (CPI) from the Bureau of Labor Statistics and the
 # personal consumption expenditures price index (PCE) from the Bureau of
@@ -631,7 +599,3 @@ def plotfred(data, title='tmp', maxi=87654321):
 # the PCE includes more comprehensive coverage of goods and services, and
 # historical PCE data can be revised (more than for seasonal factors only)."*
 # --James Bullard, president of the Federal Reserve Bank of St. Louis.
-
-
-if __name__ == "__main__":
-    system.endmodule()
