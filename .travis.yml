@@ -1,4 +1,4 @@
-#  .travis.yml     python 27 to 3, with Miniconda             Date : 2018-05-01
+#  .travis.yml     python 27 to 3, with Miniconda             Date : 2018-05-12
 #  FEATURES: pytest, flake8, pandas, pip and conda.           fecon236
 
 #  By default, Travis uses PIP to manage Python dependencies.
@@ -28,6 +28,7 @@
 
 
 #  CHANGE LOG
+#  2018-05-12  conda install some scientific packages.
 #  2018-05-01  Lower 3.6 env to 3.4.
 #  2018-04-25  First version from try_repo
 #                  Exclude "oLocal" Only Local tests by pytest.
@@ -116,7 +117,7 @@ install:
   #  - pip install beautifulsoup4
   #  - pip install coveralls --quiet
   #  #             ^for "after success:" section below.
-  - conda install flake8
+  - conda install flake8 numpy statsmodel scipy matplotlib
   - conda list
   - python setup.py install
 
@@ -131,8 +132,8 @@ script:
     #        Note we skip options pytest-cov plugin for code coverage. 
     - flake8 --version
     - flake8 fecon236
-    #        ^package directory
-    #  - flake8 pandas_datareader
+    #        ^package directory, not tests ...
+    # flake8 gives false whitespace errors in DOCTESTS which cannot be ignored.
 
 
 # ============================================================ ENDNOTES ========
