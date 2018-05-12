@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-11
+#  Python Module for import                           Date : 2018-05-12
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  fred.py :: FRED database into pandas.
@@ -24,6 +24,7 @@ REFERENCES:
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-12  Given new division, eliminate float(integer).
 2018-05-11  Fix imports. Deprecate plotfred().
 2018-05-09  fred.py, fecon236 fork. Pass flake8.
 2018-03-11  yi_fred.py, fecon235 v5.18.0312, https://git.io/fecon235
@@ -468,7 +469,7 @@ def getfred(fredcode):
     elif fredcode == m4debt:
         df = monthly(getdata_fred(q4debt))
     elif fredcode == m4workers:
-        workfrac = getdata_fred(m4emppop) / float(100)
+        workfrac = getdata_fred(m4emppop) / 100.
         pop = getdata_fred(m4pop)
         df = workfrac * pop
     elif fredcode == m4homepx:
@@ -482,7 +483,7 @@ def getfred(fredcode):
         df = getinflations()
 
     elif fredcode == m4gdpeur:
-        mgdpeu = monthly(getdata_fred(q4gdpeu)) / float(1000)
+        mgdpeu = monthly(getdata_fred(q4gdpeu)) / 1000.
         df = getfred(m4defleu) * mgdpeu
     elif fredcode == m4infleu:
         df = getm4infleu()
@@ -513,7 +514,7 @@ def getfred(fredcode):
         df = xauusd * usdjpy
     elif fredcode == m4xaurtb:
         usdrtb = getdata_fred(m4usdrtb)
-        xauusd = getfred(m4xau) / float(1000)
+        xauusd = getfred(m4xau) / 1000.
         df = usdrtb * xauusd
 
     elif fredcode == d4ff30:
@@ -538,7 +539,7 @@ def getfred(fredcode):
         df = bond10 - tips10
     elif fredcode == m4inflbei:
         inflpc = tool.pcent(getfred(m4infl), 12)  # YoY% form
-        df = (inflpc + getfred(m4bei)) / float(2)
+        df = (inflpc + getfred(m4bei)) / 2.
         #  ^average of backward and forward looking inflation!
 
     elif fredcode == d4spx:
@@ -547,7 +548,7 @@ def getfred(fredcode):
         df = monthly(getspx())
     elif fredcode == m4spxrtb:
         usdrtb = getdata_fred(m4usdrtb)
-        spxusd = getfred(m4spx) / float(1000)
+        spxusd = getfred(m4spx) / 1000.
         df = usdrtb * spxusd
     elif fredcode == q4spx:
         df = quarterly(getspx())
@@ -555,7 +556,7 @@ def getfred(fredcode):
     elif fredcode == d4oil:
         brent = getdata_fred(d4brent)
         wti = getdata_fred(d4wti)
-        df = (brent + wti) / float(2)
+        df = (brent + wti) / 2.
     elif fredcode == m4oil:
         df = monthly(getfred(d4oil))
     elif fredcode == d4gas:
