@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-10
+#  Python Module for import                           Date : 2018-05-12
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  test_fred.py :: Test fecon236 fred module.
@@ -15,12 +15,14 @@ REFERENCE
             or PDF at http://pytest.org/latest/pytest.pdf
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-12  Specify directory of zdata.
 2018-05-10  fecon236 fork. Pass flake8.
 2016-11-06  fecon235 v5.18.0312, https://git.io/fecon235
 '''
 
 from __future__ import absolute_import, print_function, division
 
+from os import sep
 from fecon236 import tool
 from fecon236.util import system
 from fecon236.host import fred
@@ -67,7 +69,7 @@ from fecon236.host import fred
 
 def test_fred_fecon236_Read_CSV_file():
     '''Read CSV file then check values.'''
-    df = fred.readfile('zdata-xau-13hj-c30.csv')
+    df = fred.readfile('tests' + sep + 'zdata-xau-13hj-c30.csv')
     #         readfile disregards XAU column name:
     assert [col for col in df.columns] == ['Y']
     assert df.shape == (30, 1)
