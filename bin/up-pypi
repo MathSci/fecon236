@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#              bash 4.3.11(1)   Linux 3.13.0 Ubuntu 14.04.3   Date : 2018-05-02
+#              bash 4.3.11(1)   Linux 3.13.0 Ubuntu 14.04.3   Date : 2018-05-11
 #
 # _______________|  up-pypi :: Create and upload dist wheel to PyPI.org
 #
@@ -17,6 +17,7 @@
 #                       build, dist, and PROJECT.egg-info
 #
 #  CHANGE LOG  LATEST version available: https://git.io/fecon236
+#  2018-05-11  Delete prior dist/*.whl, else PyPI returns error.
 #  2018-05-02  Add sanity check and warn re --universal wheel.
 #  2018-05-01  First version.
 
@@ -82,6 +83,10 @@ fi
 
 #       __________ Create WHEEL
 
+#  But first, remove prior wheels, else PyPI complains of duplicates:
+rm dist/*.whl  ||  warn "Unexpected state in dist directory."
+
+
 warn "Creating Universal wheel for python2/3 code, NOT Pure wheel."
 #            --universal refers to python2/3 straddling code:
 python2 setup.py bdist_wheel --universal  > $memf  2> $errf
@@ -93,7 +98,7 @@ python2 setup.py bdist_wheel --universal  > $memf  2> $errf
 
 #       __________ UPLOAD wheel to PyPI
 #       Expect PyPI prompts to provide username and password...
-warn "Bad STALL at twine. Enter PyPI username after 'Uploading' line..."
+warn "Bad twine prompt: ENTER PyPI USERNAME after next 'Uploading' line..."
 twine upload dist/*  2>> $errf
 #                 ^lazy, since previous wheels will be uploaded.
 
