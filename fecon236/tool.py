@@ -28,7 +28,7 @@ from __future__ import absolute_import, print_function, division
 import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf
-from .util import system
+from fecon236.util import system
 
 
 def nona(df):
@@ -256,9 +256,10 @@ def regresstimeforecast(dfy, h=24, col='Y'):
     return todf(forecast, 'Forecast')
 
 
-#     Alias for regression on time functions:
+#  ALIASES for regression on TIME functions:
 trend = regresstime
 trendforecast = regresstimeforecast
+foretrend = regresstimeforecast
 
 
 def detrend(dfy, col='Y'):

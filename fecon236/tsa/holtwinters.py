@@ -42,11 +42,11 @@ CHANGE LOG  For LATEST version, see https://git.io/fecon236
                 especially critical when beta=0 e.g. in new ema().
 '''
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, division
 
 import numpy as np
-from ..util import system
-from ...tool import todf
+from fecon236.util import system
+from fecon236.tool import todf
 
 
 #  Holt-Winters DEFAULT parameters:

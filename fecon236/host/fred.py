@@ -29,20 +29,20 @@ CHANGE LOG  For LATEST version, see https://git.io/fecon236
 2018-03-11  yi_fred.py, fecon235 v5.18.0312, https://git.io/fecon235
 '''
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, division
 
 try:
     from urllib.request import urlopen
     #    ^for python3
 except ImportError:
     from urllib2 import urlopen
-    #    ^for python2
+    #    ^for python2   # py2rm
 
 import numpy as np
 import pandas as pd
-from ... import tool
-from ..util import system
-from ..tsa import holtwinters as hw
+from fecon236 import tool as tool
+from fecon236.util import system as system
+from fecon236.tsa import holtwinters as hw
 
 
 #      __________ Convenient ABBREVIATIONS for less typing of quotes:

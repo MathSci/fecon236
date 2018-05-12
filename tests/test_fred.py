@@ -19,7 +19,7 @@ CHANGE LOG  For LATEST version, see https://git.io/fecon236
 2016-11-06  fecon235 v5.18.0312, https://git.io/fecon235
 '''
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, division
 
 from fecon236 import tool
 from fecon236.util import system
@@ -99,14 +99,14 @@ def test_fred_fecon236_check_xau_resample_main():
     >>> xaumon = fred.monthly(xau)
     >>> xaumon
                     XAU
-    T
+    T                  
     2013-03-01  1598.25
     2013-04-01  1566.50
     >>> xaumondaily = fred.daily(xaumon)
     >>> xaumondaily = xaumondaily.round(2)  # for sys independence.
     >>> xaumondaily  # expect linear interpolation.
                     XAU
-    T
+    T                  
     2013-03-01  1598.25
     2013-03-04  1596.74
     2013-03-05  1595.23
@@ -132,7 +132,7 @@ def test_fred_fecon236_check_xau_resample_main():
     >>> xauq = fred.quarterly(xau)
     >>> xauq  # verify if dates are quarterly.
                     XAU
-    T
+    T                  
     2013-01-01  1598.25
     2013-04-01  1566.50
     '''

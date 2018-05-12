@@ -19,14 +19,14 @@ CHANGE LOG  For LATEST version, see https://git.io/fecon236
 2017-05-15  yi_plot.py, fecon235 v5.18.0312, https://git.io/fecon235
 '''
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, division
 
 #  import matplotlib.cm as colormap   # Unused, but see comments.
 import matplotlib.pyplot as plt
 import pandas as pd
 import scipy
-from ..util import system
-from ... import tool
+from fecon236.util import system
+from fecon236 import tool
 
 dotsperinch = 140                   # DPI resolution for plot.
 
