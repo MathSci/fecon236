@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-12
+#  Python Module for import                           Date : 2018-05-13
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  fred.py :: FRED database into pandas.
@@ -8,9 +8,15 @@ Each economic time series and its frequency has its own "fredcode"
 which is freely available from https://fred.stlouisfed.org
 
         Usage:  df = getfred(fredcode)
-                #    fredcode favorites are variables named d4*, m4*, q4*
 
-                plot(df)
+Favorite fredcodes are variables named d4*, m4*, q4*
+which indicate their frequency: daily, monthly, or quarterly.
+
+Principal functions: getfred(), daily(), monthly(), quarterly().
+
+Some series are synthetically created using raw data from FRED.
+Also we may extend their past history, but your working directory
+must contain our supplemental CSV files.
 
 REFERENCES:
 
@@ -24,6 +30,7 @@ REFERENCES:
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-13  Eliminate lazy abbreviations, clarify comments.
 2018-05-12  Given new division, eliminate float(integer).
 2018-05-11  Fix imports. Deprecate plotfred().
 2018-05-09  fred.py, fecon236 fork. Pass flake8.
@@ -46,25 +53,6 @@ from fecon236.util import system as system
 from fecon236.tsa import holtwinters as hw
 
 
-#      __________ Convenient ABBREVIATIONS for less typing of quotes:
-#                 pandas can use string to slice data, e.g. df[t06:]
-t50 = '1950'
-t60 = '1960'
-t70 = '1970'
-t80 = '1980'
-t90 = '1990'
-t98 = '1998'
-t00 = '2000'
-t06 = '2006'                # a.k.a. post Great Recession.
-t10 = '2010'
-t13 = '2013'
-
-T = 'T'                     # Generic time index.
-Y = 'Y'                     # GENERIC FIRST COLUMN name herein.
-y = 'Y'                     # GENERIC FIRST COLUMN name herein.
-
-
-#      __________ Nearly CONSTANT:
 zero10dur = 8.962           # duration of 10-y Treasury bond
 #  2014-08-29 = 8.962 for 10-y due 8/15/24 c2.375 at 100.36 YTM 2.334%
 
@@ -212,8 +200,7 @@ def readfile(filename, separator=',', compress=None):
                             compression=compress,
                             index_col=0, parse_dates=True,
                             header=0, names=['T', 'Y'])
-    #                       Header on FRED's first line: DATE, VALUE
-    #                                        replaced by:  T,  Y
+    #                       Header on FRED's first line was: DATE, VALUE
     #
     #  Numeric conversion is critical for math ops between dataframes!
     #        (Not necessary for plotting, seemingly auto-converted?)
