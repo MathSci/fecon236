@@ -5,6 +5,55 @@ within itself. This file simply gives a grand overview of such details
 and the annotations in the commits and tags.*
 
 
+### 2018-05-12  (tag: 10.6.1a24)
+
+The objective of this micro-1 alpha release was to
+update, integrate, and test the *fred* module
+and its dependencies into the project.
+
+We shall use absolute, not relative, import statements
+for both `tests` and package modules.
+Import division from `__future__`.
+
+Add bin/up-pypi for uploading to PyPI.
+Create and upload dist wheel to PyPI.org with option to bump VERSION.
+Since our code is still straddling between python27
+and python34, we must pay attention to the difference
+between Universal versus Pure wheels.
+Delete prior wheels in `dist`, else PyPI will consider
+duplicate submissions as error.
+
+Add require.txt as placeholder for requirements.txt
+where explanation is given in `docs/fe-10-install.md`.
+
+```
+.old/235/lib/yi_fred.py -> fecon236/host/fred.py
+.old/235/lib/yi_plot.py -> fecon236/visual/plots.py
+.old/235/lib/yi_1tools.py -> fecon236/tools.py -> fecon236/tool.py
+.old/235/lib/yi_timeseries.py -> fecon236/tsa/holtwinters.py
+.old/235/tests/test_fred.py -> tests/test_fred.py
+.old/235/tests/zdata-xau-13hj-c30.csv -> tests/zdata-xau-13hj-c30.csv
+```
+
+Add fecon236/tsa, directory for *time-series analysis*.
+Holt-Winters is only one major method.
+We plan to also include Kalman filters.
+
+After each module was renamed, we made lint changes
+to comply with flake8. Then the import statements were
+modified from relative to proper absolute form.
+
+In `host/fred.py` we eliminate float(integer).
+Deprecate plotfred() in favor of using get() and plot().
+
+Add `docs/fe-80-db-store.md` to show how we can persist
+a DataFrame using the pandas pickle feature.
+
+Our integration testing via `.travis.yml` begins to
+conda install some scientific packages.
+Successfully passed Travis build 24.
+
+
 ### 2018-05-01  (tag: 10.6a19)
 
 MathSci joins new PyPI site https://pypi.org/user/MathSci and
