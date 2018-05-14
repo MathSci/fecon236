@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-13
+#  Python Module for import                           Date : 2018-05-14
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  fred.py :: FRED database into pandas.
@@ -30,6 +30,7 @@ REFERENCES:
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-14  Gracefully deprecate plotfred().
 2018-05-13  Eliminate lazy abbreviations, clarify comments.
 2018-05-12  Given new division, eliminate float(integer).
 2018-05-11  Fix imports. Deprecate plotfred().
@@ -561,7 +562,8 @@ def getfred(fredcode):
 def plotfred(data, title='tmp', maxi=87654321):
     '''DEPRECATED: Plot data should be given as dataframe or fredcode.'''
     #  ^2018-05-11. Removal OK after 2020-01-01.
-    system.die("plotfred() DEPRECATED. Instead use get() and plot().")
+    msg = "plotfred() DEPRECATED. Instead use get() and plot()."
+    raise DeprecationWarning(msg)
 
 
 if __name__ == "__main__":
