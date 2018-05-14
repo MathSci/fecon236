@@ -15,16 +15,20 @@ of the source code itself.
 
 ```
 CHANGE LOG
+2018-05-14  First working version.
 2018-04-21  Preliminary draft for fecon236.
 ```
 
 
 ### Current preamble
 
+We shall assume the following explicit style:
+`import fecon236 as fe`
+
 ```python
-#  PREAMBLE-p10.18.0421a :: Settings and system details
-from __future__ import absolute_import, print_function
-system.specs()
+#  PREAMBLE-p10.18.0514 :: Settings and system details
+from __future__ import absolute_import, print_function, division
+fe.system.specs()
 %load_ext autoreload
 %autoreload 2
 #       Use 0 to disable autoreload when a module is modified.
@@ -51,4 +55,4 @@ get_ipython().set_hook('show_in_pager', page.as_hook(page.display_page), 0)
 
 ---
 
-Last update : 2018-04-21
+Last update : 2018-05-14
