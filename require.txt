@@ -1,4 +1,4 @@
-#  require.txt :: mock requirements.txt for fecon236          Date : 2018-05-04
+#  require.txt :: mock requirements.txt for fecon236          Date : 2018-05-13
 #    "$ pip install -r requirements.txt"
 #
 #  When we do continuous integration testing, we prefer the environment
@@ -55,5 +55,10 @@ $
 #  
 # ===================================================== requirements.txt ======
 
-alice==1.0
-bob~=1.2.0
+matplotlib>=2.2.2
+numpy>=1.14.3
+pandas>=0.22.0
+scipy>=1.1.0
+statsmodels>=0.8.0
+
+#  MINIMUM lower bounds were tested as of fecon236: 10.6.1a24.post180513
