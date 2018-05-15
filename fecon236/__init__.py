@@ -1,5 +1,5 @@
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-#  Python package installation                        Date : 2018-05-13
+#  Python package installation                        Date : 2018-05-15
 '''
 _______________|  fecon236/__init__.py :: Top installation goods.
 
@@ -14,6 +14,7 @@ References:  https://github.com/kennethreitz/samplemod
              https://github.com/kennethreitz/setup.py
 
 CHANGE LOG  For latest version, see https://git.io/fecon236
+2018-05-15  Include plot() as principal.
 2018-05-13  Include principal modules.
 2018-05-01  Clarify use of hand-coded __version__.
 2018-04-25  Hand-code __version__. First pass tests: Travis build 18.
@@ -30,6 +31,7 @@ from fecon236.tool import *                               # noqa
 from fecon236.util import system                          # noqa
 from fecon236.host import fred                            # noqa
 from fecon236.visual import plots                         # noqa
+from fecon236.visual.plots import plot                    # noqa
 from fecon236.tsa import holtwinters as hw                # noqa
 
 
