@@ -1,4 +1,4 @@
-#  require.txt :: mock requirements.txt for fecon236          Date : 2018-05-13
+#  require.txt :: mock requirements.txt for fecon236          Date : 2018-05-15
 #    "$ pip install -r requirements.txt"
 #
 #  When we do continuous integration testing, we prefer the environment
@@ -55,10 +55,21 @@ $
 #  
 # ===================================================== requirements.txt ======
 
-matplotlib>=2.2.2
-numpy>=1.14.3
-pandas>=0.22.0
-scipy>=1.1.0
-statsmodels>=0.8.0
+matplotlib==2.2.2
+numpy==1.14.3
+pandas==0.22.0
+scipy==1.1.0
+statsmodels==0.8.0
 
-#  MINIMUM lower bounds were tested as of fecon236: 10.6.1a24.post180513
+#  Above tested as of fecon236:                         10.6.1a24.post180515
+#        - Python 2.7 environment
+#        - Python 3.4 environment
+#  Versions are inter-compatible (dependency resolution)
+#  per tested graphs via conda and Travis.
+#  Written in LOCKFILE format, i.e. using "==" instead of ">="
+#  since the resulting build will be DETERMINISTIC.
+
+
+#  RECOMMENDED GOODNESS to supplement fecon236:
+#              IPython console (better than regular IDE)
+#              Jupyter notebook (for research and development)
