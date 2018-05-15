@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-11
+#  Python Module for import                           Date : 2018-05-14
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  plots.py :: Plot functions.
@@ -14,6 +14,7 @@ REFERENCES:
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-14  Transplant plot() but deprecate use of symbol code as argument.
 2018-05-11  Fix imports.
 2018-05-09  plots.py, fecon236 fork. Pass flake8.
 2017-05-15  yi_plot.py, fecon235 v5.18.0312, https://git.io/fecon235
@@ -45,10 +46,10 @@ def plotdf(dataframe, title='tmp'):
     #       show x labels vertically.
 
     ax.plot(dataframe.index, dataframe, 'b-')
-    #        ^x               ^y          blue line
-    #                                     k is black.
+    #       ^x               ^y          blue line
+    #                                    k is black.
     ax.set_title(title + ' / last ' + str(dataframe.index[-1]))
-    #                                  ^timestamp of last data point
+    #                                 ^timestamp of last data point
     plt.grid(True)
     plt.show()
 
@@ -61,6 +62,22 @@ def plotdf(dataframe, title='tmp'):
         fig.set_size_inches(11.5, 8.5)
         fig.savefig(imgf, dpi=dotsperinch)
         print(" ::  Finished: " + imgf)
+    return
+
+
+#  Writer decorator not needed here.
+def plot(data, title='tmp', maxi=87654321):
+    '''Wrapper around plotdf() which accepts DataFrame with date index.
+       For list or numbered index, use plotn() instead.
+       Backwards-compatible maxi is maximum number of most recent data.
+    '''
+    if isinstance(data, pd.DataFrame):
+        plotdf(tool.tail(data, maxi), title)
+    else:
+        #  Wrapping of plotfred and plotqdl has been deprecated (fecon236),
+        #  thus "data" argument can no longer be a fredcode or quandlcode.
+        msg = "Symbol codes no longer supported by plot; get() a DataFrame."
+        raise TypeError(msg)
     return
 
 
@@ -80,10 +97,10 @@ def plotn(dataframe, title='tmp'):
     #       show x labels vertically.
 
     ax.plot(dataframe.index, dataframe, 'b-')
-    #        ^x               ^y          blue line
-    #                                     k is black.
+    #       ^x               ^y          blue line
+    #                                    k is black.
     ax.set_title(title + ' / last ' + str(dataframe.index[-1]))
-    #                                  ^index on last data point
+    #                                 ^index on last data point
     plt.grid(True)
     plt.show()
 
