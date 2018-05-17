@@ -1,10 +1,15 @@
-#  Python Module for import                           Date : 2018-05-14
+#  Python Module for import                           Date : 2018-05-16
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
-_______________|  plots.py :: Plot functions.
+_______________|  plots.py :: Plot functions using matplotlib.
 
 Functions to plot data look routine, but in actuality specifying
 the details can be a huge hassle involving lots of trial and error.
+
+A plot has default title string of 'tmp' which prevents saving the
+image to disk. This is suitable for quick screen displays and
+conserving disk space. Specifying a title NOT starting with 'tmp'
+will produce a PNG image file.
 
 REFERENCES:
 
@@ -14,6 +19,7 @@ REFERENCES:
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-16  MAJOR refactoring using decorator saveImage().
 2018-05-14  Transplant plot() but deprecate use of symbol code as argument.
 2018-05-11  Fix imports.
 2018-05-09  plots.py, fecon236 fork. Pass flake8.
@@ -31,7 +37,24 @@ from fecon236 import tool
 
 dotsperinch = 140                   # DPI resolution for plot.
 
+def saveImage(func):
+    '''Decorator to save image of a plot to disk.'''
+    #  Plotting func REQUIRED to "return [title, fig]" after plt.show().
+    #  Image saved to file ONLY if title string does NOT start with 'tmp'.
+    def saveimage(*args, **kwargs):
+        title, fig = func(*args, **kwargs)
+        if not title.startswith('tmp'):
+            title = title.replace(' ', '_')
+            imgf = 'img' + '-' + func.__name__ + '-' + title + '.png'
+            print(" ::  Stand-by... saving image to: " + imgf)
+            fig.set_size_inches(11.5, 8.5)
+            fig.savefig(imgf, dpi=dotsperinch)
+            #  ^Will overwrite file with same name.
+        return
+    return saveimage
 
+
+@saveImage
 def plotdf(dataframe, title='tmp'):
     '''Plot dataframe where its index are dates.'''
     dataframe = tool.todf(dataframe)
@@ -52,20 +75,10 @@ def plotdf(dataframe, title='tmp'):
     #                                 ^timestamp of last data point
     plt.grid(True)
     plt.show()
-
-    #  Now prepare the image FILE to save,
-    #  but ONLY if the title is not the default
-    #  (since this operation can be very slow):
-    if title != 'tmp':
-        title = title.replace(' ', '_')
-        imgf = 'plotdf-' + title + '.png'
-        fig.set_size_inches(11.5, 8.5)
-        fig.savefig(imgf, dpi=dotsperinch)
-        print(" ::  Finished: " + imgf)
-    return
+    return [title, fig]
 
 
-#  Writer decorator not needed here.
+#  saveImage decorator not needed here.
 def plot(data, title='tmp', maxi=87654321):
     '''Wrapper around plotdf() which accepts DataFrame with date index.
        For list or numbered index, use plotn() instead.
@@ -81,6 +94,7 @@ def plot(data, title='tmp', maxi=87654321):
     return
 
 
+@saveImage
 def plotn(dataframe, title='tmp'):
     '''Plot dataframe (or list) where the index is numbered (not dates).'''
     #  2014-12-13  Adapted from plotdf which uses date index.
@@ -103,28 +117,10 @@ def plotn(dataframe, title='tmp'):
     #                                 ^index on last data point
     plt.grid(True)
     plt.show()
-
-    #  Now prepare the image FILE to save,
-    #  but ONLY if the title is not the default
-    #  (since this operation can be very slow):
-    if title != 'tmp':
-        title = title.replace(' ', '_')
-        imgf = 'plotn-' + title + '.png'
-        fig.set_size_inches(11.5, 8.5)
-        fig.savefig(imgf, dpi=dotsperinch)
-        print(" ::  Finished: " + imgf)
-    return
+    return [title, fig]
 
 
-#  #  Test data for boxplot:
-#  import numpy as np
-#
-#  np.random.seed(10)
-#
-#  data = np.random.randn(30, 4)
-#  labels = ['A', 'B', 'C', 'D']
-
-
+@saveImage
 def boxplot(data, title='tmp', labels=[]):
     '''Make boxplot from data which could be a dataframe.'''
     #  - Use list of strings for labels,
@@ -142,7 +138,6 @@ def boxplot(data, title='tmp', labels=[]):
         colnames = list(data.columns)
         labels = colnames
         data = data.values
-
     fig, ax = plt.subplots()
     ax.boxplot(data)
     ax.set_xticklabels(labels)
@@ -153,16 +148,18 @@ def boxplot(data, title='tmp', labels=[]):
     ax.set_title(title + ' / last ' + lastidx)
     plt.grid(True)
     plt.show()
+    return [title, fig]
 
-    #  Now prepare the image file to save:
-    title = title.replace(' ', '_')
-    imgf = 'boxplot-' + title + '.png'
-    fig.set_size_inches(11.5, 8.5)
-    fig.savefig(imgf, dpi=dotsperinch)
-    print(" ::  Finished: " + imgf)
-    return
+    #  #  Test data for boxplot:
+    #  import numpy as np
+    #
+    #  np.random.seed(10)
+    #
+    #  data = np.random.randn(30, 4)
+    #  labels = ['A', 'B', 'C', 'D']
 
 
+@saveImage
 def scatter(dataframe, title='tmp', col=[0, 1]):
     '''Scatter plot for dataframe by zero-based column positions.'''
     #  First in col is x-axis, second is y-axis.
@@ -190,23 +187,15 @@ def scatter(dataframe, title='tmp', col=[0, 1]):
     #         but we leave cmap arg out since viridis will be the
     #         default soon: http://matplotlib.org/users/colormaps.html
     colstr = '_' + str(col[0]) + '-' + str(col[1])
+    title =+ colstr
     ax.set_title(title + colstr + ' / last ' + str(dataframe.index[-1]))
     #                                          ^index on last data point
     plt.grid(True)
     plt.show()
-
-    #  Now prepare the image FILE to save,
-    #  but ONLY if the title is not the default
-    #  (since this operation can be very slow):
-    if title != 'tmp':
-        title = title.replace(' ', '_') + colstr
-        imgf = 'scat-' + title + '.png'
-        fig.set_size_inches(11.5, 8.5)
-        fig.savefig(imgf, dpi=dotsperinch)
-        print(" ::  Finished: " + imgf)
-    return
+    return [title, fig]
 
 
+#  saveImage decorator not needed here.
 def scats(dataframe, title='tmp'):
     '''All pair-wise scatter plots for dataframe.'''
     #  Renaming title will result in file output.
@@ -225,6 +214,7 @@ def scats(dataframe, title='tmp'):
     return
 
 
+#  saveImage decorator not needed here.
 def scat(dfx, dfy, title='tmp', col=[0, 1]):
     '''Scatter plot between two pasted dataframes.'''
     #  Renaming title will result in file output.
@@ -240,6 +230,7 @@ def scat(dfx, dfy, title='tmp', col=[0, 1]):
 #     and http://v8doc.sas.com/sashtml/qc/chap8/sect9.htm
 
 
+@saveImage
 def plotqq(data, title='tmp', dist='norm', fitLS=True):
     '''Display/save quantile-quantile Q-Q probability plot.
     Q–Q plot here is used to compare data to a theoretical distribution.
@@ -269,14 +260,7 @@ def plotqq(data, title='tmp', dist='norm', fitLS=True):
     plt.title(title + " / plotqq " + dist + ", count=" + str(len(arr)))
     plt.grid(True)
     plt.show()
-    #  Prepare image FILE to save, but ONLY if the title is not the default:
-    if title != 'tmp':
-        title = title.replace(' ', '_')
-        imgf = 'plotqq-' + title + '.png'
-        fig.set_size_inches(11.5, 8.5)
-        fig.savefig(imgf, dpi=dotsperinch)
-        print(" ::  Finished: " + imgf)
-    return
+    return [title, fig]
 
 
 if __name__ == "__main__":
