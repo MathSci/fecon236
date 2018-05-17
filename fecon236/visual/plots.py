@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-16
+#  Python Module for import                           Date : 2018-05-17
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  plots.py :: Plot functions using matplotlib.
@@ -6,10 +6,11 @@ _______________|  plots.py :: Plot functions using matplotlib.
 Functions to plot data look routine, but in actuality specifying
 the details can be a huge hassle involving lots of trial and error.
 
-A plot has default title string of 'tmp' which prevents saving the
-image to disk. This is suitable for quick screen displays and
+A plot has default title STRING of 'tmp' which prevents saving the
+image to disk. This is suitable for quick show on screen, and for
 conserving disk space. Specifying a title NOT starting with 'tmp'
-will produce a PNG image file.
+will produce a PNG image file. Moreover, it is possible to
+suppress screen show by adding a leading blank space to the title.
 
 REFERENCES:
 
@@ -19,6 +20,8 @@ REFERENCES:
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-17  Suppress show screen via leading space in title.
+                Fix boxplot() by removing NaN from data.
 2018-05-16  MAJOR refactoring using decorator saveImage().
 2018-05-14  Transplant plot() but deprecate use of symbol code as argument.
 2018-05-11  Fix imports.
@@ -37,12 +40,16 @@ from fecon236 import tool
 
 dotsperinch = 140                   # DPI resolution for plot.
 
+
 def saveImage(func):
-    '''Decorator to save image of a plot to disk.'''
+    '''Decorator to save plot image to disk, option to suppress screen show.'''
     #  Plotting func REQUIRED to "return [title, fig]" after plt.show().
     #  Image saved to file ONLY if title string does NOT start with 'tmp'.
+    #  Screen show can be suppressed by a leading blank space in title.
     def saveimage(*args, **kwargs):
         title, fig = func(*args, **kwargs)
+        if not title.startswith(' '):
+            plt.show()
         if not title.startswith('tmp'):
             title = title.replace(' ', '_')
             imgf = 'img' + '-' + func.__name__ + '-' + title + '.png'
@@ -50,6 +57,7 @@ def saveImage(func):
             fig.set_size_inches(11.5, 8.5)
             fig.savefig(imgf, dpi=dotsperinch)
             #  ^Will overwrite file with same name.
+            plt.close()
         return
     return saveimage
 
@@ -74,7 +82,6 @@ def plotdf(dataframe, title='tmp'):
     ax.set_title(title + ' / last ' + str(dataframe.index[-1]))
     #                                 ^timestamp of last data point
     plt.grid(True)
-    plt.show()
     return [title, fig]
 
 
@@ -116,7 +123,6 @@ def plotn(dataframe, title='tmp'):
     ax.set_title(title + ' / last ' + str(dataframe.index[-1]))
     #                                 ^index on last data point
     plt.grid(True)
-    plt.show()
     return [title, fig]
 
 
@@ -134,6 +140,8 @@ def boxplot(data, title='tmp', labels=[]):
     #  If data is a dataframe, extract some info
     #    before conversion to values:
     if isinstance(data, pd.DataFrame):
+        data = data.dropna()
+        #          ^NaN interferes with "percentile interpolation"
         lastidx = str(data.index[-1])
         colnames = list(data.columns)
         labels = colnames
@@ -147,7 +155,6 @@ def boxplot(data, title='tmp', labels=[]):
     #         for autoscale to work properly.
     ax.set_title(title + ' / last ' + lastidx)
     plt.grid(True)
-    plt.show()
     return [title, fig]
 
     #  #  Test data for boxplot:
@@ -187,11 +194,10 @@ def scatter(dataframe, title='tmp', col=[0, 1]):
     #         but we leave cmap arg out since viridis will be the
     #         default soon: http://matplotlib.org/users/colormaps.html
     colstr = '_' + str(col[0]) + '-' + str(col[1])
-    title =+ colstr
+    title = title + colstr
     ax.set_title(title + colstr + ' / last ' + str(dataframe.index[-1]))
     #                                          ^index on last data point
     plt.grid(True)
-    plt.show()
     return [title, fig]
 
 
@@ -259,7 +265,6 @@ def plotqq(data, title='tmp', dist='norm', fitLS=True):
     #         But points in common should be blue, rather than brown.
     plt.title(title + " / plotqq " + dist + ", count=" + str(len(arr)))
     plt.grid(True)
-    plt.show()
     return [title, fig]
 
 
