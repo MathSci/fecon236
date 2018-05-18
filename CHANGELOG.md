@@ -5,6 +5,50 @@ within itself. This file simply gives a grand overview of such details
 and the annotations in the commits and tags.*
 
 
+### 2018-05-18  (tag: 10.6.2a29)
+
+The objective of this micro-2 alpha release was to
+update, integrate, and test the *plots* module
+and its dependencies into the project.
+
+`host/fred.py`: Graceful deprecate plotfred()
+since system.die() does not provide traceback.
+
+`visual/plots.py`: Transplant plot() from `.old/235`
+and deprecate use of symbol code as argument.
+Wrapping of plotfred and plotqdl within `plot()`
+has been deprecated in fecon236, thus the "data"
+argument can no longer be a fredcode or quandlcode.
+
+MAJOR decorator refactoring of `visual/plots.py`
+using ***decorator*** `saveImage()`.
+This greatly reduced repetitive boilerplate code,
+and introduced centralized logic, for example, the
+option to suppress screen show via leading blank space in title.
+
+Fix `boxplot()` by removing NaN from data.
+Hopefully this fixes the "percentile interpolation" bug
+which can be traced back to use of `np.compress()`.
+
+`require.txt`: Mirror conda installs in .travis.yml where
+minimum versions were obtained through Travis' raw log.
+Adopt lockfile "==" syntax to obtain a known deterministic build,
+actually used in testing. The shown combination of versions
+is *de facto* dependency resolved.
+
+`fecon236/__init__.py`: Include principal modules,
+i.e. tool, fred, plots, holtwinters.
+
+`docs/nb-02-preamble.md`: Update Preamble-p10.18.0514
+for use in Jupyter notebooks.
+
+Renamed and fully tested:
+
+```
+.old/235/tests/test_1tools.py -> tests/test_tool.py
+```
+
+
 ### 2018-05-12  (tag: 10.6.1a24)
 
 The objective of this micro-1 alpha release was to
@@ -147,19 +191,21 @@ Thus we have 10 directories, 49 files as shown in this tree:
     └── VERSION
 ```
 
-File movements:
+File renames:
 
-- Rename: .old/235/.gitignore -> .gitignore
-- Rename: .old/235/__init__.py -> fecon236/__init__.py
-- Rename: .old/235/lib/__init__.py -> fecon236/util/__init__.py
-- Rename: .old/235/lib/yi_0sys.py -> fecon236/util/system.py
-- Rename: .old/235/tests/test_system.py -> tests/test_system.py
+```
+.old/235/.gitignore -> .gitignore
+.old/235/__init__.py -> fecon236/__init__.py
+.old/235/lib/__init__.py -> fecon236/util/__init__.py
+.old/235/lib/yi_0sys.py -> fecon236/util/system.py
+.old/235/tests/test_system.py -> tests/test_system.py
+```
 
 Establish rudimentary package structure:
 
 - Add **setup.py**: OK using virtualenv and `pip install DIR`
-- fecon236/__init__.py: Non-empty to call in favors
-- Delete tests/__init__.py, explain in docs/fe-90-tests.md
+- `fecon236/__init__.py`: Non-empty to call in favors
+- Delete `tests/__init__.py`, explain in docs/fe-90-tests.md
 - Add fecon236/core.py, a dummy for now
 - New package directory created: fecon236/util
 - Add docs/fe-00-intro.md, first introductory draft
