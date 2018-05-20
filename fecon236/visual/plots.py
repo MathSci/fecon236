@@ -1,10 +1,11 @@
-#  Python Module for import                           Date : 2018-05-17
+#  Python Module for import                           Date : 2018-05-20
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  plots.py :: Plot functions using matplotlib.
 
 Functions to plot data look routine, but in actuality specifying
 the details can be a huge hassle involving lots of trial and error.
+To avoid repetitive boilerplate code, we use decorator saveImage.
 
 A plot has default title STRING of 'tmp' which prevents saving the
 image to disk. This is suitable for quick show on screen, and for
@@ -20,6 +21,7 @@ REFERENCES:
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-20  Use functools.wraps within saveImage decorator.
 2018-05-17  Suppress show screen via leading space in title.
                 Fix boxplot() by removing NaN from data.
 2018-05-16  MAJOR refactoring using decorator saveImage().
@@ -38,22 +40,33 @@ import scipy
 from fecon236.util import system
 from fecon236 import tool
 
-dotsperinch = 140                   # DPI resolution for plot.
+from functools import wraps
+#  functools.wraps is meta-decorator which revises attributes of the wrapper
+#  to those of the underlying function. Useful for introspection and debugging,
+#  adequate for "?" but not informative enough for "??" inquiry.
+#  https://www.thecodeship.com/patterns/guide-to-python-function-decorators
+
+
+dotsperinch = 140
+# DPI resolution for plots. Modifiable by e.g. "fe.plots.dotsperinch = 200"
 
 
 def saveImage(func):
     '''Decorator to save plot image to disk, option to suppress screen show.'''
-    #  Plotting func REQUIRED to "return [title, fig]" after plt.show().
+    #  The underlying func MUST "return [title, fig]".
     #  Image saved to file ONLY if title string does NOT start with 'tmp'.
-    #  Screen show can be suppressed by a leading blank space in title.
+    #  Screen show can be suppressed by a leading blank space in title arg.
+    @wraps(func)
     def saveimage(*args, **kwargs):
+        '''Wrapper for the decorator saveImage.'''
         title, fig = func(*args, **kwargs)
         if not title.startswith(' '):
             plt.show()
         if not title.startswith('tmp'):
             title = title.replace(' ', '_')
             imgf = 'img' + '-' + func.__name__ + '-' + title + '.png'
-            print(" ::  Stand-by... saving image to: " + imgf)
+            print(" ::  Stand-by, saving, " + str(dotsperinch)
+                  + " DPI: " + imgf)
             fig.set_size_inches(11.5, 8.5)
             fig.savefig(imgf, dpi=dotsperinch)
             #  ^Will overwrite file with same name.
