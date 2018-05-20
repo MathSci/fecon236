@@ -1,41 +1,41 @@
-#  Python Module for import                           Date : 2016-12-18
-#  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per Python PEP 0263 
-''' 
-_______________|  test_timeseries : Test fecon235 yi_timeseries module.
+#  Python Module for import                           Date : 2018-05-20
+#  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
+'''
+_______________|  test_holtwinters.py :: Test fecon236 holtwinters module.
 
-- Include test of holt() and its workout dataframe. 
-- Include test of ema() which is a special case of Holt-Winters.
+- Test holt() and its workout dataframe.
+- Test ema() which is a special case of Holt-Winters.
 
-Doctests display at lower precision since equality test becomes fuzzy across 
+Doctests display at lower precision since equality test becomes fuzzy across
 different systems if full floating point representation is used.
 
-Testing: As of fecon235 v4, we favor pytest over nosetests, so e.g. 
+Testing: We favor pytest over nosetests, so e.g.
     $ py.test --doctest-modules
 
 REFERENCE
    pytest:  https://pytest.org/latest/getting-started.html
-               or PDF at http://pytest.org/latest/pytest.pdf
+            or PDF at http://pytest.org/latest/pytest.pdf
 
-CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
-2016-12-18  First version to verify fix #5 which revises ema():
-               https://github.com/rsvp/fecon235/issues/5
+CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-20  fecon236 fork. Doctest flake8 fail: W291 trailing whitespace.
+2016-12-18  fecon235 v5.18.0312, https://git.io/fecon235
 '''
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, division
 
-from fecon235.lib import yi_0sys as system
-from fecon235.lib import yi_fred as fred
-from fecon235.lib import yi_1tools as tools
-from fecon235.lib import yi_timeseries as ts
+from os import sep
+from fecon236 import tool
+from fecon236.util import system
+from fecon236.host import fred
+from fecon236.tsa import holtwinters as hw              # noqa
 #
-#  N.B. -  In this tests directory without __init__.py, 
-#          we use absolute import as if outside the fecon235 package,
-#          not relative import (cf. modules within lib).
+#  In this tests directory without __init__.py, we use absolute import,
+#  as if outside the fecon236 package, not relative import.
 
 
 #  #  Show the CSV file zdata-xau-13hj-c30.csv:
 #  #                    ^created in Linux environment...
-#  
+#
 #       T,XAU
 #       2013-03-08,1581.75
 #       2013-03-11,1579.0
@@ -69,28 +69,28 @@ from fecon235.lib import yi_timeseries as ts
 #       2013-04-18,1393.75
 
 
-def test_yi_timeseries_fecon235_Read_CSV_file():
+def test_holtwinters_fecon236_Read_CSV_file():
     '''Read CSV file then check values.'''
-    df = fred.readfile('zdata-xau-13hj-c30.csv')
+    df = fred.readfile('tests' + sep + 'zdata-xau-13hj-c30.csv')
     #         readfile disregards XAU column name:
-    assert [ col for col in df.columns ] == ['Y']
+    assert [col for col in df.columns] == ['Y']
     assert df.shape == (30, 1)
     return df
 
 
 #  Establish REFERENCE dataframe for tests below:
-xau = test_yi_timeseries_fecon235_Read_CSV_file()
+xau = test_holtwinters_fecon236_Read_CSV_file()
 
 
-def test_yi_timeseries_fecon235_check_xau_DataFrame():
+def test_holtwinters_fecon236_check_xau_DataFrame():
     '''Check xau dataframe.'''
-    assert tools.tailvalue( xau ) == 1393.75
+    assert tool.tailvalue(xau) == 1393.75
 
 
-def test_yi_timeseries_fecon235_check_workout_dataframe_from_holt():
+def test_holtwinters_fecon236_check_workout_dataframe_from_holt():
     '''Get workout dataframe from holt(), then display in low precision.
        Arguments alpha and beta are explicitly set to default values.
-    >>> xauholt = ts.holt( xau, alpha=0.26, beta=0.19 )
+    >>> xauholt = hw.holt(xau, alpha=0.26, beta=0.19)
     >>> xauholt2 = xauholt.round(2)
     >>> xauholt2
                       Y    Level  Growth
@@ -126,16 +126,15 @@ def test_yi_timeseries_fecon235_check_workout_dataframe_from_holt():
     2013-04-17  1392.00  1434.49  -20.70
     2013-04-18  1393.75  1408.58  -21.69
     '''
-    #  This output can be used to verify the initialization 
+    #  This output can be used to verify the initialization
     #  and subsequent recursive computation by hand (with precision).
     pass
 
 
-
-def test_yi_timeseries_fecon235_check_workout_beta0_from_holt():
+def test_holtwinters_fecon236_check_workout_beta0_from_holt():
     '''Get workout dataframe from holt(), then display in low precision.
        Argument beta=0 esp. for ema() check, where its alpha defaults to 0.20.
-    >>> xauholt_b0 = ts.holt( xau, alpha=0.20, beta=0 )
+    >>> xauholt_b0 = hw.holt(xau, alpha=0.20, beta=0)
     >>> xauholt2_b0 = xauholt_b0.round(2)
     >>> xauholt2_b0
                       Y    Level  Growth
@@ -177,11 +176,10 @@ def test_yi_timeseries_fecon235_check_workout_beta0_from_holt():
     pass
 
 
-
-def test_yi_timeseries_fecon235_check_ema():
-    '''Function ema() reads off the Level column via holtlevel(), 
+def test_holtwinters_fecon236_check_ema():
+    '''Function ema() reads off the Level column via holtlevel(),
        given beta fixed at 0. Its alpha defaults to 0.20.
-    >>> xauema = ts.ema( xau, alpha=0.20 )
+    >>> xauema = hw.ema(xau, alpha=0.20)
     >>> xauema2 = xauema.round(2)
     >>> xauema2
                       Y
@@ -217,12 +215,11 @@ def test_yi_timeseries_fecon235_check_ema():
     2013-04-17  1480.25
     2013-04-18  1462.95
     '''
-    #  Our revised exponential moving average function was recently 
-    #  written as a special case of our Holt-Winters routines, 
+    #  Our revised exponential moving average function was recently
+    #  written as a special case of our Holt-Winters routines,
     #  instead of the rolling average function offered by pandas.
     pass
 
 
-
 if __name__ == "__main__":
-     system.endmodule()
+    system.endmodule()
