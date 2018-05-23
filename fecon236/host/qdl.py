@@ -1,40 +1,46 @@
-#  Python Module for import                           Date : 2017-02-07
+#  Python Module for import                           Date : 2018-05-23
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
-_______________|  yi_quandl.py: Access Quandl with pandas for plots, etc.
+_______________|  qdl.py :: Access Quandl data vendors using fecon236.
 
-We define procedures to access data from Quandl.  Each economic time series
-and its frequency has its own "quandlcode" which is available at their site:
-http://www.quandl.com
+We define functions to access data from Quandl.  Each time-series and its
+frequency has its own "quandlcode" available at: https://www.quandl.com
 
-        Usage:  df = getqdl(quandlcode)
-                  #            ^Favorites are named d4*, w4*, m4*, q4*.
+Single column dot notation for quandlcode: e.g. 'NSE/OIL.4'
+grabs the 4th column of NSE/OIL.
 
-                  plotqdl(dataframe or quandlcode)
+Favorite quandlcodes are variables named d4*, m4*, q4*
+which indicate their frequency: daily, monthly, or quarterly.
 
-                  holtqdl(dataframe or quandlcode)
-                  #  Holt-Winters forecast.
+USAGE:  df = getqdl(quandlcode)
 
-                  #  Single column dot notation for quandlcode:
-                  #  e.g. 'NSE/OIL.4' grabs the 4th column of NSE/OIL.
 
-SYNOPSIS
+_______________ SYNOPSIS
+
+On 2016-04-22 Quandl released version 3 of their API which was a "drop-in"
+replacement of version 2, but a very complex *package* which has not seen
+any substantive improvement since that date -- see
+https://github.com/quandl/quandl-python/blob/master/2_SERIES_UPGRADE.md
+
+Their version 2.8.7, however, had the virtue of being just a *single* module,
+and has been battle-tested in fecon235 notebooks since 2015-08-03.
+That module has been forked at fecon236 and renamed _ex_Quandl.py.
+This qdl module is a wrapper around _ex_Quandl.py, and
+as of 2018-05-22 has passed tests/test_qdl.py.
+
+
         _____ API Key
 
-You will need an API Key unless you are doing fewer than 50 calls per day.
+You will need an API Key UNLESS you are doing fewer than 50 calls per day.
+After creating an account at quandl.com, set your authentication token
+by executing this fecon236 function (described in this module):
 
-Once you have your token, simply include it with your first function call,
-like this:
+    fe.qdl.setQuandlToken(API_key)
 
-    mydata = qdlapi.get("NSE/OIL", authtoken="your token here")
-
-It will then be stored in your working directory for continued use.
+The token will then be stored in your working directory for continued use.
 Authtokens are saved as pickled files in the local directory as "authtoken.p"
 so it is unnecessary to enter them more than once, unless you change your
 working directory.
-
-After creating an account at quandl.com, set your authentication token with
-the [Deprecated: Quandl.auth() function] setQuandlToken function below.
 
 
         _____ Usage Rules
@@ -51,10 +57,9 @@ All API requests must be made using HTTPS. Requests made over HTTP will fail.
 
 To use the API to download a dataset, you will need to know the dataset's
 "quandlcode".  Each dataset on Quandl has a unique Quandl code, comprising a
-database_code and a dataset_code. For instance, the dataset named GDP of the
-United States has the Quandl code FRED/GDP, where FRED is the database code
-and GDP is the dataset_code. All datasets from the same database will have the
-same database code.
+database_code and a dataset_code. For instance, the dataset for Bitcoin
+prices has the Quandl code 'BCHAIN/MKPRU', where BCHAIN is the database_code
+and MKPRU is the dataset_code.
 
 Dataset codes are not guaranteed to be unique across databases. SHFE/CUG2014
 is not the same as MCX/CUG2014. You need both the database_code and the
@@ -85,15 +90,15 @@ of the entire dataset.
 
         _____ Specific API Guides
 
-Economics: https://www.quandl.com/resources/api-for-economic-data
-Stocks:    https://www.quandl.com/resources/api-for-stock-data
-Earnings:  https://www.quandl.com/resources/api-for-earnings-data
-Futures:   https://www.quandl.com/resources/api-for-futures-data
-Currencies:  https://www.quandl.com/resources/api-for-currency-data
-Bitcoin:     https://www.quandl.com/resources/api-for-bitcoin-data
-Commodities: https://www.quandl.com/resources/api-for-commodity-data
-Housing:     https://www.quandl.com/resources/api-for-housing-data
-Cross-Country Stats: https://www.quandl.com/resources/api-for-country-data
+Economics:     https://www.quandl.com/resources/api-for-economic-data
+Stocks:        https://www.quandl.com/resources/api-for-stock-data
+Earnings:      https://www.quandl.com/resources/api-for-earnings-data
+Futures:       https://www.quandl.com/resources/api-for-futures-data
+Currencies:    https://www.quandl.com/resources/api-for-currency-data
+Bitcoin:       https://www.quandl.com/resources/api-for-bitcoin-data
+Commodities:   https://www.quandl.com/resources/api-for-commodity-data
+Housing:       https://www.quandl.com/resources/api-for-housing-data
+International: https://www.quandl.com/resources/api-for-country-data
 
 
         _____ Contact
@@ -102,68 +107,51 @@ Reach out to Quandl for direct support at connect@quandl.com
 Inquires about the Python API package to    Chris@quandl.com
 
 
-    __________ Using Quandl's Python module
+    __________ Using low-level API
 
-[We have copied the Quandl.py module to yi_quandl_api.py as qdlapi.
- Thus their use of Quandl.get is equivalent to our quandl function here.]
+A fecon236 user would normally just employ high-level wrapper getqdl(),
+not _qget(), but for the developer the following may be interesting:
 
-The Quandl package is able to return data in 2 formats: a pandas data series
-("pandas") and a numpy array ("numpy"). "pandas" is the default. Here's how
-you specify the format explicitly:
+The module named as quandlapi is able to return data in 2 formats: a pandas
+data series ("pandas") and a numpy array ("numpy"). "pandas" is the default.
+One can specify the format explicitly:
 
-    mydata = Quandl.get("WIKI/AAPL", returns="numpy")
+    mydata = fe.qdl._qget("WIKI/AAPL", returns="numpy")
 
-You can get multiple datasets in one call by passing an array of Quandl codes,
-like this:
+You can get multiple datasets in one call by passing an array of Quandl codes:
 
-    mydata = Quandl.get(["NSE/OIL.4","WIKI/AAPL.1"])
+    mydata = fe.qdl._qget(["NSE/OIL.4","WIKI/AAPL.1"])
 
 This grabs the 4th column of dataset NSE/OIL and the 1st column of dataset
 WIKI/AAPL, and returns them in a single call.
 
-Python package offers various ways to manipulate or transform the data prior
-to download:
+We can manipulate or transform the data prior to download [not advised]:
 
-    Specific Date Range:
-    mydata = Quandl.get("NSE/OIL", trim_start="yyyy-mm-dd",
-                                    trim_end="yyyy-mm-dd")
+    #  Specific Date Range:
+    mydata = fe.qdl._qget("NSE/OIL", trim_start="yyyy-mm-dd",
+                          trim_end="yyyy-mm-dd")
 
-    Frequency Change:
-    mydata = Quandl.get("NSE/OIL", collapse="annual")
-    #  ("daily"|weekly"|"monthly"|"quarterly"|"annual")
+    #  Frequency Change:
+    #  Choices are ("daily"|weekly"|"monthly"|"quarterly"|"annual")
+    mydata = fe.qdl._qget("NSE/OIL", collapse="annual")
 
-    Transformations:
-    mydata = Quandl.get("NSE/OIL", transformation="rdiff")
-    #  ("diff"|"rdiff"|"normalize"|"cumul")
+    #  Transformations:
+    #  Choices are ("diff"|"rdiff"|"normalize"|"cumul")
+    mydata = fe.qdl._qget("NSE/OIL", transformation="rdiff")
 
-    Return last n rows:
-    mydata = Quandl.get("NSE/OIL", rows=5)
+    #  Return last n rows:
+    mydata = fe.qdl._qget("NSE/OIL", rows=5)
 
 A request with a full list of options would look like the following:
 
-data = Quandl.get('PRAGUESE/PX', authtoken='xxxxxx', trim_start='2001-01-01',
-                  trim_end='2010-01-01', collapse='annual',
-                  transformation='rdiff', rows=4, returns='numpy')
+data = fe.qdl._qget('PRAGUESE/PX', authtoken='xxxxxx', trim_start='2001-01-01',
+                    trim_end='2010-01-01', collapse='annual',
+                    transformation='rdiff', rows=4, returns='numpy')
 
 
-        _____ Push Example
+        _____ Low-level push() [deprecated in Quandl API 2.8.9]
 
-You can now upload your own data to Quandl through the Python package. At this
-time the only accepted format is a date indexed Pandas DataSeries.
-
-Things to do before you upload:
-
-    - Make an account and set your authentication token within the package
-      with the setQuandlToken function below.
-    - Get your data into a data frame with the dates in the first column.
-    - Pick a code for your dataset - only capital letters, numbers and
-      underscores are acceptable.
-
-Then call the following to push the data:
-    Quandl.push(data, code='TEST', name='Test', desc='test')
-
-All parameters but desc are necessary. If you wish to override the existing
-set at code TEST add override=True.
+You can no longer upload your own data to Quandl using version 2.
 
 
 REFERENCES:
@@ -175,7 +163,7 @@ REFERENCES:
   including error codes.
 
 - [RESTful interface introduction:  https://www.quandl.com/help/api
-            Not needed here, but it's available.]
+    Not needed here, but it's available for their API version 3.]
 
 - CFTC Commitments of Traders Report, explanatory notes:
   http://www.cftc.gov/MarketReports/CommitmentsofTraders/ExplanatoryNotes
@@ -189,17 +177,11 @@ REFERENCES:
 - Wes McKinney, 2013, _Python for Data Analysis_.
 
 
-CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
-2017-02-07  Add quandlcode for Bitcoin count and USD price.
-2017-02-06  Use names() within getqdl() to standardize names.
-2016-11-05  Remove comments intended as code templates.
-2016-03-21  Add freqM2MS for compatibility with FRED monthly format.
-            Add m4spx_1871_p, m4spx_1871_e, m4spx_1871_d.
-2015-12-20  python3 compatible: lib import fix.
-2015-12-17  python3 compatible: fix with yi_0sys
-2015-09-11  Add getfut to quickly retrieve futures price data.
-2015-08-26  Add silver futures symbol and w4cotr_metals.
-2015-08-03  First version patterned after yi_fred.py
+CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-23  qdl.py, fecon236 fork. Edit intro. Pass flake8 and test_qdl.
+                Fix imports. Deprecate plotqdl() and holtqdl.
+                Rename quandl() as _qget() for future clarity.
+2017-02-07  yi_quandl.py, fecon235 v5.18.0312, https://git.io/fecon235
 '''
 
 from __future__ import absolute_import, print_function, division
@@ -208,89 +190,66 @@ import pandas as pd
 
 from fecon236 import tool
 from fecon236.util import system
+from fecon236.host.fred import monthly   # For freqM2MS.
 from fecon236.host import _ex_Quandl as qdlapi
-from fecon236.tsa import holtwinters as hw        
-from fecon236.host import fred                    # For: plotdf, freqM2MS
 
-
-#      __________ Convenient ABBREVIATIONS for less typing of quotes:
-#                 pandas can use string to slice data, e.g. df[t06:]
-t50 = '1950'
-t60 = '1960'
-t70 = '1970'
-t80 = '1980'
-t90 = '1990'
-t98 = '1998'
-t00 = '2000'
-t06 = '2006'                  #  a.k.a. post Great Recession.
-t10 = '2010'
-t13 = '2013'
-
-T = 'T'                     #  Generic time index.
-Y = 'Y'                     #  GENERIC FIRST COLUMN name herein.
-y = 'Y'                     #  GENERIC FIRST COLUMN name herein.
-
+_qget = qdlapi.get
+#              ^Workhorse which RETREIVES RAW DATA using QUANDL API.  <= !!
+#               However, we expose our getqdl() as convenience wrapper.
 
 
 #      __________ FUTURES quandlcode:
 #                 Related to fut_dict and fut_decode() for code slang.
 #
-f4fed = 'FF'      #  CME/CBOT Fed Funds
-f4libor = 'ED'      #  CME Eurodollars
-f4bond10 = 'TY'      #  CME/CBOT 10-y Treasury
-f4spx = 'SP'      #  CME S&P 500
-f4spes = 'ES'      #  CME E-minis
-f4cad = 'CD'      #  CME
-f4gbp = 'BP'      #  CME
-f4eur = 'EC'      #  CME
-f4chf = 'SF'      #  CME
-f4jpy = 'JY'      #  CME
-f4xau = 'GC'      #  CME/COMEX Gold
-f4xag = 'SI'      #  CME/COMEX Silver
-f4wti = 'CL'      #  CME/NYMEX Oil
-
+f4fed = 'FF'      # CME/CBOT Fed Funds
+f4libor = 'ED'    # CME Eurodollars
+f4bond10 = 'TY'   # CME/CBOT 10-y Treasury
+f4spx = 'SP'      # CME S&P 500
+f4spes = 'ES'     # CME E-minis
+f4cad = 'CD'      # CME
+f4gbp = 'BP'      # CME
+f4eur = 'EC'      # CME
+f4chf = 'SF'      # CME
+f4jpy = 'JY'      # CME
+f4xau = 'GC'      # CME/COMEX Gold
+f4xag = 'SI'      # CME/COMEX Silver
+f4wti = 'CL'      # CME/NYMEX Oil
 
 
 #      __________ DAILY quandlcode: #  d7 means seven days/week
-d7xbtusd = 'BCHAIN/MKPRU'      #  Bitcoin price in USD
-d7xbtcount = 'BCHAIN/TOTBC'      #  number of Bitcoins (~16 million)
-#  d7xbtcap = 'BCHAIN/MKTCP'      #  Market capitalization (~16 billion USD)
-#                ...                   ... replicated by d7xbtusd * d7xbtcount
+d7xbtusd = 'BCHAIN/MKPRU'      # Bitcoin price in USD
+d7xbtcount = 'BCHAIN/TOTBC'    # number of Bitcoins (~16 million)
+#  d7xbtcap = 'BCHAIN/MKTCP'      # Market capitalization (~16 billion USD)
+#                ...                  ... replicated by d7xbtusd * d7xbtcount
 
 
 #      __________ WEEKLY quandlcode:
-w4cotr_xau = 'w4cotr_xau'      #  CFTC COTR Manager position: Gold
-w4cotr_metals = 'w4cotr_metals'   #  CFTC COTR Manager position: Gold, Silver
-w4cotr_usd = 'w4cotr_usd'      #  CFTC COTR Manager position: US Dollar
-w4cotr_bonds = 'w4cotr_bonds'    #  CFTC COTR Manager position: Bonds
-w4cotr_equities = 'w4cotr_equities' #  CFTC COTR Manager position: Equities
-
+w4cotr_xau = 'w4cotr_xau'            # CFTC COTR Manager position: Gold
+w4cotr_metals = 'w4cotr_metals'      # CFTC COTR Manager position: Gold, Silver
+w4cotr_usd = 'w4cotr_usd'            # CFTC COTR Manager position: US Dollar
+w4cotr_bonds = 'w4cotr_bonds'        # CFTC COTR Manager position: Bonds
+w4cotr_equities = 'w4cotr_equities'  # CFTC COTR Manager position: Equities
 
 
 #      __________ MONTHLY quandlcode:
-m4spx_1871_p = 'm4spx_1871_p'    #  Shiller S&P500 nominal price
-m4spx_1871_e = 'm4spx_1871_e'    #  Shiller S&P500 nominal earnings 12-month
-m4spx_1871_d = 'm4spx_1871_d'    #  Shiller S&P500 nominal dividends 12-month
-
-
-
-#       __________ ALIASES
-
-quandl = qdlapi.get
-#              ^MAIN workhorse to RETREIVE data using QUANDL API.  <= !!
-#                    Note: getqdl is our convenience wrapper.
-
+m4spx_1871_p = 'm4spx_1871_p'    # Shiller S&P500 nominal price
+m4spx_1871_e = 'm4spx_1871_e'    # Shiller S&P500 nominal earnings 12-month
+m4spx_1871_d = 'm4spx_1871_d'    # Shiller S&P500 nominal dividends 12-month
 
 
 def setQuandlToken(API_key):
     '''Generate authtoken.p in the local directory for API access.'''
     #  Must have API key which is free by creating a Quandl account,
-    #  however, this is not necessary for very limited usage.
-    dummy = qdlapi.get("NSE/OIL", authtoken=API_key, rows=1)
-    #  The first request is all that matters for getting initiated.
-    print(' ::  Generated authtoken.p in local directory for API access.')
+    #  however, this is not necessary for limited usage.
+    _ = _qget("NSE/OIL", authtoken=API_key, rows=1)   # noqa
+    #  This dummy request creates your token file "authtoken.p"
+    #  in your current working directory.
     #
-    #  For security, authtoken.p shall not be committed via .gitignore
+    #  For SECURITY, "authtoken.p" shall not be committed due to .gitignore
+    #  but be aware that setup.py will bundle it to public PyPI.
+    #
+    print(' ::  Generated authtoken.p in local directory for API access.')
+    return
 
 
 def cotr_get(futures='GC', type='FO'):
@@ -302,7 +261,7 @@ def cotr_get(futures='GC', type='FO'):
     #  Traders' option positions are computed on a futures-equivalent basis
     #  using delta factors supplied by the exchanges.
     quandlcode = 'CFTC/' + futures + '_' + type + '_ALL'
-    return quandl(quandlcode)
+    return _qget(quandlcode)
 
 
 def cotr_position(futures='GC'):
@@ -316,7 +275,7 @@ def cotr_position(futures='GC'):
         shorts = cotr['Asset Manager Shorts']
         #  "Leveraged Funds" for FINANCIALS appear short-term, whereas
         #  "Asset Manager" takes longer term perspective.
-    except:
+    except Exception:
         longs = cotr['Money Manager Longs']
         shorts = cotr['Money Manager Shorts']
         #  "Money Manager" for COMMODITIES.
@@ -370,7 +329,6 @@ def cotr_position_equities():
     #
     #                  _Average reading between two contracts.
     return tool.todf((pos1 + pos2) / 2.0)
-
 
 
 #   DICTIONARY to translate our futures slang to vendor code:
@@ -429,7 +387,7 @@ def fut_decode(slang):
             year = '20' + slang[-3:-1]
             month = slang[-1].upper()
             symbol = fut_dict[asset] + month + year
-        except:
+        except Exception:
             raise ValueError('Futures slang argument is invalid.')
     return symbol
 
@@ -448,28 +406,28 @@ def getfut(slang, maxi=512, col='Settle'):
     #  of data due to finite life of a futures contract.
     #  2015-09-11  quandl default seems to be maxi around 380.
     #
-    fut = quandl(fut_decode(slang), rows=maxi)
+    fut = _qget(fut_decode(slang), rows=maxi)
     #      return just a single column dataframe:
     return tool.todf(fut[[col]])
 
 
 #  CONTINUOUS FUTURES CONTRACTS are also available:
 #
-#  Quandl proides continuous (aka concatenated or chained) futures contracts from
-#  two sources: a free inhouse source CHRIS and a paid premium source Stevens SCF.
+#  Quandl provides continuous (concatenated or chained) futures contracts from
+#  two sources: free inhouse source CHRIS and paid premium source Stevens SCF.
 #  Quality of SCF is substantially higher than that of CHRIS; the latter has
-#  spikes, nulls, missing rows, jumps in the data, and inconsistent OHLC values;
+#  spikes, nulls, missing rows, jumps in data, and inconsistent OHLC values;
 #  the former is audited to be accurate, consistent and error-free.
 #
 #  The format for continuous contracts from source CHRIS is
 #       CHRIS/{EXCHANGE}_{CODE}{NUMBER}
 #  where {NUMBER} is the "depth" associated with the chained contract. For
-#  instance, the front month contract has depth 1, the second month contract has
-#  depth 2, and so on.
+#  instance, the front month contract has depth 1, the second month contract
+#  has depth 2, and so on.
 #
 #  The format for continuous contracts from source Stevens SCF is
 #       SCF/{EXCHANGE}_{CODE}{NUMBER}_{RULE}
-#  where {NUMBER} is the "depth" associated with the chained contract, and {RULE}
+#  where {NUMBER} is "depth" associated with the chained contract, and {RULE}
 #  specifies the roll-date rule and price adjustment if any. SCF offers 14
 #  different combinations of roll date and price adjustment.
 
@@ -487,7 +445,7 @@ def freqM2MS(dataframe):
     #  Quandl *may* not infer frequency in its transmitted dataframes.
     #  So lastly, resampling converts index freq from None to 'MS'
     #  which may be necessary to align operations between dataframes:
-    return fred.monthly(df)
+    return monthly(df)
 
 
 #  For details on Shiller m4spx_1871_*, see notebook qdl-spx-earn-div.ipynb
@@ -496,7 +454,7 @@ def freqM2MS(dataframe):
 
 def getm4spx_1871_p():
     '''Retrieve nominal monthly Shiller S&P500 price, starting 1871.'''
-    price = freqM2MS(quandl('MULTPL/SP500_REAL_PRICE_MONTH'))
+    price = freqM2MS(_qget('MULTPL/SP500_REAL_PRICE_MONTH'))
     #                           ^But they meant NOMINAL!
     #  Their inflation-adjusted monthly series is called
     #        MULTPL/SP500_INFLADJ_MONTH
@@ -506,7 +464,7 @@ def getm4spx_1871_p():
 
 def getm4spx_1871_e():
     '''Retrieve nominal monthly Shiller S&P500 earnings, starting 1871.'''
-    ratio = freqM2MS(quandl('MULTPL/SP500_PE_RATIO_MONTH'))
+    ratio = freqM2MS(_qget('MULTPL/SP500_PE_RATIO_MONTH'))
     #  Gets price/earnings ratio, so solve for 12-month earnings.
     #  Alternative: official YALE/SPCOMP, but 9 months latency!
     price = getm4spx_1871_p()
@@ -516,7 +474,7 @@ def getm4spx_1871_e():
 
 def getm4spx_1871_d():
     '''Retrieve nominal monthly Shiller S&P500 dividends, starting 1871.'''
-    dyield = freqM2MS(quandl('MULTPL/SP500_DIV_YIELD_MONTH'))
+    dyield = freqM2MS(_qget('MULTPL/SP500_DIV_YIELD_MONTH'))
     #  Gets dividend yield in percentage form,
     #  but we want just plain dividends over previous 12 months.
     #  Alternative: official YALE/SPCOMP, but 9 months latency!
@@ -533,7 +491,7 @@ def getqdl(quandlcode, maxi=87654321):
                  but NOT used in all cases below.
     We can SYNTHESIZE a quandlcode by use of string equivalent arg.
     '''
-    if   quandlcode == w4cotr_xau:
+    if quandlcode == w4cotr_xau:
         df = cotr_position(f4xau)
     elif quandlcode == w4cotr_metals:
         df = cotr_position_metals()
@@ -555,10 +513,10 @@ def getqdl(quandlcode, maxi=87654321):
         df = getfut(quandlcode)
 
     else:
-        df = quandl(quandlcode, rows=maxi)
+        df = _qget(quandlcode, rows=maxi)
     #                 ^just the vanilla series... so
     # for "transformation" and "collapse" (resampling),
-    #                  call quandl() directly.
+    #                  call _qget() directly.
     #
     #         _Give default fecon235 names to column and index:
     df = tool.names(df)
@@ -568,50 +526,18 @@ def getqdl(quandlcode, maxi=87654321):
     return df.dropna()
 
 
-
 def plotqdl(data, title='tmp', maxi=87654321):
-    '''Plot data should be it given as dataframe or quandlcode.'''
-    #  maxi is an arbitrary maximum number of points to be plotted.
-    #  Single column dot notation: e.g. 'NSE/OIL.4'
-    #                              grabs the 4th column of NSE/OIL.
-    if isinstance(data, pd.DataFrame):
-        fred.plotdf(tool.tail(data, maxi), title)
-    else:
-        quandlcode = data
-        df = getqdl(quandlcode)
-        fred.plotdf(tool.tail(df,   maxi), title)
-    return
+    '''DEPRECATED: Plot data should be it given as dataframe or quandlcode.'''
+    #  ^2018-05-22. Removal OK after 2020-01-01.
+    msg = "plotqdl() DEPRECATED. Instead use get() and plot()."
+    raise DeprecationWarning(msg)
 
 
-def holtqdl(data, h=24, alpha=hw.hw_alpha, beta=hw.hw_beta):
-    '''Holt-Winters forecast h-periods ahead (quandlcode aware).'''
-    #  "data" can be a quandlcode, or a dataframe to be detected:
-    if isinstance(data, pd.DataFrame):
-        holtdf = hw.holt(data             , alpha, beta)
-    else:
-        quandlcode = data
-        holtdf = hw.holt(getqdl(quandlcode), alpha, beta)
-        #              ^No interim results retained.
-    #    holtdf is expensive to compute, but also not retained.
-    #    For details, see module yi_timeseries.
-    return hw.holtforecast(holtdf, h)
-
-
-
-
-#  #      __________ save and load dataframe by pickle.
-#                    ^^^^     ^^^^ renamed recently.
-#
-#  The easiest way is to pickle it using save:
-#
-#       df.to_pickle(file_name)  # where to save it, usually as a .pkl
-#
-#  Then you can load it back using:
-#
-#       df = pd.read_pickle(file_name)
-#
-#  However, PICKLE FORMAT IS NOT GUARANTEED, and takes up 4x relative to gz.
-
+def holtqdl(data, h=24, alpha=0.26, beta=0.19):
+    '''DEPRECATED: Holt-Winters forecast h-periods ahead (quandlcode aware).'''
+    #  ^2018-05-22. Removal OK after 2020-01-01.
+    msg = "holtqdl() DEPRECATED. Instead use get(), holt(), holtforecast()."
+    raise DeprecationWarning(msg)
 
 
 if __name__ == "__main__":
