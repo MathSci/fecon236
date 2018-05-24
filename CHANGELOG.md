@@ -5,6 +5,41 @@ within itself. This file simply gives a grand overview of such details
 and the annotations in the commits and tags.*
 
 
+### 2018-05-24  (tag: 10.6.3a35)
+
+The objective of this micro-3 alpha release was to
+update, integrate, and test the *qdl* module
+and its dependencies into the project.
+
+```
+.old/235/lib/yi_quandl.py -> fecon236/host/qdl.py
+.old/235/lib/yi_quandl_api.py -> fecon236/host/_ex_Quandl.py
+.old/235/tests/test_timeseries.py -> tests/test_holtwinters.py
+```
+
+Add tests/test_qdl.py: Pass xbt price test.
+
+The `_ex_Quandl` module is still operational,
+despite Quandl's deprecation of its Quandl.py version 2.8.9.
+We fork the single module and will maintain it
+as straddling python2/3 code.
+
+host/qdl.py: Deprecate plotqdl() and holtqdl().
+Rename quandl() as `_qget()` for future clarity.
+Explain the mechanics of API key and token file "authtoken.p".
+
+test_qdl.py: Mark download function with "oLocal",
+else Quandl raises: "HTTP Error 429: Too Many Requests"
+when testing without authtoken.p through external Travis.
+
+setup.py: Support markdown, correct PyPI rendering
+by appending "content_type" incantation.
+PyPI rendering also corrected by excluding "license" as text.
+
+Add `docs/READ/fe-97-upkeep.md`
+for maintenance of the code infrastructure and distribution.
+
+
 ### 2018-05-18  (tag: 10.6.2a29)
 
 The objective of this micro-2 alpha release was to
