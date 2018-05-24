@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-#  Python package installation                        Date : 2018-05-01
+#  Python package installation                        Date : 2018-05-24
 '''
 _______________|  fecon236/setup.py :: Installation via setuptools.
 
                   Essential install config file, esp. for pip.
+
+   Dependencies:  setuptools>=38.6.0  [for markdown support]
+
+                  (wheel>=0.31.0      [for markdown support] distribution)
+                  (twine>=1.11.0      [for markdown support] PyPI submit)
 
 VERSION in play:  Use "pip show fecon236"
 
@@ -32,9 +37,15 @@ VERSION in play:  Use "pip show fecon236"
                         twine upload dist/*
                   - Check up at https://pypi.org/project/PROJECT
 
+     Markdown support (2018, finally at PyPI!):
+     https://dustingram.com/articles/2018/03/16/markdown-descriptions-on-pypi
+
      CLASSIFERS:  https://pypi.python.org/pypi?%3Aaction=list_classifiers
 
 CHANGE LOG  For latest version, see https://git.io/fecon236
+2018-05-24  Support markdown by appending "content_type" incantations.
+                Recent setuptools, wheel, and twine are necessary.
+                PyPI rendering corrected by excluding "license" as text.
 2018-05-01  Eliminate attempt at __version__ here.
 2018-04-30  Additional directives, requirements.txt comparison.
 2018-04-23  First version.
@@ -84,19 +95,31 @@ REQUIRED = []
 with open('README.md') as f:
     readme = f.read()
 
-with open('LICENSE.md') as f:
-    licensed = f.read()
-
 with open('VERSION') as f:
     #  Read top-level file as pure string, deleting line return:
     versioned = f.read().strip().replace(os.linesep, '')
 
 
+#  with open('LICENSE.md') as f:
+#      licensed = f.read()
+#
+#  #   license=licensed,  # GOTCHA in setup
+#  #
+#  #  The "license" argument is for supplying the name of the software license
+#  #  being used (e.g. 'MIT' or 'GPLv2'), NOT for supplying the entire text
+#  #  of the license. If the text is included, setuptools' failure to indent
+#  #  the license text causes all subsequent fields of the PKG-INFO
+#  #  (including the long description and keywords) to not be parsed,
+#  #  hence they will not show up correctly on PyPI.
+#  #      2017-07-14  https://stackoverflow.com/questions/45104281
+
+
 setup(
     name=PROJECT,
     version=versioned,
-    description='Computational tools for financial economics',
+    description='Tools for financial economics',
     long_description=readme,
+    long_description_content_type="text/markdown",
     author='Mathematical Sciences Group',
     author_email='MathSci-github@googlegroups.com',
     python_requires='>=2.7.0',
@@ -109,7 +132,7 @@ setup(
     install_requires=REQUIRED,
     include_package_data=True,
     packages=find_packages(exclude=('.old', 'docs', 'tests')),
-    license=licensed,
+    license='BSD',
     keywords='pandas finance economics statistics econometrics jupyter',
     classifiers=[
         'Development Status :: 3 - Alpha',
