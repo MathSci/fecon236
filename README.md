@@ -44,6 +44,8 @@ and works across major platforms: Linux, Mac, and Windows.
 ***The best way to see the convenience of [fecon236] in action is to
 run the notebooks in the `nb` directory at [fecon235].***
 
+Documentation is currently being served from [236docs].
+
 
 ### Currently at ALPHA development status
 
@@ -78,7 +80,7 @@ please ping @rsvp at [Gitter] or see [rsvp] at the [MathSci] Group.
 
 ---
 
-[BSD License and TOS][236li] / This page, last update : 2018-05-26
+[BSD License and TOS][236li] / This page, last update : 2018-05-29
 
 [rsvp]: https://rsvp.github.com "Adriano, lead developer"
 [MathSci]: https://github.com/MathSci "Mathematical Sciences Group"
@@ -87,6 +89,7 @@ please ping @rsvp at [Gitter] or see [rsvp] at the [MathSci] Group.
 [fecon235]: https://github.com/rsvp/fecon235 "fecon235 repository"
 [fecon236]: https://github.com/MathSci/fecon236 "fecon236 repository"
 [CHANGELOG]: https://git.io/236log "fecon236 Change Log"
+[236docs]: https://github.com/MathSci/fecon236/tree/develop/docs "fecon236 Documentation"
 [236li]: https://git.io/236li "fecon236 BSD License and TOS"
 [236is]: https://git.io/236is "fecon236 issues"
 [Travis]: https://travis-ci.org/MathSci/fecon236 "fecon236 at Travis CI"
