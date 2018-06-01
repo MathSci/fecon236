@@ -5,6 +5,34 @@ within itself. This file simply gives a grand overview of such details
 and the annotations in the commits and tags.*
 
 
+### 2018-06-01  (tag: 10.6.4a43)
+
+The objective of this micro-4 alpha release was to
+update, integrate, and test the *optimize* module.
+That enabled the absorption of the *opt_holt* module
+into the *holtwinters* module.
+
+Add `oc` "Optimal Control" directory for general optimization methods.
+
+```
+.old/235/lib/ys_optimize.py -> fecon236/oc/optimize.py
+.old/235/tests/test_optimize.py -> tests/test_optimize.py
+.old/235/lib/ys_opt_holt.py -> fecon236/tsa/opt_holt.py -> rm
+```
+
+tsa/holtwinters.py: Absorb tsa/opt_holt.py
+and delete tsa/opt_holt.py.
+
+test_holtwinters.py: Include test of `optimize_holt()`
+concluding absorption of opt_holt module, which produces
+robust optimal estimation of alpha and beta,
+into the holtwinters module.
+
+README.md: Edit sections, include issues URL,
+add "what for" section and logo image.
+Provisional link to docs.
+
+
 ### 2018-05-24  (tag: 10.6.3a35)
 
 The objective of this micro-3 alpha release was to
@@ -288,9 +316,15 @@ https://github.com/rsvp/fecon235/issues/9
 
 ---
 
-[rsvp]: https://rsvp.github.com
-[issue235]: https://github.com/rsvp/fecon235/issues/9
-[fecon235]: https://github.com/rsvp/fecon235
-[fecon236]: https://github.com/MathSci/fecon236
-[MathSci]: https://github.com/MathSci
-
+[rsvp]: https://rsvp.github.com "Adriano rsvp.github.com"
+[MathSci]: https://github.com/MathSci "Mathematical Sciences Group"
+[Gitter]: https://gitter.im/MathSci/fecon236 "MathSci at Gitter"
+[235is9]: https://git.io/235is9 "fecon235 issue 9"
+[fecon235]: https://github.com/rsvp/fecon235 "fecon235 Repository"
+[fecon236]: https://github.com/MathSci/fecon236 "fecon236 Repository"
+[CHANGELOG]: https://git.io/236log "fecon236 Change Log"
+[236docs]: https://github.com/MathSci/fecon236/tree/develop/docs "fecon236 Documentation"
+[236li]: https://git.io/236li "fecon236 BSD License and TOS"
+[236is]: https://git.io/236is "fecon236 Issues"
+[Travis]: https://travis-ci.org/MathSci/fecon236 "fecon236 at Travis CI"
+[PyPI]: https://pypi.org/project/fecon236 "fecon236 at PyPI"
