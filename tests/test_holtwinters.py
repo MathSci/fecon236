@@ -1,10 +1,12 @@
-#  Python Module for import                           Date : 2018-05-20
+#  Python Module for import                           Date : 2018-05-31
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  test_holtwinters.py :: Test fecon236 holtwinters module.
 
 - Test holt() and its workout dataframe.
 - Test ema() which is a special case of Holt-Winters.
+- Test optimize_holt(), absorbed from opt_holt module, which produces
+  robust optimal estimates of alpha and beta.
 
 Doctests display at lower precision since equality test becomes fuzzy across
 different systems if full floating point representation is used.
@@ -17,6 +19,7 @@ REFERENCE
             or PDF at http://pytest.org/latest/pytest.pdf
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-05-31  Include test of optimize_holt().
 2018-05-20  fecon236 fork. Doctest flake8 fail: W291 trailing whitespace.
 2016-12-18  fecon235 v5.18.0312, https://git.io/fecon235
 '''
@@ -219,6 +222,15 @@ def test_holtwinters_fecon236_check_ema():
     #  written as a special case of our Holt-Winters routines,
     #  instead of the rolling average function offered by pandas.
     pass
+
+
+def test_holtwinters_fecon236_download_fred_optimize_holt_vSlow():
+    '''Download inflation data from FRED and test optimize_holt().'''
+    #  Requires network connection. Coarse optimization, else too expensive.
+    infl = fred.getfred(fred.m4infl)
+    alpha, beta, _, _ = hw.optimize_holt(infl['2003':'2010'], grids=20)
+    assert abs(alpha - 0.8947) <= 0.02
+    assert abs(beta - 0.7895) <= 0.02
 
 
 if __name__ == "__main__":
