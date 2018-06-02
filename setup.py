@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-#  Python package installation                        Date : 2018-05-24
+#  Python package installation                        Date : 2018-06-02
 '''
 _______________|  fecon236/setup.py :: Installation via setuptools.
 
@@ -43,6 +43,7 @@ VERSION in play:  Use "pip show fecon236"
      CLASSIFERS:  https://pypi.python.org/pypi?%3Aaction=list_classifiers
 
 CHANGE LOG  For latest version, see https://git.io/fecon236
+2018-06-02  Add PROJECTURL and edit project_urls.
 2018-05-24  Support markdown by appending "content_type" incantations.
                 Recent setuptools, wheel, and twine are necessary.
                 PyPI rendering corrected by excluding "license" as text.
@@ -56,6 +57,8 @@ from setuptools import setup, find_packages
 
 
 PROJECT = 'fecon236'
+PROJECTURL = 'https://github.com/MathSci/' + PROJECT
+
 
 #  What packages are required? For example:
 #  'foo', 'bar>=2.0', 'foobar~=3.4.5'
@@ -123,11 +126,16 @@ setup(
     author='Mathematical Sciences Group',
     author_email='MathSci-github@googlegroups.com',
     python_requires='>=2.7.0',
-    url='https://github.com/MathSci/'+PROJECT,
+    url=PROJECTURL,
     project_urls={
-        'Source': 'https://github.com/MathSci/'+PROJECT,
-        'Documentation': 'https://github.com/MathSci/'+PROJECT+'/docs',
-        'Tracker': 'https://github.com/MathSci/'+PROJECT+'/issues',
+        'Source': PROJECTURL,
+        'Require': PROJECTURL+'/blob/develop/require.txt',
+        'Install': PROJECTURL+'/blob/develop/docs/READ/fe-10_Install.md',
+        'Documentation': PROJECTURL+'/tree/develop/docs',
+        'Notebooks': 'https://github.com/rsvp/fecon235/tree/master/nb',
+        'Tracker': PROJECTURL+'/projects/2',
+        'Issues': PROJECTURL+'/issues',
+        'License': PROJECTURL+'/blob/master/LICENSE.md',
     },
     install_requires=REQUIRED,
     include_package_data=True,
