@@ -1,4 +1,4 @@
-#  .travis.yml     python 27 to 3, with Miniconda             Date : 2018-05-12
+#  .travis.yml     python 27 to 3, with Miniconda             Date : 2018-06-04
 #  FEATURES: pytest, flake8, pandas, pip and conda.           fecon236
 
 #  By default, Travis uses PIP to manage Python dependencies.
@@ -28,6 +28,7 @@
 
 
 #  CHANGE LOG
+#  2018-06-04  conda install sympy pandas_datareader
 #  2018-05-12  conda install some scientific packages.
 #  2018-05-01  Lower 3.6 env to 3.4.
 #  2018-04-25  First version from try_repo
@@ -117,7 +118,7 @@ install:
   #  - pip install beautifulsoup4
   #  - pip install coveralls --quiet
   #  #             ^for "after success:" section below.
-  - conda install flake8 numpy statsmodels scipy matplotlib
+  - conda install flake8 numpy statsmodels scipy matplotlib sympy pandas_datareader
   - conda list
   - python setup.py install
 
