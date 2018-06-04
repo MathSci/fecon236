@@ -1,43 +1,55 @@
-#  Python Module for import                           Date : 2017-06-05
-#  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per Python PEP 0263 
-''' 
-_______________|  test_gauss_mix : Test fecon235 ys_gauss_mix module.
+#  Python Module for import                           Date : 2018-06-04
+#  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
+'''
+_______________|  test_gaussmix.py :: Test fecon236 gaussmix module.
 
-Assuming testing will occur in tests directory, to locate small data file.
-
-Doctests display at lower precision since equality test becomes fuzzy across 
+Doctests display at lower precision since equality test becomes fuzzy across
 different systems if full floating point representation is used.
 
-Testing: As of fecon235 v4, we favor pytest over nosetests, so e.g. 
-    $ py.test --doctest-modules
+Dependencies:  zdata-xau-13hj-c30.csv in tests directory
 
-REFERENCE
-   pytest:  https://pytest.org/latest/getting-started.html
-               or PDF at http://pytest.org/latest/pytest.pdf
+We favor pytest over nosetests, so e.g. $ py.test --doctest-modules
 
-CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
-2017-06-05  Add test for gm2gem().
-2017-05-21  Add tests for gemrate() and gemrat(). Note the deprecation of
-               gm2_georet() and georet_gm2() due to math proof.
-2017-05-19  First version.
+REFERENCE   https://pytest.org/latest/getting-started.html
+            or PDF at http://pytest.org/latest/pytest.pdf
+
+CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-04  test_gaussmix.py, fecon236 fork. Pass flake8, fix imports.
+2017-06-05  test_gauss_mix.py, fecon235 v5.18.0312, https://git.io/fecon235
 '''
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, division
 
-from fecon235.lib import yi_0sys as system
-from fecon235.lib import yi_fred as fred
-from fecon235.lib import yi_1tools as tools
-from fecon235.lib import ys_gauss_mix as gmix
-#
-#  N.B. -  In this tests directory without __init__.py, 
-#          we use absolute import as if outside the fecon235 package,
-#          not relative import (cf. modules within lib).
+from os import sep
+from fecon236 import tool
+from fecon236.util import system
+from fecon236.host import fred
+from fecon236.dst import gaussmix as gmix
+
+
+def test_gaussmix_fecon236_check_gm2_strategy_feasible():
+    '''Test sympy solving for "a" in Proposition 2 numerically.'''
+    a_feasible = round(gmix.gm2_strategy(kurtosis=7, b=2), 4)
+    assert a_feasible == 0.7454
+
+
+def test_gaussmix_fecon236_check_gm2_strategy_infeasible():
+    '''Destroy sympy solving for "a" in Proposition 2 numerically.'''
+    try:
+        a_feasible = round(gmix.gm2_strategy(kurtosis=13, b=2), 4)
+        #  INTENTIONAL FAIL: That b is too low for high kurtosis.
+        #  Previous test shows feasible when kurtosis=7.
+        #  sympy actually fails correctly, and will raise its exception.
+    except:          # noqa
+        a_feasible = "Intentionally_FATAL_since_INFEASIBLE"
+        #             Avoids reproducing the traceback to assert next:
+    assert a_feasible == "Intentionally_FATAL_since_INFEASIBLE"
 
 
 #  #  Show the CSV file zdata-xau-13hj-c30.csv:
 #  #                    ^created in Linux environment...
 #  #  Warning: last four points may look like outliers, but they are actual.
-#  
+#
 #       T,XAU
 #       2013-03-08,1581.75
 #       2013-03-11,1579.0
@@ -71,46 +83,27 @@ from fecon235.lib import ys_gauss_mix as gmix
 #       2013-04-18,1393.75
 
 
-def test_ys_gauss_mix_fecon235_Read_CSV_file():
+def test_gaussmix_fecon236_Read_CSV_file():
     '''Read CSV file then check values.'''
-    df = fred.readfile('zdata-xau-13hj-c30.csv')
+    df = fred.readfile('tests' + sep + 'zdata-xau-13hj-c30.csv')
     #         readfile disregards XAU column name:
-    assert [ col for col in df.columns ] == ['Y']
+    assert [col for col in df.columns] == ['Y']
     assert df.shape == (30, 1)
     return df
 
 
 #  Establish REFERENCE dataframe for tests below:
-xau = test_ys_gauss_mix_fecon235_Read_CSV_file()
+xau = test_gaussmix_fecon236_Read_CSV_file()
 
 
-def test_ys_gauss_mix_fecon235_check_xau_DataFrame():
+def test_gaussmix_fecon236_check_xau_DataFrame():
     '''Check xau dataframe.'''
-    assert tools.tailvalue( xau ) == 1393.75
+    assert tool.tailvalue(xau) == 1393.75
 
 
-def test_ys_gauss_mix_fecon235_check_gm2_strategy_feasible():
-    '''Test sympy solving for "a" in Proposition 2 numerically.'''
-    a_feasible = round( gmix.gm2_strategy(kurtosis=7, b=2), 4 )
-    assert a_feasible == 0.7454
-
-
-def test_ys_gauss_mix_fecon235_check_gm2_strategy_infeasible():
-    '''Destroy sympy solving for "a" in Proposition 2 numerically.'''
-    try:
-        a_feasible = round( gmix.gm2_strategy(kurtosis=13, b=2), 4 )
-        #  INTENTIONAL FAIL: That b is too low for high kurtosis.
-        #  Previous test shows feasible when kurtosis=7.
-        #  sympy actually fails correctly, and will raise its exception.
-    except:
-        a_feasible = "Intentionally_FATAL_since_INFEASIBLE"
-        #             Avoids reproducing the traceback to assert next:
-    assert a_feasible == "Intentionally_FATAL_since_INFEASIBLE"
-
-
-def test_ys_gauss_mix_fecon235_check_gm2_vols():
+def test_gaussmix_fecon236_check_gm2_vols():
     '''Check the annualized version of gm2_vols_fit() on test data.'''
-    xauvols = gmix.gm2_vols( xau[:'2013-04-12'], b=2.5, yearly=256 )
+    xauvols = gmix.gm2_vols(xau[:'2013-04-12'], b=2.5, yearly=256)
     #                            ^else severe drop in price for small sample.
     mu, sigma1, sigma2, q, k_Pearson, sigma, b, yearly, N = xauvols
     assert round(mu, 4) == -30.3880       # mu annualized
@@ -124,23 +117,26 @@ def test_ys_gauss_mix_fecon235_check_gm2_vols():
     assert N == 25                        # N, sample size
 
 
-def test_ys_gauss_mix_fecon235_check_gemrate():
+def test_gaussmix_fecon236_check_gemrate():
     '''Check on geometric mean rate gemrate() based on gemreturn_Jean().'''
     assert 0.05 - ((0.20*0.20)/2.) == 0.03
     #           ^most well-known approx. for mu=0.05 and sigma=0.20
-    assert round(gmix.gemrate(0.05, 0.20, kurtosis=3, yearly=1),  7) == 0.0301066
+    assert round(gmix.gemrate(0.05, 0.20, kurtosis=3, yearly=1),
+                 7) == 0.0301066
     #      Jean (1983) adds just 1 bp for Gaussian over usual approximation.
-    assert round(gmix.gemrate(0.05, 0.20, kurtosis=13, yearly=1), 7) == 0.0267223
+    assert round(gmix.gemrate(0.05, 0.20, kurtosis=13, yearly=1),
+                 7) == 0.0267223
     #      So increase in kurtosis lowered geometric mean rate by 34 bp.
-    assert round(gmix.gemrate(0.05, 0.20, kurtosis=3, yearly=10), 7) == 0.3453084
+    assert round(gmix.gemrate(0.05, 0.20, kurtosis=3, yearly=10),
+                 7) == 0.3453084
     #      OK, compounding works as intended.
 
 
-def test_ys_gauss_mix_fecon235_check_gemrat():
+def test_gaussmix_fecon236_check_gemrat():
     '''Check on geometric mean rate of data, gemrat() in percentage form.'''
-    xaugem = gmix.gemrat( xau[:'2013-04-12'], yearly=256 )
+    xaugem = gmix.gemrat(xau[:'2013-04-12'], yearly=256)
     #                         ^else severe drop in price for small sample.
-    grate, mu, sigma, k_Pearson, yearly, N  = xaugem
+    grate, mu, sigma, k_Pearson, yearly, N = xaugem
     assert round(grate, 4) == -31.3826    # gemrat annualized
     assert round(mu, 4) == -30.388        # arithmetic mean annualized
     assert round(sigma, 4) == 11.5085     # sigma
@@ -149,9 +145,9 @@ def test_ys_gauss_mix_fecon235_check_gemrat():
     assert N == 25                        # N, sample size
 
 
-def test_ys_gauss_mix_fecon235_check_gm2gem():
+def test_gaussmix_fecon236_check_gm2gem():
     '''Check on geometric mean rate of data and GM(2) model: print gm2gemrat().
-    >>> gmix.gm2gem( xau[:'2013-04-12'], yearly=256, b=2.5, pc=True, n=4 )
+    >>> gmix.gm2gem(xau[:'2013-04-12'], yearly=256, b=2.5, pc=True, n=4)
     Geometric  mean rate: -31.3826
     Arithmetic mean rate: -30.388
     sigma: 11.5085
@@ -167,4 +163,4 @@ def test_ys_gauss_mix_fecon235_check_gm2gem():
 
 
 if __name__ == "__main__":
-     system.endmodule()
+    system.endmodule()

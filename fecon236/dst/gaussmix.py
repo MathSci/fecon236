@@ -72,10 +72,7 @@ from fecon236.util import system
 
 
 def gm2_strategy(kurtosis, b=2):
-    '''Use sympy to solve for "a" in Proposition 2 numerically.
-    >>> round(gm2_strategy(7, 2), 4)
-    0.7454
-    '''
+    '''Use sympy to solve for "a" in Proposition 2 numerically.'''
     #  sym.init_printing(use_unicode=True)
     #  #        ^required if symbolic output is desired.
     a = sym.symbols('a')
@@ -88,7 +85,7 @@ def gm2_strategy(kurtosis, b=2):
     #      provided in sympy's FiniteSet format.
     if a_solved == sym.S.EmptySet:
         #               ^when no feasible solution was found in domain.
-        #                Do not accept imaginary solutions:-)
+        #                Do not accept imaginary solutions.
         system.die("Extreme kurtosis: argument b should be increased.")
         #     ^dies when kurtosis > 12 and b=2, for example.
         #           SPX returns since 1957 have kurtosis around 31.6
