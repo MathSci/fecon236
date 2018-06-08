@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-20
+#  Python Module for import                           Date : 2018-06-08
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  plots.py :: Plot functions using matplotlib.
@@ -21,6 +21,7 @@ REFERENCES:
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-08  Clarify plotn() usage.
 2018-05-20  Use functools.wraps within saveImage decorator.
 2018-05-17  Suppress show screen via leading space in title.
                 Fix boxplot() by removing NaN from data.
@@ -115,21 +116,18 @@ def plot(data, title='tmp', maxi=87654321):
 
 
 @saveImage
-def plotn(dataframe, title='tmp'):
-    '''Plot dataframe (or list) where the index is numbered (not dates).'''
-    #  2014-12-13  Adapted from plotdf which uses date index.
-    #  2016-01-21  With todf pre-filter, list type will be converted.
-    dataframe = tool.todf(dataframe)
-    #                ^todf must dropna(),
-    #                 otherwise index of last point plotted may be wrong.
-    #           Also helps if dataframe resulted from synthetic operations,
-    #           or if a Series was incorrectly submitted as Dataframe.
+def plotn(data, title='tmp'):
+    '''Plot list, array, Series, or DataFrame where the index is numbered.'''
+    #  With todf: list, array, or Series will be converted to DataFrame.
+    dataframe = tool.todf(data)
+    #               ^todf must dropna(),
+    #                otherwise index of last point plotted may be wrong.
     fig, ax = plt.subplots()
     #  ax.xaxis_date()
     #  #  ^interpret x-axis values as dates.
     plt.xticks(rotation='vertical')
     #       show x labels vertically.
-
+    #
     ax.plot(dataframe.index, dataframe, 'b-')
     #       ^x               ^y          blue line
     #                                    k is black.
