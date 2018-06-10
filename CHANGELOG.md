@@ -5,6 +5,43 @@ within itself. This file simply gives a grand overview of such details
 and the annotations in the commits and tags.*
 
 
+### 2018-06-09  (tag: 10.6.5a50)
+
+The objective of this micro-5 alpha release was to
+update, integrate, and test the *gaussmix* module.
+The sympy module for symbolic mathematics is a prerequisite
+so we have included notebook documentation.
+The analytical results are verified through numerical simulation,
+hence we also use our *sim* module.
+
+Add fecon236/dst directory for Distributions (Statistical, not software).
+We extensively develop the Gaussian mixture distribution.
+In .travis.yml: conda install sympy --
+symbolic math package needed for gaussmix module.
+Notebook demo of symbolic math package: `docs/READ/fe-54_Symbolic_sympy.ipynb`.
+
+```
+.old/235/lib/ys_gauss_mix.py -> fecon236/dst/gaussmix.py
+.old/235/tests/test_gauss_mix.py -> tests/test_gaussmix.py
+.old/235/docs/fecon235-08-sympy.ipynb -> docs/READ/fe-54_Symbolic_sympy.ipynb
+.old/235/lib/yi_simulation.py -> fecon236/prob/sim.py
+.old/235/lib/yi_stocks.py -> fecon236/host/stock.py
+```
+
+Add fecon236/boots directory for Bootstrap and small-sample studies.
+Spin-off 2014 material from prob/sim.py to boots/bootstrap.py.
+This will need polish and generalization, useful for a notebook later.
+
+prob/sim.py: Add rates2prices() and simshow().
+The latter provides a statistical and optional visual summary
+of the simulation module.
+
+In .travis.yml: conda install pandas-datareader --
+not pandas_datareader, GOTCHA, which is the module name.
+The package name is pandas-datareader, which is prerequisite for
+`fecon236/host/stock.py` to retrieve data from Yahoo and Google Finance.
+
+
 ### 2018-06-01  (tag: 10.6.4a43)
 
 The objective of this micro-4 alpha release was to
