@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#              bash 4.3.11(1)   Linux 3.13.0 Ubuntu 14.04.3   Date : 2018-05-11
+#              bash 4.3.11(1)   Linux 3.13.0 Ubuntu 14.04.3   Date : 2018-06-10
 #
 # _______________|  up-pypi :: Create and upload dist wheel to PyPI.org
 #
@@ -17,6 +17,7 @@
 #                       build, dist, and PROJECT.egg-info
 #
 #  CHANGE LOG  LATEST version available: https://git.io/fecon236
+#  2018-06-10  Update __version__ in PROJECT __init__.py
 #  2018-05-11  Delete prior dist/*.whl, else PyPI returns error.
 #  2018-05-02  Add sanity check and warn re --universal wheel.
 #  2018-05-01  First version.
@@ -44,13 +45,14 @@ versioned=${1:-'0'}
 
 program=${0##*/}   #  similar to using basename
 memf=$( mktemp /dev/shm/88_${program}_tmp.XXXXXXXXXX )
+mem2=$( mktemp /dev/shm/88_${program}_tmp.XXXXXXXXXX )
 errf=$( mktemp /dev/shm/88_${program}_tmp.XXXXXXXXXX )
 
 
 cleanup () {
      #  Delete temporary files, then optionally exit given status.
      local status=${1:-'0'}
-     rm -f $memf $errf
+     rm -f $memf $mem2 $errf
      [ $status = '-1' ] ||  exit $status      #  thus -1 prevents exit.
 } #--------------------------------------------------------------------
 warn () {
@@ -79,6 +81,11 @@ PROJECT='fecon236'
 if [ $versioned != '0' ] ; then
      echo "$versioned" > VERSION
 fi
+
+
+#     Use current VERSION, to update __version__ variable in __init__.py:
+cat ${PROJECT}/__init__.py  >  $mem2
+sed -e "/^__version__/s/=.*/= '$(cat VERSION)'/" $mem2 > ${PROJECT}/__init__.py
 
 
 #       __________ Create WHEEL
