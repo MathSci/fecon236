@@ -1,22 +1,24 @@
 #!/usr/bin/env bash
-#              bash 4.3.11(1)   Linux 3.13.0 Ubuntu 14.04.3   Date : 2018-06-10
+#              bash 4.3.11(1)   Linux 3.13.0 Ubuntu 14.04.3   Date : 2018-06-11
 #
-# _______________|  up-pypi :: Create and upload dist wheel to PyPI.org
+# _______________|  up-pypi :: ADMIN create and upload dist wheel to PyPI.org
 #
 #           Usage:  $ ./bin/up-pypi  [optional: versioned]
 #                   # ^MUST BE EXECUTED from project's ROOT directory !!
 #
-#         Example:  $ ./bin/up-pypi 10.6a21
+#         Example:  $ ./bin/up-pypi 10.6.5a50
 #
 #    Dependencies:  python2 or python3: Pick in "Create WHEEL" section.
-#                   setup.py file which reads VERSION file.
+#                   setup.py file which reads container VERSION file.
+#                   PROJECT/__init__.py with __version__ variable.
 #                   twine >= 1.09
 #                   PyPI login credentials  [PROJECT admins only]
 #
-#           Notes:  twine will create three directories:
+#           Notes:  twine will create three scratch directories:
 #                       build, dist, and PROJECT.egg-info
 #
 #  CHANGE LOG  LATEST version available: https://git.io/fecon236
+#  2018-06-11  Auto-commit __version__. Clean messages with ver variable.
 #  2018-06-10  Update __version__ in PROJECT __init__.py
 #  2018-05-11  Delete prior dist/*.whl, else PyPI returns error.
 #  2018-05-02  Add sanity check and warn re --universal wheel.
@@ -82,10 +84,13 @@ if [ $versioned != '0' ] ; then
      echo "$versioned" > VERSION
 fi
 
+#  Definitive VERSION expressed in bash variable:
+ver="$(cat VERSION)"
 
-#     Use current VERSION, to update __version__ variable in __init__.py:
+
+#  Use definitive VERSION, to update __version__ variable in __init__.py:  <=!
 cat ${PROJECT}/__init__.py  >  $mem2
-sed -e "/^__version__/s/=.*/= '$(cat VERSION)'/" $mem2 > ${PROJECT}/__init__.py
+sed -e "/^__version__/s/=.*/= '$ver'/"  $mem2  >  ${PROJECT}/__init__.py
 
 
 #       __________ Create WHEEL
@@ -102,17 +107,22 @@ python2 setup.py bdist_wheel --universal  > $memf  2> $errf
 #  #  [ ] - Modify "python_requires" in setup.py
 #  python3 setup.py bdist_wheel  > $memf  2> $errf
 
+echo " ::  ${program}: setup.py has read VERSION as $ver "
+
 
 #       __________ UPLOAD wheel to PyPI
 #       Expect PyPI prompts to provide username and password...
-warn "Bad twine prompt: ENTER PyPI USERNAME after next 'Uploading' line..."
+warn "[Bad twine prompt]  ENTER PyPI USERNAME after the next 'Uploading' line >"
 twine upload dist/*  2>> $errf
 #                 ^lazy, since previous wheels will be uploaded.
+echo " ::  ${program}: twine DONE, confirm: https://pypi.org/project/$PROJECT "
 
 
-echo " ::  $program setup.py read VERSION as: $(cat VERSION) "
+#       __________ POST-SUCCESS
+git add ${PROJECT}/__init__.py  \
+     &&  git commit -m "Bump __version__ to $ver via $program"
+echo " ::  ${program}: SUCCESS, and auto-commit of __version__."
 echo " ::  Manage project https://pypi.org/manage/project/${PROJECT}/releases "
-echo " ::  $program twine DONE, confirm at https://pypi.org/project/$PROJECT "
 
 
 cleanup    #  Instead of: trap arg EXIT
