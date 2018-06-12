@@ -106,8 +106,8 @@ def invert(mat, rcond=RCOND):
     try:
         #  Faster version first, with is_singular() test...
         return invert_caution(mat)
-    except Exception:
-        #  ... so mat is probably singular:
+    except:  # noqa ... but system.die has brought us here,
+        #           ... so mat is probably singular:
         system.warn("ILL-CONDITION: invert() may output pseudo-nonsense.")
         #  How did we get here? The problem is most likely collinearity.
         return invert_pseudo(mat, rcond)
