@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-06-12
+#  Python Module for import                           Date : 2018-06-13
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  matrix.py :: Linear algebra module
@@ -29,6 +29,7 @@ REFERENCES
 - Gene H. Golub, 1989, Matrix Computations, 2nd. ed.
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-13  Appropriate error message for invert_caution().
 2018-06-12  matrix.py, fecon236 fork. Fix imports, pass flake8.
 2017-06-19  yi_matrix.py, fecon235 v5.18.0312, https://git.io/fecon235
 '''
@@ -83,7 +84,7 @@ def invert_caution(mat):
     '''
     #  Curiously np.linalg.inv() does not test this beforehand:
     if is_singular(mat):
-        system.die("invert_caution(): matrix is SINGULAR.")
+        raise ValueError("SINGULAR matrix here is fatal. Try invert().")
     else:
         #         LinAlgError if mat is not square.
         return np.linalg.inv(mat)
@@ -106,7 +107,7 @@ def invert(mat, rcond=RCOND):
     try:
         #  Faster version first, with is_singular() test...
         return invert_caution(mat)
-    except:  # noqa ... but system.die has brought us here,
+    except Exception:
         #           ... so mat is probably singular:
         system.warn("ILL-CONDITION: invert() may output pseudo-nonsense.")
         #  How did we get here? The problem is most likely collinearity.
