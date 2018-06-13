@@ -1,7 +1,7 @@
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-#  Python package installation                        Date : 2018-06-10
+#  Python package installation                        Date : 2018-06-13
 '''
-_______________|  fecon236/__init__.py :: Top installation goods.
+_______________|  fecon236/__init__.py :: Top installation goods
 
 - Clarify the essential namespace for this project.
 - Simplify the import of modules, possibly with shorter names.
@@ -14,7 +14,8 @@ A:  When something is IMPORTED BUT UNUSED, flake8 lint alerts as F401.
 References:  https://github.com/kennethreitz/samplemod
              https://github.com/kennethreitz/setup.py
 
-CHANGE LOG  For latest version, see https://git.io/fecon236
+CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-13  Include matrix and learn modules, but not sec.
 2018-06-10  Include plotn(). __version__ updates by ./bin/up-pypi
 2018-06-07  Include stock, gaussmix, and sim modules.
 2018-05-30  Include optimize module. Delete core module.
@@ -42,6 +43,8 @@ from fecon236.oc import optimize as op                    # noqa
 from fecon236.dst import gaussmix as gmix                 # noqa
 from fecon236.dst.gaussmix import gemrat, gm2gem          # noqa
 from fecon236.prob import sim                             # noqa
+from fecon236.math import matrix as mat                   # noqa
+from fecon236.ml import learn                             # noqa
 
 
 __version__ = '10.6.5a50'
