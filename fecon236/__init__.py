@@ -47,7 +47,7 @@ from fecon236.math import matrix as mat                   # noqa
 from fecon236.ml import learn                             # noqa
 
 
-__version__ = '10.6.5a50'
+__version__ = '10.6.6a58'
 #             ^MAJOR.MINOR.MICRO release (updated by ./bin/up-pypi).
 #              The alpha "a" or beta "b" tag is based on Travis build number.
 #              Release candidates will be denoted by "c" (not rc).
