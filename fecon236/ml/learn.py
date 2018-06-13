@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-06-12
+#  Python Module for import                           Date : 2018-06-13
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  learn.py :: Fundamentals from Machine Learning
@@ -6,13 +6,15 @@ _______________|  learn.py :: Fundamentals from Machine Learning
 - softmax() for cross-entropy, MLE, neural networks, Boltzmann portfolio.
 - softmax_sort() for ordering and filtering info on the probabilities.
 
+USAGE: tests/test_learn.py contains numerical examples.
 
 REFERENCES
 - David J.C. MacKay (2008), Information theory, Inference, and Learning
     Algorithms, 7th printing from Cambridge U. Press.
-
+- Softmax, https://compute.quora.com/What-is-softmax?share=1
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-13  Spin-off doctests to tests/test_learn.py.
 2018-06-12  learn.py, fecon236 fork. Fix imports, pass flake8, pass doctest.
 2017-06-09  ys_mlearn.py, fecon235 v5.18.0312, https://git.io/fecon235
 '''
@@ -34,22 +36,7 @@ def softmax(it, temp=55, n=4):
        can be sharpened by decreasing temp towards 1.
        Setting temp to 0 results in generic softmax without temperature.
        Results are rounded to n decimal places.
-    >>> softmax([16, 8, 4, 0, -8, -16], temp=200, n=4)
-    [0, 16, 0.2598, 200, [0.2598, 0.2001, 0.1757, 0.1542, 0.1188, 0.0915]]
-    >>> softmax([16, 8, 4, 0, -8, -16], temp=50, n=4)
-    [0, 16, 0.5733, 50, [0.5733, 0.2019, 0.1198, 0.0711, 0.0251, 0.0088]]
-    >>> softmax([16, 8, 4, 0, -8, -16], temp=30, n=4)
-    [0, 16, 0.7773, 30, [0.7773, 0.1365, 0.0572, 0.024, 0.0042, 0.0007]]
-    >>> softmax([16, 8, 4, 0, -8, -16], temp=1, n=4)
-    [0, 16, 1.0, 1, [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]]
-    >>> softmax([16, 8, 4, 0, -8, -16], temp=0, n=4)
-    [0, 16, 0.9997, 0, [0.9997, 0.0003, 0.0, 0.0, 0.0, 0.0]]
-    >>> softmax([16, 16], temp=200, n=4)
-    [0, 16, 0.5, 200, [0.5, 0.5]]
-    >>> softmax([16, 15, -8], temp=50, n=4)
-    [0, 16, 0.5587, 50, [0.5587, 0.4395, 0.0018]]
     '''
-    #  Reference: https://compute.quora.com/What-is-softmax
     #  Convert iterable to numpy array, then find index of its maximum value:
     arr = tool.toar(it)
     idmax = np.argmax(arr)
@@ -97,15 +84,17 @@ def softmax(it, temp=55, n=4):
     #      information theory, and maximum likelihood statistics.
     #      To test temperature variations, softmax() will be much faster.
 
+#  >>> softmax_sort([-16, -8, 0, 4, 8, 16], temp=50, drop=0.05, renorm=False)
+#  [(0.5733, 5, 16.0), (0.2019, 4, 8.0), (0.1198, 3, 4.0), (0.0711, 2, 0.0)]
+#
+#  >>> softmax_sort([-16, -8, 0, 4, 8, 16], temp=50, drop=0.05, renorm=True)
+#  [(0.5934, 5, 16.0), (0.209, 4, 8.0), (0.124, 3, 4.0), (0.0736, 2, 0.0)]
+
 
 def softmax_sort(it, temp=55, n=4, drop=0.00, renorm=False):
     '''Softmax results sorted, include index; option to drop and renormalize.
        Probabilities less than drop are ignored.
        Setting renorm=True will make probabilities sum to 1.
-    >>> softmax_sort([-16, -8, 0, 4, 8, 16], temp=50, drop=0.05, renorm=False)
-    [(0.5733, 5, 16.0), (0.2019, 4, 8.0), (0.1198, 3, 4.0), (0.0711, 2, 0.0)]
-    >>> softmax_sort([-16, -8, 0, 4, 8, 16], temp=50, drop=0.05, renorm=True)
-    [(0.5934, 5, 16.0), (0.209, 4, 8.0), (0.124, 3, 4.0), (0.0736, 2, 0.0)]
     '''
     arr = tool.toar(it)
     softmax_approx = softmax(arr, temp, n)[-1]
