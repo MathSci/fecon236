@@ -1,4 +1,4 @@
-#  require.txt :: mock requirements.txt for fecon236          Date : 2018-06-04
+#  require.txt :: mock requirements.txt for fecon236          Date : 2018-06-13
 #
 #    "$ pip install -r requirements.txt" is the orthodox way, BUT
 #    "$ pip install -r require.txt"      ONLY after reading below.
@@ -67,10 +67,16 @@ pandas-datareader==0.6.0
 #
 #  Written in LOCKFILE format, i.e. using "==" instead of ">="
 #  since the resulting build will be DETERMINISTIC.
-#
+
+
 #  _______________ RECOMMENDED GOODNESS to supplement fecon236:
 #                  IPython console  (far better than regular >>> Python IDE)
 #                  Jupyter notebook (for research and development)
+#  ----- but also...
+#  lxml
+#  html5lib
+#  bs4
+#  ----- pandas needs the previous three to best parse, see sec module.
 
 
 # =========================================================== ENDNOTES ========
