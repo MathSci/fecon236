@@ -5,6 +5,23 @@ within itself. This file simply gives a grand overview of such details
 and the annotations in the commits and tags.*
 
 
+### 2018-06-13  (tag: 10.6.6a58)
+
+The `__version__` variable in `fecon236/__init__.py` will be updated
+by `./bin/up-pypi` before each release upload to PyPI.
+
+Add new directories: `parse`, `math`, and `ml` such that
+
+```
+.old/235/lib/yi_secform.py -> fecon236/parse/sec.py
+.old/235/lib/yi_matrix.py -> fecon236/math/matrix.py
+.old/235/tests/test_matrix.py -> tests/test_matrix.py
+.old/235/lib/ys_mlearn.py -> fecon236/ml/learn.py
+```
+
+Add `tests/test_learn.py` by spin-off of doctests from ml/learn.py.
+
+
 ### 2018-06-09  (tag: 10.6.5a50)
 
 The objective of this micro-5 alpha release was to

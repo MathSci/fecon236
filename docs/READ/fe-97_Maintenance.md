@@ -17,8 +17,11 @@ Use absolute, rather than relative, import styles.
 
 Merge commits disabled at GitHub (prefer fast-forward rebase).
 
-- `__version__` should be manually edited in `fecon236/__init__.py`
-- `__version__` is not necessarily synced with VERSION.
+- The `__version__` variable in `fecon236/__init__.py` will be updated
+  by `./bin/up-pypi` before each release upload to PyPI.
+
+- `__version__` is not necessarily in sync with VERSION,
+  unless a release is being created.
 
 
 ### Dependencies
@@ -39,10 +42,11 @@ Merge commits disabled at GitHub (prefer fast-forward rebase).
 This is the site from which the world will `pip install fecon236`
 so great care must be taken here.
 
-- For ./bin/up-pypi, verify whether wheel is Universal (2/3) or Pure (3).
-- Bump VERSION.
 - Upload project to PyPI *only* from the *master* branch.
-- Execute ./bin/up-pypi without version argument.
+- For ./bin/up-pypi, verify whether wheel is Universal (2/3) or Pure (3).
+- Execute ./bin/up-pypi with version argument.
+- Bump VERSION.
+- Commit annotated tag to master branch.
 
 
 ### References
@@ -52,4 +56,4 @@ so great care must be taken here.
 
 ---
 
-Last update : 2018-05-19
+Last update : 2018-06-13
