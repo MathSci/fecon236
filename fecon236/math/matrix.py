@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-06-13
+#  Python Module for import                           Date : 2018-06-16
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  matrix.py :: Linear algebra module
@@ -29,6 +29,7 @@ REFERENCES
 - Gene H. Golub, 1989, Matrix Computations, 2nd. ed.
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-16  Bring covdiflog() from util.group module.
 2018-06-13  Appropriate error message for invert_caution().
 2018-06-12  matrix.py, fecon236 fork. Fix imports, pass flake8.
 2017-06-19  yi_matrix.py, fecon235 v5.18.0312, https://git.io/fecon235
@@ -38,6 +39,7 @@ from __future__ import absolute_import, print_function, division
 
 import numpy as np
 from fecon236.util import system
+from fecon236.util.group import groupdiflog
 
 
 RCOND = 1e-15
@@ -112,6 +114,18 @@ def invert(mat, rcond=RCOND):
         system.warn("ILL-CONDITION: invert() may output pseudo-nonsense.")
         #  How did we get here? The problem is most likely collinearity.
         return invert_pseudo(mat, rcond)
+
+
+def covdiflog(groupdf, lags=1):
+    '''Covariance array for differenced log(column) from group dataframe.
+       For correlation array, feed output here to cov2cor().
+    '''
+    #  See util.group.groupget() to retrieve and create group dataframe.
+    rates = groupdiflog(groupdf, lags)
+    V = rates.cov()
+    #        ^Type of V is still pandas DataFrame, so convert to array.
+    #  AVOID the np.matrix subclass; stick with np.ndarrays instead:
+    return V.values
 
 
 def cov2cor(cov, n=6):

@@ -1,10 +1,11 @@
-#  Python Module for import                           Date : 2018-06-14
+#  Python Module for import                           Date : 2018-06-16
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  group.py :: Group utilities
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-16  Move covdiflog() to math.matrix module.
 2018-06-14  Spin-off group stuff from top.py.
 2018-03-12  fecon235.py, fecon235 v5.18.0312, https://git.io/fecon235
 '''
@@ -84,18 +85,6 @@ def groupdiflog(groupdf, lags=1):
     '''Difference between lagged log(data) for columns in group dataframe.'''
     #  See groupget() to retrieve and create group dataframe.
     return groupfun(tool.diflog, groupdf, lags)
-
-
-#  def covdiflog(groupdf, lags=1):
-#      '''Covariance array for differenced log(column) from group dataframe.
-#         For correlation array: apply yi_matrix.cov2cor() later.
-#      '''
-#      #  See groupget() to retrieve and create group dataframe.
-#      rates = groupdiflog(groupdf, lags)
-#      V = rates.cov()
-#      #        ^Type of V is still pandas DataFrame, so convert to array.
-#      #  AVOID the np.matrix subclass; stick with np.ndarrays instead:
-#      return V.values
 
 
 def groupgeoret(groupdf, yearly=256, order=True):
