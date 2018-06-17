@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-06-14
+#  Python Module for import                           Date : 2018-06-16
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  top.py :: Unity among fecon236 modules
@@ -14,6 +14,7 @@ REFERENCE
   instruments is now accessible via OpenFIGI, https://www.openfigi.com/search
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-16  Spin-off Holt-Winters section to tsa/holtwinters.py.
 2018-06-14  Spin-off group stuff to util/group.py.
                 Spin-off get() to host/hostess.py.
 2018-06-13  Rename to top.py, fecon236 fork. Lint bugs:
@@ -25,97 +26,6 @@ from __future__ import absolute_import, print_function, division
 
 import pandas as pd
 from fecon236.util import system
-
-
-def get(code, maxi=0):
-    '''Unifies getfred, getqdl, and getstock for data retrieval.
-    code is fredcode, quandlcode, futures slang, or stock slang.
-    maxi should be an integer to set maximum number of data points,
-         where 0 implies the default value.
-
-    get() will accept the vendor code directly as string, e.g.
-    from FRED and Quandl, or use one of our abbreviated variables
-    documented in the appropriate module listed above.
-    The notebooks provide good code examples in action.
-
-    Futures slang is of the form 'f4spotyym' where
-                  spot is the spot symbol in lower case,
-                  yy   is the last two digits of the year
-                  m    is the delivery month code,
-            so for December 2015 COMEX Gold: 'f4xau15z'
-
-    Stock slang can be also used for ETFs and mutual funds.
-    The general form is 's4symbol' where the symbol must be in
-    lower case, so for SPY, use 's4spy' as an argument.
-    '''
-    try:
-        df = getfred(code)
-    except:
-        try:
-            if maxi:
-                df = getqdl(code, maxi)
-            else:
-                df = getqdl(code)
-        except:
-            try:
-                if maxi:
-                    df = getstock(code, maxi)
-                else:
-                    df = getstock(code)
-            except:
-                raise ValueError('INVALID string or code for fecon get()')
-    return df
-
-
-def forecast(data, h=12, grids=0, maxi=0):
-    '''Make h period ahead forecasts using holt* or optimize_holtforecast,
-       where "data" may be a DataFrame, fredcode, quandlcode, or stock slang.
-       (Supercedes: "Unifies holtfred and holtqdl for quick forecasting.")
-    '''
-    #  Generalization of 2016-12-29 preserves and expands former interface.
-    if not isinstance(data, pd.DataFrame):
-        try:
-            data = get(data, maxi)
-            #           ^expecting fredcode, quandlcode, or stock slang
-            #      to be retrieved as DataFrame.
-        except:
-            raise ValueError("fecon235.forecast(): INVALID data argument.")
-    if grids > 0:
-        #  Recommend grids=50 for reasonable results,
-        #  but TIME-CONSUMING for search grids > 49
-        #  to FIND OPTIMAL alpha and beta by minBrute():
-        opt = optimize_holtforecast(data, h, grids=grids)
-        #  See optimize_holtforecast() in module ys_opt_holt for details.
-        system.warn(str(opt[1]), stub="OPTIMAL alpha, beta, losspc, loss:")
-        return opt[0]
-    else:
-        #  QUICK forecasts when grids=0 ...
-        #  by using FIXED defaults: alpha=ts.hw_alpha and beta=ts.hw_beta:
-        holtdf = holt(data)
-        system.warn("Holt-Winters parameters have NOT been optimized.")
-        return holtforecast(holtdf, h)
-
-
-def foreholt(data, h=12, alpha=hw_alpha, beta=hw_beta, maxi=0):
-    '''Holt-Winters forecast h-periods ahead (data slang aware).'''
-    #  "data" can be a fredcode, quandlcode, stock slang,
-    #         OR a DataFrame which will be detected:
-    if not isinstance(data, pd.DataFrame):
-        try:
-            data = get(data, maxi)
-        except:
-            raise ValueError("fecon235.forehalt(): INVALID data argument.")
-    #  To find optimal parameter values for alpha and beta beforehand,
-    #  use optimize_holtforecast() in module ys_opt_holt.
-    holtdf = holt(data, alpha, beta)
-    #   Interim results will not be retained.
-    return holtforecast(holtdf, h)
-
-
-def holtfred(data, h=24, alpha=hw_alpha, beta=hw_beta):
-    '''Holt-Winters forecast h-periods ahead (fredcode aware).'''
-    #  Retained for backward compatibility, esp. pre-2016 notebooks.
-    return foreholt(data, h, alpha, beta)
 
 
 def forefunds(nearby='16m', distant='17m'):

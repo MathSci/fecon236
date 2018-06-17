@@ -1,9 +1,12 @@
-#  Python Module for import                           Date : 2018-05-31
+#  Python Module for import                           Date : 2018-06-16
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  holtwinters.py :: Holt-Winters time-series functions.
 
 Holt-Winters is two-parameter linear growth exponential smoothing model.
+It has many uses, for example, stabilizing a time-series.
+For forecasting, the results are distilled in the forecast() function
+which features robust parameter optimization in the background.
 
 TESTS for this module are carried out in tests/test_holtwinters.py
 and the doctests there show numerical examples of how some of our
@@ -36,6 +39,7 @@ REFERENCES:
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-16  Absort Holt-Winters functions from top.py, esp. forecast().
 2018-05-31  ABSORB opt_holt module to estimate optimal alpha and beta.
 2018-05-11  Fix imports.
 2018-05-10  holtwinters.py, fecon236 fork. Pass flake8.
@@ -47,8 +51,10 @@ CHANGE LOG  For LATEST version, see https://git.io/fecon236
 from __future__ import absolute_import, print_function, division
 
 import numpy as np
+import pandas as pd
 from fecon236.util import system
 from fecon236.tool import todf, tailvalue
+from fecon236.host.hostess import get
 
 #  To estimate optimal alpha and beta, see === section:
 from fecon236.oc import optimize as op
@@ -137,6 +143,26 @@ def holtforecast(holtdf, h=12):
     forecasts = [y] + [l + (b*(i+1)) for i in range(h)]
     #            ^last actual point
     return todf(forecasts, 'Forecast')
+
+
+def foreholt(data, h=12, alpha=hw_alpha, beta=hw_beta, maxi=0):
+    '''Data slang aware Holt-Winters holtforecast(), h-periods ahead.
+       Thus "data" can be a fredcode, quandlcode, stock slang,
+       OR a DataFrame should be detected.
+    '''
+    if not isinstance(data, pd.DataFrame):
+        try:
+            data = get(data, maxi)
+        except Exception:
+            raise ValueError("INVALID data argument.")
+    holtdf = holt(data, alpha, beta)
+    return holtforecast(holtdf, h)
+
+
+def holtfred(data, h=24, alpha=hw_alpha, beta=hw_beta):
+    '''Holt-Winters forecast h-periods ahead (fredcode aware).'''
+    #  Retained for backward compatibility, esp. pre-2016 notebooks.
+    return foreholt(data, h, alpha, beta)
 
 
 def plotholt(holtdf, h=12):
@@ -268,6 +294,30 @@ def optimize_holtforecast(dataframe, h=12, grids=50):
     #     so that the model parameters and median absolute loss are available.
     #     Forecasts alone can be obtained directly by func(...)[0]
     return [forecasts_df, alphabetaloss]
+
+
+def forecast(data, h=12, grids=0, maxi=0):
+    '''h-period ahead forecasts by holtforecast or optimize_holtforecast,
+       where "data" may be fredcode, quandlcode, stock slang, or DataFrame.
+       Given default grids argument, forecast is very QUICK since we use
+       FIXED parameters implicitly: alpha=hw_alpha and beta=hw_beta.
+       Recommend grids=50 for reasonable results, but it is TIME-CONSUMING
+       for search grids > 49 to find OPTIMAL alpha and beta.
+    '''
+    if not isinstance(data, pd.DataFrame):
+        try:
+            data = get(data, maxi)
+            #          ^Expecting fredcode, quandlcode, or stock slang.
+        except Exception:
+            raise ValueError("INVALID data argument.")
+    if grids > 0:
+        opt = optimize_holtforecast(data, h, grids=grids)
+        system.warn(str(opt[1]), stub="OPTIMAL alpha, beta, losspc, loss:")
+        return opt[0]
+    else:
+        holtdf = holt(data)
+        system.warn("Holt-Winters parameters have NOT been optimized.")
+        return holtforecast(holtdf, h)
 
 
 if __name__ == "__main__":
