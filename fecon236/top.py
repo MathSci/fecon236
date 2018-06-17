@@ -1,9 +1,9 @@
-#  Python Module for import                           Date : 2018-06-16
+#  Python Module for import                           Date : 2018-06-17
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
-_______________|  top.py :: Unity among fecon236 modules
+_______________|  top.py :: Top priority fecon236 experiments
 
-- Frequently used idioms can be generalized with shorter names.
+- TODO: Works in progress to be moved into a subdirectory upon maturity.
 
 USAGE
 - More explicit syntax recommended: "import fecon236 as fe"
@@ -14,6 +14,7 @@ REFERENCE
   instruments is now accessible via OpenFIGI, https://www.openfigi.com/search
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-17  Spin-off forefunds() to rates/fedfunds.py.
 2018-06-16  Spin-off Holt-Winters section to tsa/holtwinters.py.
 2018-06-14  Spin-off group stuff to util/group.py.
                 Spin-off get() to host/hostess.py.
@@ -24,23 +25,7 @@ CHANGE LOG  For LATEST version, see https://git.io/fecon236
 
 from __future__ import absolute_import, print_function, division
 
-import pandas as pd
 from fecon236.util import system
-
-
-def forefunds(nearby='16m', distant='17m'):
-    '''Forecast distant Fed Funds rate using Eurodollar futures.'''
-    #  Long derivation is given in qdl-libor-fed-funds.ipynb
-    ffer = getfred('DFF')
-    #      ^Retrieve Fed Funds effective rate, daily since 1954.
-    ffer_ema = ema(ffer['1981':], 0.0645)
-    #                    ^Eurodollar futures debut.
-    #          ^Exponentially Weighted Moving Average, 30-period.
-    libor_nearby = get('f4libor' + nearby)
-    libor_distant = get('f4libor' + distant)
-    libor_spread = todf(libor_nearby - libor_distant)
-    #     spread in forward style quote since futures uses 100-rate.
-    return todf(ffer_ema + libor_spread)
 
 
 def foreinfl(n=120, alpha=1.0, beta=0.3673):
