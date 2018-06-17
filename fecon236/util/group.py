@@ -1,10 +1,10 @@
-#  Python Module for import                           Date : 2018-06-16
+#  Python Module for import                           Date : 2018-06-17
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  group.py :: Group utilities
 
-
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-17  Spin-off groupcotr() to futures.cftc module.
 2018-06-16  Move covdiflog() to math.matrix module.
 2018-06-14  Spin-off group stuff from top.py.
 2018-03-12  fecon235.py, fecon235 v5.18.0312, https://git.io/fecon235
@@ -15,7 +15,6 @@ from __future__ import absolute_import, print_function, division
 from fecon236 import tool
 from fecon236.util import system
 from fecon236.host import fred
-from fecon236.host import qdl
 from fecon236.host.hostess import get
 from fecon236.dst.gaussmix import gemrat
 from fecon236.tsa import holtwinters as hw
@@ -28,12 +27,6 @@ group4d = {'Zero10': fred.d4zero10, 'SPX': fred.d4spx, 'XAU': fred.d4xau,
            'EURUSD': fred.d4eurusd, 'USDJPY': fred.d4usdjpy}
 #         For usage, see https://git.io/georet for details,
 #         in particular, functions like group*() in this module.
-
-cotr4w = {'Bonds': qdl.w4cotr_bonds, 'Equities': qdl.w4cotr_equities,
-          'Metals': qdl.w4cotr_metals, 'USD': qdl.w4cotr_usd}
-#         For usage, see https://git.io/cotr for details,
-#         "Market position indicators using CFTC COTR"
-#         COTR:= Commitment of Traders Report.
 
 world4d = {'America': 's4spy', 'Europe': 's4ezu',
            'Japan': 's4ewj',  'Emerging': 's4eem', 'Gold': 's4gld'}
@@ -123,10 +116,6 @@ def groupgemrat(groupdf, yearly=256, order=False, n=2):
 
 def groupholtf(groupdf, h=12, alpha=hw.hw_alpha, beta=hw.hw_beta):
     '''Holt-Winters forecasts h-periods ahead from group dataframe.'''
-    #  Tip: use all available (non-sliced) data for forecasting.
-    #  This is essentially a Kalman filter with optimal alpha-beta,
-    #  applied to each series individually, not jointly.
-    #  cf. holtfred() which works given a single series dataframe.
     forecasts = []
     keys = list(groupdf.columns)
     for k in keys:
@@ -137,22 +126,6 @@ def groupholtf(groupdf, h=12, alpha=hw.hw_alpha, beta=hw.hw_beta):
     keysdf = tool.paste(forecasts)
     keysdf.columns = keys
     return keysdf
-
-
-def groupcotr(group=cotr4w, alpha=0):
-    '''Compute latest normalized CFTC COTR position indicators.
-       Optionally specify alpha for Exponential Moving Average
-       which is a smoothing parameter: 0 < alpha < 1 (try 0.26)
-       COTR is the Commitment of Traders Report from US gov agency.
-    '''
-    #  For detailed derivation, see qdl-COTR-positions.ipynb
-    positions = groupget(group)
-    norpositions = groupfun(tool.normalize, positions)
-    #  alpha default should skip SMOOTHING operation...
-    if alpha:
-        return groupfun(hw.ema, norpositions, alpha)
-    else:
-        return norpositions
 
 
 if __name__ == "__main__":
