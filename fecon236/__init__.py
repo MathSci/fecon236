@@ -1,5 +1,5 @@
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-#  Python package installation                        Date : 2018-06-15
+#  Python package installation                        Date : 2018-06-18
 '''
 _______________|  fecon236/__init__.py :: Top installation goods
 
@@ -15,6 +15,7 @@ References:  https://github.com/kennethreitz/samplemod
              https://github.com/kennethreitz/setup.py
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-18  Include top, fedfunds, group, cftc, infl modules.
 2018-06-15  Include get() from host/hostess.py.
 2018-06-13  Include matrix and learn modules, but not sec.
 2018-06-10  Include plotn(). __version__ updates by ./bin/up-pypi
@@ -33,7 +34,9 @@ from __future__ import absolute_import, print_function, division
 import numpy as np                                        # noqa
 import pandas as pd                                       # noqa
 from fecon236.tool import *                               # noqa
+from fecon236.top import *                                # noqa
 from fecon236.util import system                          # noqa
+from fecon236.util import group                           # noqa
 from fecon236.host import fred                            # noqa
 from fecon236.host import qdl                             # noqa
 from fecon236.host import stock                           # noqa
@@ -47,6 +50,9 @@ from fecon236.dst.gaussmix import gemrat, gm2gem          # noqa
 from fecon236.prob import sim                             # noqa
 from fecon236.math import matrix as mat                   # noqa
 from fecon236.ml import learn                             # noqa
+from fecon236.econ.infl import foreinfl                   # noqa
+from fecon236.rates.fedfunds import forefunds             # noqa
+from fecon236.futures.cftc import groupcotr               # noqa
 
 
 __version__ = '10.6.6a58'
