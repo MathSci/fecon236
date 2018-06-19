@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-06-18
+#  Python Module for import                           Date : 2018-06-19
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  test_group.py :: Test fecon236 util.group module
@@ -27,38 +27,6 @@ CHANGE LOG  For LATEST version, see https://git.io/fecon236
 from __future__ import absolute_import, print_function, division
 
 from fecon236.util import system
-
-
-#  def test_group_fecon236_GET_d4xau_from_FRED_vSlow():
-#      '''Test get() in fecon which uses getfred() in yi_fred module.
-#         Here we get gold quotes from the FRED database.
-#      >>> xau = get(d4xau)
-#      >>> xau['2015-07-21':'2015-07-28']
-#                       Y
-#      T
-#      2015-07-21  1105.6
-#      2015-07-22  1088.6
-#      2015-07-23  1097.4
-#      2015-07-24  1080.8
-#      2015-07-27  1100.0
-#      2015-07-28  1096.2
-#      '''
-#      pass
-
-
-#  def test_group_fecon236_GET_w4cotr_metals_from_QUANDL_vSlow():
-#      '''Test get() in fecon which uses getqdl() in yi_quandl module.
-#         Thus it is an indirect test of yi_quandl_api module.
-#         Here we get the CFTC Commitment of Traders Reports
-#         for gold and silver expressed as our position indicator.
-#      >>> metals = get(w4cotr_metals)
-#      >>> metals['2015-07-21':'2015-07-28']
-#                         Y
-#      Date
-#      2015-07-21  0.458814
-#      2015-07-28  0.461077
-#      '''
-#      pass
 
 
 #  def test_group_fecon236_FORECAST_m4xau_from_FRED_vSlow():
