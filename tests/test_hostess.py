@@ -11,6 +11,10 @@ Mark very slow tests with "vSlow" suffix, so
 
     $ py.test -k 'not vSlow'  # Excludes such tests.
 
+Mark tests requiring authentication with "oLocal" suffix
+denoting Only Local testing, e.g. Quandl access.
+
+
 REFERENCE:
 pytest:  https://pytest.org/latest/getting-started.html
          or PDF at http://pytest.org/latest/pytest.pdf
@@ -46,7 +50,7 @@ def test_group_fecon236_GET_d4xau_from_FRED_vSlow():
     pass
 
 
-def test_group_fecon236_GET_d7xbtusd_from_QUANDL_vSlow():
+def test_group_fecon236_GET_d7xbtusd_from_QUANDL_vSlow_oLocal():
     '''Test get() which uses getqdl() in qdl module.
        Here we get a Bitcoin price from Quandl.
     '''
@@ -56,7 +60,7 @@ def test_group_fecon236_GET_d7xbtusd_from_QUANDL_vSlow():
 
 #  FAIL 2018-06-19. Quandl is operational, so the problem is w4cotr* series.
 @pytest.mark.xfail
-def test_group_fecon236_GET_w4cotr_metals_from_QUANDL_vSlow():
+def test_group_fecon236_GET_w4cotr_metals_from_QUANDL_vSlow_oLocal():
     '''Test get() which uses getqdl() in qdl module.
        Here we get the CFTC Commitment of Traders Reports
        for gold and silver expressed as our position indicator.
