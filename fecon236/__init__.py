@@ -56,7 +56,7 @@ from fecon236.rates.fedfunds import forefunds                            # noqa
 from fecon236.futures.cftc import groupcotr                              # noqa
 
 
-__version__ = '10.6.6a58'
+__version__ = '10.6.7b70'
 #             ^MAJOR.MINOR.MICRO release (updated by ./bin/up-pypi).
 #              The alpha "a" or beta "b" tag is based on Travis build number.
 #              Release candidates will be denoted by "c" (not rc).
