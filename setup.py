@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-#  Python package installation                        Date : 2018-06-02
+#  Python package installation                        Date : 2018-06-20
 '''
 _______________|  fecon236/setup.py :: Installation via setuptools.
 
@@ -43,6 +43,7 @@ VERSION in play:  Use "pip show fecon236"
      CLASSIFERS:  https://pypi.python.org/pypi?%3Aaction=list_classifiers
 
 CHANGE LOG  For latest version, see https://git.io/fecon236
+2018-06-20  Change development status from alpha to stable.
 2018-06-02  Add PROJECTURL and edit project_urls.
 2018-05-24  Support markdown by appending "content_type" incantations.
                 Recent setuptools, wheel, and twine are necessary.
@@ -130,10 +131,10 @@ setup(
     project_urls={
         'Source': PROJECTURL,
         'Require': PROJECTURL+'/blob/develop/require.txt',
-        'Install': PROJECTURL+'/blob/develop/docs/READ/fe-10_Install.md',
+        'Installation': PROJECTURL+'/blob/develop/docs/READ/fe-10_Install.md',
         'Documentation': PROJECTURL+'/tree/develop/docs',
         'Notebooks': 'https://github.com/rsvp/fecon235/tree/master/nb',
-        'Tracker': PROJECTURL+'/projects/2',
+        'Tracker': PROJECTURL+'/projects/3',
         'Issues': PROJECTURL+'/issues',
         'License': PROJECTURL+'/blob/master/LICENSE.md',
     },
@@ -141,9 +142,9 @@ setup(
     include_package_data=True,
     packages=find_packages(exclude=('.old', 'docs', 'tests')),
     license='BSD',
-    keywords='pandas finance economics statistics econometrics jupyter',
+    keywords='finance economics statistics econometrics pandas jupyter',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: BSD License',
         'Topic :: Scientific/Engineering',
         'Topic :: Office/Business :: Financial :: Investment',
