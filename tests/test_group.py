@@ -27,49 +27,6 @@ CHANGE LOG  For LATEST version, see https://git.io/fecon236
 from __future__ import absolute_import, print_function, division
 
 from fecon236.util import system
-
-
-#  def test_group_fecon236_FORECAST_m4xau_from_FRED_vSlow():
-#      '''Test forecast() in fecon which uses Holt-Winters method.
-#         Values for alpha and beta are somewhat optimized by moderate grids:
-#             alpha, beta, losspc, loss: [0.9167, 0.125, 2.486, 28.45]
-#         We use monthly gold data, and type forecast as integers
-#         to avoid doctest with floats (almost equal problem).
-#      >>> xau = get(m4xau)
-#      >>> xaufc = forecast(xau['2005-07-28':'2015-07-28'], h=6, grids=25)
-#      >>> xaufc.astype('int')
-#         Forecast
-#      0      1144
-#      1      1135
-#      2      1123
-#      3      1112
-#      4      1100
-#      5      1089
-#      6      1078
-#      '''
-#      pass
-
-
-#  def test_group_fecon236_foreholt_m4xau_from_FRED_vSlow():
-#      '''Test foreholt() in fecon236 which uses Holt-Winters method.
-#         Default values for alpha and beta are assumed.
-#         We use monthly gold data, and type forecast as integers
-#         to avoid doctest with floats (almost equal problem).
-#      >>> xau = get(m4xau)
-#      >>> xaufh = foreholt(xau['2005-07-28':'2015-07-28'], h=6)
-#      >>> xaufh.astype('int')
-#         Forecast
-#      0      1144
-#      1      1161
-#      2      1154
-#      3      1146
-#      4      1138
-#      5      1130
-#      6      1122
-#      '''
-#      pass
-
-
 from fecon236.util import group
 from fecon236.host import fred
 

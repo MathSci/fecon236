@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-31
+#  Python Module for import                           Date : 2018-06-20
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  test_holtwinters.py :: Test fecon236 holtwinters module.
@@ -7,6 +7,7 @@ _______________|  test_holtwinters.py :: Test fecon236 holtwinters module.
 - Test ema() which is a special case of Holt-Winters.
 - Test optimize_holt(), absorbed from opt_holt module, which produces
   robust optimal estimates of alpha and beta.
+- Test foreholt() and forecast().
 
 Doctests display at lower precision since equality test becomes fuzzy across
 different systems if full floating point representation is used.
@@ -19,6 +20,7 @@ REFERENCE
             or PDF at http://pytest.org/latest/pytest.pdf
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-20  Include test of foreholt() and forecast() from test_group.py.
 2018-05-31  Include test of optimize_holt().
 2018-05-20  fecon236 fork. Doctest flake8 fail: W291 trailing whitespace.
 2016-12-18  fecon235 v5.18.0312, https://git.io/fecon235
@@ -30,6 +32,7 @@ from os import sep
 from fecon236 import tool
 from fecon236.util import system
 from fecon236.host import fred
+from fecon236.host.hostess import get                   # noqa
 from fecon236.tsa import holtwinters as hw              # noqa
 #
 #  In this tests directory without __init__.py, we use absolute import,
@@ -231,6 +234,47 @@ def test_holtwinters_fecon236_download_fred_optimize_holt_vSlow():
     alpha, beta, _, _ = hw.optimize_holt(infl['2003':'2010'], grids=20)
     assert abs(alpha - 0.8947) <= 0.02
     assert abs(beta - 0.7895) <= 0.02
+
+
+def test_holtwinters_fecon236_foreholt_m4xau_from_FRED_vSlow():
+    '''Test get() and foreholt() which uses Holt-Winters method.
+       Default values for alpha and beta are assumed.
+       We use monthly gold data, and type forecast as integers
+       to avoid doctest with floats (almost equal problem).
+    >>> xau = get(fred.m4xau)
+    >>> xaufh = hw.foreholt(xau['2005-07-28':'2015-07-28'], h=6)
+    >>> xaufh.astype('int')
+       Forecast
+    0      1144
+    1      1161
+    2      1154
+    3      1146
+    4      1138
+    5      1130
+    6      1122
+    '''
+    pass
+
+
+def test_holtwinters_fecon236_FORECAST_m4xau_from_FRED_vSlow():
+    '''Test get() and hw.forecast() which uses Holt-Winters method.
+       Values for alpha and beta are somewhat optimized by moderate grids:
+           alpha, beta, losspc, loss: [0.9167, 0.125, 2.486, 28.45]
+       We use monthly gold data, and type forecast as integers
+       to avoid doctest with floats (almost equal problem).
+    >>> xau = get(fred.m4xau)
+    >>> xaufc = hw.forecast(xau['2005-07-28':'2015-07-28'], h=6, grids=25)
+    >>> xaufc.astype('int')
+       Forecast
+    0      1144
+    1      1135
+    2      1123
+    3      1112
+    4      1100
+    5      1089
+    6      1078
+    '''
+    pass
 
 
 if __name__ == "__main__":
