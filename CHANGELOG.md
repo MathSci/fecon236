@@ -5,6 +5,41 @@ within itself. This file simply gives a grand overview of such details
 and the annotations in the commits and tags.*
 
 
+### 2018-06-20  (tag: 10.6.7b70)
+
+The objective of this micro-7 beta release was to
+spin-off, integrate, and test the old *fecon235/fecon235.py*
+top module as *fecon236/fecon236/top.py*.
+Spin-off from top.py, which is now entirely clean and empty,
+results in several new subdirectories and modules.
+
+```
+.old/235/fecon235.py -> fecon236/top.py
+.old/235/tests/test_fecon235.py -> tests/test_group.py
+```
+
+- Add util/group.py for `group*()` functions
+    - Move covdiflog() from util/group.py to math/matrix.py
+- Add futures/cftc.py resulting from groupcotr()
+- Function forecast() moved to holtwinters module
+    - Include foreholt() and forecast() in test_holtwinters.py
+- Add rates/fedfunds.py especially for forefunds()
+- Add econ/infl.py especially for foreinfl()
+- Add host/hostess.py especially for get()
+
+Fix #3: Circular dependencies resolved within host/hostess.py.
+The Python circular dependency hack is detailed in the Endnotes:
+put imports inside get() and avoid "from" import syntax.
+Test get() via FRED and Quandl in test_hostess.py.
+
+Decorate w4cotr_metals with pytest.mark.xfail, to be investigated.
+
+**setup.py: Change development status from alpha to STABLE.**
+***The essential core spin-off from fecon235 to fecon236
+is now complete and passes flake8, unit and integration tests:***
+Travis build 70, https://travis-ci.org/MathSci/fecon236/builds/394678277
+
+
 ### 2018-06-13  (tag: 10.6.6a58)
 
 The `__version__` variable in `fecon236/__init__.py` will be updated
