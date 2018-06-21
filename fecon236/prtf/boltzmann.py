@@ -1,13 +1,14 @@
-#  Python Module for import                           Date : 2017-07-08
-#  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per Python PEP 0263 
-''' 
-_______________|  ys_prtf_boltzmann.py : Boltzmann portfolio
+#  Python Module for import                           Date : 2018-06-20
+#  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
+'''
+_______________|  boltzmann.py :: Boltzmann portfolio for fecon236
 
 Alternative to Markowitz portfolio. Usage demonstrated in notebook, see
-nb/prtf-boltzmann-1.ipynb for explicit details and derivation.
+fecon235/nb/prtf-boltzmann-1.ipynb for explicit details and derivation,
+or Part 1: https://git.io/boltz1 and Part 2: https://git.io/boltz2
 
-    The softmax() function is in lib/ys_mlearn.py since it applies more widely
-    in machine learning.
+    The softmax() function is in fecon236/ml/learn.py since it applies
+    more widely in machine learning.
 
 One virtually has no control over how the assets perform and interact. Only
 the portfolio allocation over time is in our decision set. Let's recast the
@@ -71,49 +72,46 @@ REFERENCES
 
 - John H. Cochrane, 2005, Asset Pricing, Princeton U. Press.
 
-CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
-2017-07-08  Add narrative.
-2017-06-30  Revise boltzportfolio() as list, not print.
-               Increase default precision when using groupgemrat().
-2017-06-28  Condense functions described in Part 1 notebook.
-2017-06-26  First version.
+CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-20  boltzmann.py, fecon236 fork. Fix imports, pass flake8.
+2017-07-08  ys_prtf_boltzmann.py, fecon235 v5.18.0312, https://git.io/fecon235
 '''
 
 from __future__ import absolute_import, print_function, division
+
 import numpy as np
-import fecon235.fecon235
-#      ^SOLE circular import style which works for Python 2 & 3.
-from . import yi_0sys as system
-from . import yi_1tools as tools
-from . import yi_matrix as matrix
+from fecon236 import tool
+from fecon236.util import system
+from fecon236.util import group
+from fecon236.math import matrix
 #               ^avoiding the np matrix type, stick with arrays!
-from . import ys_mlearn as mlearn
+from fecon236.ml import learn
 
 
-def weighcov( cov ):
+def weighcov(cov):
     '''WEIGHT array (N,1) for Global Min Var Portfolio, given cov.'''
     #  Derived in Cochrane (2005), chp. 5, p.83.
-    Viv = matrix.invert_pseudo( cov )
+    Viv = matrix.invert_pseudo(cov)
     #                  ^in case covariance matrix is ill-conditioned.
-    one = np.ones( (cov.shape[0], 1) )
+    one = np.ones((cov.shape[0], 1))
     top = Viv.dot(one)
     bot = one.T.dot(Viv).dot(one)
     return top / bot
 
 
-def weighcovdata( dataframe ):
+def weighcovdata(dataframe):
     '''WEIGHT array (N,1) for Global Min Var Portfolio, given data.'''
-    V = fecon235.fecon235.covdiflog( dataframe )
+    V = matrix.covdiflog(dataframe)
     return weighcov(V)
 
 
-def trimit( it, floor, level ):
+def trimit(it, floor, level):
     '''For an iterable, accept values > floor, else set to level.'''
     try:
         #  ... in case "it" array elements are integers,
         #  else we cannot assign floats later when enumerating:
         it = it.astype(np.float64)
-    except:
+    except Exception:
         pass
     cpit = it[:]
     for i, x in enumerate(it):
@@ -122,19 +120,19 @@ def trimit( it, floor, level ):
     return cpit
 
 
-def renormalize( it ):
+def renormalize(it):
     '''Let elements of an iterable proportionally abs(sum) to 1.
        Renormalization of portfolio weights is treated differently
        than probabilities which cannot be negative.
     '''
     #  Remember that a list is an iterable, too.
-    arr = np.array([ float(x) for x in it ])
+    arr = np.array([float(x) for x in it])
     sumit = float(np.sum(arr))
     try:
         #  ... in case "it" array elements are integers,
         #  else we cannot assign floats later when enumerating:
         it = it.astype(np.float64)
-    except:
+    except Exception:
         pass
     cpit = it[:]
     for i, x in enumerate(it):
@@ -144,23 +142,23 @@ def renormalize( it ):
     return cpit
 
 
-def rentrim( weights, floor, level ): 
+def rentrim(weights, floor, level):
     '''Accept weight > floor, else set to level, then renormalize.'''
-    trimmed = trimit( weights, floor, level )
+    trimmed = trimit(weights, floor, level)
     return renormalize(trimmed)
 
 
-def gemratarr( dataframe, yearly=256 ):
+def gemratarr(dataframe, yearly=256):
     '''Extract geometric mean rate of each column into an array.'''
-    gems = fecon235.fecon235.groupgemrat( dataframe, yearly, order=False, n=8 )
+    gems = group.groupgemrat(dataframe, yearly, order=False, n=8)
     return np.array([item[0] for item in gems]).reshape(len(gems), 1)
 
 
-def weighsoft( weights, rates, temp, floor, level ):
+def weighsoft(weights, rates, temp, floor, level):
     '''Given weights, compute pweights as array by softmax transform.'''
     scores = weights * rates
-    problist = mlearn.softmax( scores, temp )[-1]
-    probs = np.array( problist ).reshape(len(problist), 1)
+    problist = learn.softmax(scores, temp)[-1]
+    probs = np.array(problist).reshape(len(problist), 1)
     #  Revise weights based on softmax probabilities:
     pweights = probs * weights
     #  Then appropriately adjust:
@@ -178,7 +176,7 @@ def boltzweigh(dataframe, yearly=256, temp=55, floor=0.01, level=0):
 
 def boltzportfolio(dataframe, yearly=256, temp=55, floor=0.01, level=0, n=4):
     '''MAIN: SUMMARY of Boltzmann portfolio, rounded to n-decimal places.
-       Return list where computed values are Python floats, not array type, e.g.
+       Return list where values are Python floats, not array type, e.g.
            [2.7833,
             [[0.6423, 2.05, 'America'],
              [0.0, -11.17, 'Emerging'],
@@ -198,10 +196,10 @@ def boltzportfolio(dataframe, yearly=256, temp=55, floor=0.01, level=0, n=4):
     grat = round(float(np.sum(scores)), n)
     keys = list(dataframe.columns)
     #  wrk, i.e. "weight, rate, key", is a list of lists:
-    wrk = [tools.roundit([float(w), float(rates[i]), keys[i]], n, echo=False)
-            for i, w in enumerate(pweights)]
-    return [ grat, wrk ]
+    wrk = [tool.roundit([float(w), float(rates[i]), keys[i]], n, echo=False)
+           for i, w in enumerate(pweights)]
+    return [grat, wrk]
 
 
 if __name__ == "__main__":
-     system.endmodule()
+    system.endmodule()
