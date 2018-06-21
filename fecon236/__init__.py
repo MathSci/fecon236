@@ -1,5 +1,5 @@
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-#  Python package installation                        Date : 2018-06-20
+#  Python package installation                        Date : 2018-06-21
 '''
 _______________|  fecon236/__init__.py :: Top installation goods
 
@@ -15,6 +15,7 @@ References:  https://github.com/kennethreitz/samplemod
              https://github.com/kennethreitz/setup.py
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-06-21  Include boltzmann module as boltz.
 2018-06-20  Arrange star imports.
 2018-06-18  Include top, fedfunds, group, cftc, infl modules.
 2018-06-15  Include get() from host/hostess.py.
@@ -51,6 +52,7 @@ from fecon236.dst.gaussmix import gemrat, gm2gem                         # noqa
 from fecon236.prob import sim                                            # noqa
 from fecon236.math import matrix as mat                                  # noqa
 from fecon236.ml import learn                                            # noqa
+from fecon236.prtf import boltzmann as boltz                             # noqa
 from fecon236.econ.infl import foreinfl                                  # noqa
 from fecon236.rates.fedfunds import forefunds                            # noqa
 from fecon236.futures.cftc import groupcotr                              # noqa
