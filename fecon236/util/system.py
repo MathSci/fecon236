@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-15
+#  Python Module for import                           Date : 2018-06-20
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  system.py :: system and date functions including specs.
@@ -18,6 +18,7 @@ REFERENCES:
 
 
 CHANGE LOG  For latest version, see https://git.io/fecon236
+2018-06-20  Update specs(), include version for statsmodels.
 2018-05-15  Include version("fecon236") to specs.
 2018-04-25  Ignore "raw_input" < python3 flake8.
 2018-04-21  yi_0sys module from fecon235 renamed to system.
@@ -195,23 +196,25 @@ def gitinfo():
 
 
 def specs():
-    '''Show ecosystem specifications, including execution timestamp.'''
-    #  APIs are subject to change, so versions are critical for debugging:
-    version("Python")
+    '''Show ecosystem specifications, including execution timestamp.
+       APIs are subject to change, so versions are critical for replication.
+    '''
     if pythontup() < minimumPython:
-        warn("may need newer Python version.")
+        warn("This project requires a more recent Python version.")
+    else:
+        print(" !:  Code for this project straddles python27 and python3.")
+    version("Python")
     version("IPython")
     version("jupyter_core")
-    version("notebook")
-    #       ^worked for Jupyter notebook 4.0.6
+    version("notebook")             # Worked for Jupyter notebook 4.0.6
     version("matplotlib")
     version("numpy")
-    #       ^dependency for pandas
     version("scipy")
+    version("statsmodels")
     version("sympy")
-    version("pandas")
+    version("pandas")               # pandas is the keystone for the rest.
     version("pandas_datareader")
-    #       ^but package is "pandas-datareader" esp. for financial quotes.
+    #       ^but package is "pandas-datareader" <=! GOTCHA
     version("fecon236")
     repo, tag, bra = gitinfo()
     print(" ::  Repository:", repo, tag, bra)
