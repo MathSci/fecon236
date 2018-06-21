@@ -62,4 +62,4 @@ For extremely serious bugs, contact security@ipython.org
 
 ---
 
-Revision date : 2018-06-21
+Latest revision at https://git.io/trustnb | This document date : 2018-06-21
