@@ -15,6 +15,7 @@ of the source code itself.
 
 ```
 CHANGE LOG
+2018-06-23  Include self-referential URL.
 2018-05-14  First working version.
 2018-04-21  Preliminary draft for fecon236.
 ```
@@ -26,7 +27,7 @@ We shall assume the following explicit style:
 `import fecon236 as fe`
 
 ```python
-#  PREAMBLE-p10.18.0514 :: Settings and system details
+#  PREAMBLE-p10.18.0623 :: Settings, https://git.io/236pa
 from __future__ import absolute_import, print_function, division
 fe.system.specs()
 %load_ext autoreload
@@ -55,4 +56,4 @@ get_ipython().set_hook('show_in_pager', page.as_hook(page.display_page), 0)
 
 ---
 
-Last update : 2018-05-14
+Short URL, https://git.io/236pa | Last update : 2018-06-23
