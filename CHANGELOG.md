@@ -5,6 +5,33 @@ within itself. This file simply gives a grand overview of such details
 and the annotations in the commits and tags.*
 
 
+### 2018-06-24  (tag: 10.7.0)
+
+**Bump minor to 7 to mark COMPLETION OF REFACTORING.**
+See `fecon236/__init__.py` for tree "map" of package directory,
+reproduced in README.md: `print(fe.map)`
+
+Revise docs/READ/fe-00_Intro.md esp. on versioning and
+use first half on first half of wiki Home.
+
+Add docs/READ/fe-02_FAQ.md originally from
+https://github.com/rsvp/fecon235/wiki a.k.a. Home
+but revised to reflect new fecon236 changes.
+Re-use this FAQ as second half of renewed Home.
+
+Add docs/jupyter/nb-10_Security_trust.md for notebooks.
+*Documentation now in sync between fecon235 and fecon236.*
+
+```
+.old/235/lib/ys_prtf_boltzmann.py -> fecon236/prtf/boltzmann.py
+.old/235/tests/test_boltzmann.py -> tests/test_boltzmann.py
+```
+
+prtf/boltzmann.py: Fix circular dependency problem using
+fecon235.fecon235 module, especially for covdiflog()
+and groupgemrat().
+
+
 ### 2018-06-20  (tag: 10.6.7b70)
 
 The objective of this micro-7 beta release was to
