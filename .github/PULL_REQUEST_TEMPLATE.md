@@ -1,11 +1,11 @@
-### Proposed changes in this pull request
+### Proposed changes in this pull request for fecon236
 
 Fix #
 
 - [ ] Bug :bug:
 - [ ] Add tests :white_check_mark:
 - [ ] Performance boost :racehorse:
-- [ ] Documentation or notebook change :memo:
+- [ ] Documentation change :memo:
 - [ ] Removed code or file :fire:
 - [ ] Security issue :lock:
 - [ ] Dependency downgrade :arrow_down:
@@ -18,7 +18,7 @@ Fix #
 
 ### Additional helpful details
 
-- [ ] REQUIRE: PR rebased on *latest* master branch
+- [ ] REQUIRE: PR rebased on *latest* `develop` branch
 - [ ] This pull request needs to be manually tested
 - [ ] Work-in-progress: more changes will follow
 - [ ] Issue requires further discussion
