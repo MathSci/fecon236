@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-06-09
+#  Python Module for import                           Date : 2018-07-01
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  sim.py :: Simulation module for fecon236
@@ -9,6 +9,9 @@ _______________|  sim.py :: Simulation module for fecon236
 - Let N be an integer for sample size or length of a series.
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-07-01  Add norat2ret() and ret2prices().
+                Replace rates2prices by zerat2prices for clarity.
+                Rename simshow() to simushow() and use new function.
 2018-06-09  Add rates2prices() and summary simshow().
 2018-06-08  Spin-off 2014 bootstrap material to boots/bootstrap.py.
 2018-06-07  Rename to sim.py, fecon236 fork. Pass flake8, fix imports.
@@ -75,32 +78,53 @@ def simug_mix(sigma1=0.0969/16., sigma2=0.26/16., q=0.129, N=256):
     return ratarr
 
 
-def rates2prices(ratarr, mean=0/256., initialpx=0):
-    '''Convert array containing rates of return to DataFrame of prices.'''
-    #  Initial price, initialpx, if not set, implicitly starts at 1.
-    #  REMEMBER to adjust annualized mean to match data frequency.
-    ret = (1 + mean) + ratarr
-    #  Price history is just the products of the returns ret.
-    #      Cumulative product, cumprod(), of array elements is very fast.
+def norat2ret(normarr, mean, sigma, yearly=256):
+    '''Reform array of N(0, 1) normalized RATES into array of RETURNS.
+       Arguments mean and sigma should be in decimal form.
+       Argument yearly expresses frequency to be obtained.
+    '''
+    meanly = mean / yearly   # e.g. 256 trading days in a year.
+    sigmaly = sigma / (yearly ** 0.5)
+    retarr = (1 + meanly) + (sigmaly * normarr)
+    #  Thus e.g. an approximate 2% gain is converted to 1.02.
+    #  Recall that log differences approximate percentage changes.
+    return retarr
+
+
+def ret2prices(retarr, inprice=1.0):
+    '''Transform array of returns into DataFrame of prices.'''
+    #  For cumulative product of array elements,
+    #  numpy's cumprod is very fast, and records the ongoing results.
     #  http://docs.scipy.org/doc/numpy/reference/generated/numpy.cumprod.html
-    productret = np.cumprod(ret)
-    if initialpx:
-        prices = initialpx * productret
+    prices = np.cumprod(retarr)  # prices here is in np.array form.
+    #      Initial price implicitly starts at 1 where
+    #      the history of prices is just the products of the returns.
+    if inprice == 1.0:
+        return todf(prices)
     else:
-        prices = productret
-    return todf(prices)
+        return todf(inprice * prices)
 
 
-def simshow(repeat=3, mean=0/256., N=256, func=simug_mix, visual=True):
-    '''Statistical and optional visual SUMMARY: repeat simulations of func.'''
-    #  Function func should rely on all its default args, except for N.
+def zerat2prices(ratarr, mean=0, yearly=256, inprice=1.0):
+    '''Transform array of mean-0 rates into DataFrame of prices with mean.'''
+    #  Default inprice means initial price implicitly starts at 1.
+    meanly = mean / yearly   # e.g. 256 trading days in a year.
+    retarr = (1 + meanly) + ratarr
+    return ret2prices(retarr, inprice)
+
+
+def simushow(N=256, mean=0, yearly=256, repeat=1, func=simug_mix, visual=True,
+             b=3.5, inprice=100):
+    '''Statistical and optional visual SUMMARY: repeat simulations of func.
+       Function func shall use all its default arguments, except for N.
+    '''
     for i in range(repeat):
         istr = str(i)
         ratarr = func(N=N)
-        prices = rates2prices(ratarr, mean, initialpx=100)
+        prices = zerat2prices(ratarr, mean, yearly, inprice)
         if visual:
-            plotn(prices, title='tmp-'+istr)
-        gm2gem(prices, b=2)
+            plotn(prices, title='tmp-'+func.__name__+'-'+istr)
+        gm2gem(prices, yearly=yearly, b=b)
         print('---------------------------------------' + istr)
     return
 
