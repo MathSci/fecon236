@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-06-20
+#  Python Module for import                           Date : 2018-07-01
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  test_bootstrap.py :: Test fecon236 bootstrap module.
@@ -14,6 +14,7 @@ REFERENCE
             or PDF at http://pytest.org/latest/pytest.pdf
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-07-01  Reflect change of function names.
 2018-06-28  First version
 '''
 
@@ -95,10 +96,10 @@ def test_bootstrap_fecon236_ROUNDTRIP():
     #  gemrat: "RuntimeWarning: invalid value encountered in log"
     #          due to smackdown in price on 2013-04-15,
     #          i.e. expect inaccuracies as a consequence.
-    poparr = bs.reshape_dst(fname, mean=xaumean, sigma=xausigma, yearly=256)
+    poparr = bs.csv2ret(fname, mean=xaumean, sigma=xausigma, yearly=256)
     #  So poparr is the "population" array which will be
     #  repetitively hammered in memory for bootstrap resamplings.
-    pxdf = bs.simu_prices(29, poparr, inprice=1581.75, replace=False)
+    pxdf = bs.bsret2prices(29, poparr, inprice=1581.75, replace=False)
     #  Crucial fact: tail price is indifferent as to the order in which
     #                returns are selected without replacement,
     #                so long as ALL the returns are selected.
