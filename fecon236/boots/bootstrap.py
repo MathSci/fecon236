@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-06-28
+#  Python Module for import                           Date : 2018-07-01
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  bootstrap.py :: Bootstrap module for fecon236
@@ -9,8 +9,8 @@ _______________|  bootstrap.py :: Bootstrap module for fecon236
 
 USAGE: Two methods to efficiently pre-compute asset returns:
     - writefile_normdiflog(): Create a CSV file of normalized rates of return.
-    - Use CSV file in reshape_dst() to create "population" array of returns.
-- Bootstrap (resample) from poparr to simulate price history by simu_prices().
+    - Use CSV file in csv2ret() to create "population" array of returns.
+- Bootstrap (resample) from poparr to simulate price history by bsret2prices().
 
 
 The broad theoretical justification in using bootstrapping for asset prices
@@ -25,6 +25,7 @@ Function np.random.choice() used in bootstrap():
 http://docs.scipy.org/doc/numpy/reference/generated/numpy.random.choice.html
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-07-01  Apply the functions extracted to sim module.
 2018-06-28  TOTAL REWRITE: generalization and clarification of logic flow.
                 Deprecate fecon235/nb/SIMU-mn0-sd1pc-d4spx_1957-2014.csv.gz
                 Include recipe for creating similar CSV files.
@@ -37,16 +38,20 @@ from __future__ import absolute_import, print_function, division
 import numpy as np
 from fecon236 import tool
 from fecon236.util import system
+from fecon236.prob import sim
 from fecon236.host.fred import readfile
 from fecon236.visual.plots import plotn
-from fecon236.dst.gaussmix import gemrat
+from fecon236.dst.gaussmix import gm2gem
 
 
-#  SPX mean and volatility in DECIMAL form from 1957-01-03 to 2014-12-11.
-SPXmean = 0.076306
-SPXsigma = 0.155742
-SPXn = 15116
-SPXinprice = 46.20
+#  SPX stats from 1957-01-03 to 2018-06-29:
+SPXmean = 0.065026     # Arithmetic vs. Geometric mean rate: 0.050103
+SPXsigma = 0.154936    # volatility
+SPXsigma1 = 0.060996   # gaussmix
+SPXsigma2 = 0.542276   # gaussmix, its magnitude is not a typo.
+SPXq = 0.0699          # probability of sigma2
+SPXN = 16042           # Number of returns
+SPXinprice = 46.20     # initial price
 
 
 def writefile_normdiflog(df, filename='tmp-fe-normdiflog.csv', lags=1):
@@ -71,20 +76,16 @@ def readcsv(datafile='tmp-fe-normdiflog.csv'):
         raise ValueError("Improper or non-existent datafile specified.")
 
 
-def reshape_dst(datafile, mean=SPXmean, sigma=SPXsigma, yearly=256):
-    '''Reshape empirical N(0, 1) rates distribution as returns array.'''
-    df = readcsv(datafile)   # Get dataframe containing rates of return.
-    meanly = mean / yearly   # e.g. 256 trading days in a year.
-    sigmaly = sigma / (yearly ** 0.5)
-    returns = tool.todf((1 + meanly) + (df * sigmaly))
-    #  Thus e.g. an approximate 2% gain is converted to 1.02.
-    #  Recall that log differences approximate percentage changes.
+def csv2ret(datafile, mean=SPXmean, sigma=SPXsigma, yearly=256):
+    '''Reform empirical N(0, 1) rates distribution as returns array.'''
+    df = readcsv(datafile)    # Dataframe of normalized RATES of return.
+    normarr = df['Y'].values  # That dataframe expressed as array.
+    #                .values converts to numpy ARRAY form.
+    #      The pandas index will no longer matter.
     #      Next, form an array to efficiently bootstrap later.
-    #      The date index will no longer matter.
-    #                    .values converts to numpy ARRAY form.
-    poparr = returns['Y'].values
+    poparr = sim.norat2ret(normarr, mean, sigma, yearly)
     #  TIP: For repetitive simulations, poparr should be PRE-COMPUTED.
-    #     "POPULATION" array
+    #     "POPULATION" array in RETURNS form (no longer rates):
     return poparr
 
 
@@ -97,32 +98,25 @@ def bootstrap(N, poparr, replace=False):
     return bsarr
 
 
-def simu_prices(N, poparr, inprice=1.0, replace=False):
-    '''Convert bootstrap returns into pandas DataFrame of prices.'''
+def bsret2prices(N, poparr, inprice=1.0, replace=False):
+    '''Transform array of bootstrap returns into DataFrame of prices.'''
     bsarr = bootstrap(N, poparr, replace=replace)
-    #  For cumulative product of array elements,
-    #  numpy's cumprod is very fast, and records the ongoing results.
-    #  http://docs.scipy.org/doc/numpy/reference/generated/numpy.cumprod.html
-    prices = np.cumprod(bsarr)  # prices will be a np.array
-    #      Initial price implicitly starts at 1 where
-    #      the history of prices is just the products of the returns.
-    #      Initial price for SPX on 1957-01-02 was 46.20.
-    if inprice == 1.0:
-        return tool.todf(prices)
-    else:
-        return tool.todf(inprice * prices)
+    bsprices = sim.ret2prices(bsarr, inprice=inprice)
+    return bsprices
 
 
-def simu_plots(N, poparr, charts=1, inprice=1.0, replace=False):
-    '''Display simulated price charts of N periods.'''
+def bootshow(N, poparr, yearly=256, repeat=1, visual=True, b=3.5,
+             inprice=100, replace=False):
+    '''Statistical and optional visual SUMMARY: repeat bsret2prices().'''
     #  Also nice template for gathering SMALL-SAMPLE statistics...
     #  to be pursued elsewhere for different asset classes.
-    for i in range(charts):
-        px = simu_prices(N, poparr, inprice=inprice, replace=replace)
-        plotn(px)
-        print('     gemrat: ' + str(gemrat(px)))
-        print('   ____________________________________')
-        print('')
+    for i in range(repeat):
+        istr = str(i)
+        prices = bsret2prices(N, poparr, inprice=inprice, replace=replace)
+        if visual:
+            plotn(prices, title='tmp-bootshow-'+istr)
+        gm2gem(prices, yearly=yearly, b=b)
+        print('---------------------------------------' + istr)
     return
 
 
