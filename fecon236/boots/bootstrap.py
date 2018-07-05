@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-07-04
+#  Python Module for import                           Date : 2018-07-05
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  bootstrap.py :: Bootstrap module for fecon236
@@ -10,24 +10,37 @@ _______________|  bootstrap.py :: Bootstrap module for fecon236
 USAGE: Two methods to efficiently pre-compute asset returns:
     - writefile_normdiflog(): Create a CSV file of normalized rates of return.
     - Use CSV file in csv2ret() to create "population" array of returns.
-- Bootstrap (resample) from poparr to simulate price history by bsret2prices().
+- Bootstrap from poparr to simulate price history by bsret2prices().
+- See [TODO] notebook for concrete usage and studies.
 
 
-The broad theoretical justification in using bootstrapping for asset prices
-is that the best in-sample fit of an ARIMA model to log(price) is AR(1)
-with unit root. Thus the stochastic process is memory-less. In addition,
-studies of post-sample performances show it is extremely difficult to
-surpass the current price as the forecast of prices over long horizons.
+If the data is temporally correlated, bootstrapping will destroy the
+inherent correlations. Our broad practical justification
+in favor of bootstrapping here is that for short-term financial
+time-series, most frequently, the best in-sample fit of an
+ARIMA model to log(price) is AR(1) with unit root.
+This implies that the underlying stochastic process is memoryless.
+To add further credence, studies of post-sample performances
+regularly show that it is extremely difficult to surpass the
+most current price as the best forecast of prices over long
+future horizons among all competing models.
 
 
 DEPENDENCIES
-fecon236.prob.sim module
+    - fecon236.prob.sim module
 
 REFERENCES
-Function np.random.choice() used in bootstrap():
-http://docs.scipy.org/doc/numpy/reference/generated/numpy.random.choice.html
+- Bradley Efron; Robert Tibshirani (1994). An Introduction to the Bootstrap.
+
+- Bootstrapping, https://en.wikipedia.org/wiki/Bootstrapping_(statistics)
+
+- Function np.random.choice() used in bootstrap(),
+  http://docs.scipy.org/doc/numpy/reference/generated/numpy.random.choice.html
+
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-07-05  Let replace=True as default argument.
+                The opposite was useful during testing.
 2018-07-04  Add hybrid2ret() for synthesis with Gaussian mixture.
 2018-07-01  Apply the functions extracted to sim module.
 2018-06-28  TOTAL REWRITE: generalization and clarification of logic flow.
@@ -112,16 +125,19 @@ def hybrid2ret(poparr, mean=SPXmean, sigma=SPXsigma, yearly=256):
     return poparr2
 
 
-def bootstrap(N, poparr, replace=False):
+def bootstrap(N, poparr, replace=True):
     '''Randomly pick out N items from poparr.
-       Default argument, replace=False, means "WITHOUT replacement."
+       Default argument, replace=True, means "WITH replacement."
     '''
+    #  Note that replace=False is useful during testing to replicate
+    #  the entire population if necessary (e.g. to check terminal price).
+    #  The theory on bootstrap generally assumes replace=True.
     bsarr = np.random.choice(poparr, size=N, replace=replace)
     #      BOOTSTRAPPED array
     return bsarr
 
 
-def bsret2prices(N, poparr, inprice=1.0, replace=False):
+def bsret2prices(N, poparr, inprice=1.0, replace=True):
     '''Transform array of bootstrap returns into DataFrame of prices.'''
     bsarr = bootstrap(N, poparr, replace=replace)
     bsprices = sim.ret2prices(bsarr, inprice=inprice)
@@ -129,7 +145,7 @@ def bsret2prices(N, poparr, inprice=1.0, replace=False):
 
 
 def bootshow(N, poparr, yearly=256, repeat=1, visual=True, b=SPXb,
-             inprice=100, replace=False):
+             inprice=100, replace=True):
     '''Statistical and optional visual SUMMARY: repeat bsret2prices().'''
     #  Also nice template for gathering SMALL-SAMPLE statistics...
     #  to be pursued elsewhere for different asset classes.
