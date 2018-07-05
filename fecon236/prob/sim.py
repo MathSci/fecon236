@@ -1,14 +1,16 @@
-#  Python Module for import                           Date : 2018-07-01
+#  Python Module for import                           Date : 2018-07-04
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  sim.py :: Simulation module for fecon236
 
 - Essential probabilistic functions for simulations.
-- Handles Gaussian mixture model GM(2).
-- Visualize simulated price paths, see simshow().
+- Synthesis of prices from Gaussian mixture model GM(2), see gmix2prices().
+- Visualize simulated price paths, see simushow() and gmixshow().
 - Let N be an integer for sample size or length of a series.
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-07-04  Add gmix2ret() and SPX constants for default arguments.
+                Add supplemental gmix2prices() and gmixshow().
 2018-07-01  Add norat2ret() and ret2prices().
                 Replace rates2prices by zerat2prices for clarity.
                 Rename simshow() to simushow() and use new function.
@@ -25,6 +27,17 @@ from fecon236.util import system
 from fecon236.tool import todf
 from fecon236.dst.gaussmix import gm2gem
 from fecon236.visual.plots import plotn
+
+
+#  SPX stats from 1957-01-03 to 2018-06-29:
+SPXmean = 0.065026     # Arithmetic vs. Geometric mean rate: 0.050103
+SPXsigma = 0.154936    # volatility
+SPXsigma1 = 0.060996   # gaussmix
+SPXsigma2 = 0.542276   # gaussmix, its magnitude is not a typo.
+SPXq = 0.0699          # probability of sigma2
+SPXb = 3.5             # sigma2 = sigma * b
+SPXN = 16042           # Number of returns
+SPXinprice = 46.20     # initial price
 
 
 def randou(upper=1.0):
@@ -52,17 +65,21 @@ def randog(sigma=1.0):
     return np.random.normal(loc=0.0, scale=sigma, size=None)
 
 
-def simug(sigma=0.13/16., N=256):
-    '''Simulate array of shape (N,) from Gaussian Normal(0.0, sigma^2).'''
-    #  Argument sigma is the standard deviation, NOT the variance!
+def simug(sigma=SPXsigma/16., N=256):
+    '''Simulate array of shape (N,) from Gaussian Normal(0.0, sigma^2).
+       Argument sigma is the standard deviation, NOT the variance!
+       Note the use of raw sigma, which is not necessarily annualized.
+    '''
     #  Default sigma is stylized per daily SPX data, see https://git.io/gmix
     ratarr = sigma * np.random.randn(N)
     #  For non-zero mean, simply add it later: mu + simug(sigma)
     return ratarr
 
 
-def simug_mix(sigma1=0.0969/16., sigma2=0.26/16., q=0.129, N=256):
-    '''Simulate array from zero-mean Gaussian mixture GM(2).'''
+def simug_mix(sigma1=SPXsigma1/16., sigma2=SPXsigma2/16., q=SPXq, N=256):
+    '''Simulate array from zero-mean Gaussian mixture GM(2).
+       Note the use of raw sigmas, which are not necessarily annualized.
+    '''
     #  Default values are stylized per daily SPX data, see https://git.io/gmix
     #  Mathematical details in fecon235/nb/gauss-mix-kurtosis.ipynb
     #     Pre-populate an array of shape (N,) with the FIRST Gaussian,
@@ -114,7 +131,7 @@ def zerat2prices(ratarr, mean=0, yearly=256, inprice=1.0):
 
 
 def simushow(N=256, mean=0, yearly=256, repeat=1, func=simug_mix, visual=True,
-             b=3.5, inprice=100):
+             b=SPXb, inprice=100):
     '''Statistical and optional visual SUMMARY: repeat simulations of func.
        Function func shall use all its default arguments, except for N.
     '''
@@ -124,7 +141,53 @@ def simushow(N=256, mean=0, yearly=256, repeat=1, func=simug_mix, visual=True,
         prices = zerat2prices(ratarr, mean, yearly, inprice)
         if visual:
             plotn(prices, title='tmp-'+func.__name__+'-'+istr)
-        gm2gem(prices, yearly=yearly, b=b)
+        try:
+            gm2gem(prices, yearly=yearly, b=b)
+        except OverflowError:
+            system.warn("Excessive kurtosis: Skipping gm2gem() print.")
+        print('---------------------------------------' + istr)
+    return
+
+
+def gmix2ret(N=256, mean=SPXmean, sigma=SPXsigma, yearly=256):
+    '''Simulate array of GM(2) returns given arithmetic mean and plain sigma.
+       GAUSSIAN MIXTURE is synthesized through primitive sim functions.
+       Default values are stylized per daily SPX data, see https://git.io/gmix
+    '''
+    sigmaly = SPXsigma / (yearly ** 0.5)
+    sigmaly1 = SPXsigma1 / (yearly ** 0.5)
+    sigmaly2 = SPXsigma2 / (yearly ** 0.5)
+    gmarr = simug_mix(sigmaly1, sigmaly2, q=SPXq, N=N)
+    normarr = gmarr * (1. / sigmaly)  # Stylized array of normalized rates.
+    #  normarr, though normalized, still retains leptokurtotic features.
+    #  Plain volatility is used to RESCALE variations using fitted GM(2).
+    retarr = norat2ret(normarr, mean, sigma, yearly)
+    #  TIP: concatenate this array with corresponding array from bootstrap
+    #       to create HYBRID synthetic/empirical returns.
+    #       See fecon236.boots.bootstrap.hybrid2ret()
+    return retarr
+
+
+def gmix2prices(N=256, mean=SPXmean, sigma=SPXsigma, yearly=256, inprice=1.0):
+    '''Simulate N prices from GM(2) given arithmetic mean and plain sigma.
+       GAUSSIAN MIXTURE is synthesized through primitive sim functions.
+    '''
+    retarr = gmix2ret(N, mean, sigma, yearly)
+    return ret2prices(retarr, inprice)
+
+
+def gmixshow(N=256, mean=SPXmean, sigma=SPXsigma, yearly=256, repeat=1,
+             visual=True, inprice=100, b=SPXb):
+    '''Statistical and optional visual SUMMARY: repeat simulations of GM(2).'''
+    for i in range(repeat):
+        istr = str(i)
+        prices = gmix2prices(N, mean, sigma, yearly, inprice)
+        if visual:
+            plotn(prices, title='tmp-gmixshow-'+istr)
+        try:
+            gm2gem(prices, yearly=yearly, b=b)
+        except OverflowError:
+            system.warn("Excessive kurtosis: Skipping gm2gem() print.")
         print('---------------------------------------' + istr)
     return
 
