@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-07-01
+#  Python Module for import                           Date : 2018-07-04
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  bootstrap.py :: Bootstrap module for fecon236
@@ -20,11 +20,15 @@ studies of post-sample performances show it is extremely difficult to
 surpass the current price as the forecast of prices over long horizons.
 
 
+DEPENDENCIES
+fecon236.prob.sim module
+
 REFERENCES
 Function np.random.choice() used in bootstrap():
 http://docs.scipy.org/doc/numpy/reference/generated/numpy.random.choice.html
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-07-04  Add hybrid2ret() for synthesis with Gaussian mixture.
 2018-07-01  Apply the functions extracted to sim module.
 2018-06-28  TOTAL REWRITE: generalization and clarification of logic flow.
                 Deprecate fecon235/nb/SIMU-mn0-sd1pc-d4spx_1957-2014.csv.gz
@@ -44,14 +48,16 @@ from fecon236.visual.plots import plotn
 from fecon236.dst.gaussmix import gm2gem
 
 
-#  SPX stats from 1957-01-03 to 2018-06-29:
-SPXmean = 0.065026     # Arithmetic vs. Geometric mean rate: 0.050103
-SPXsigma = 0.154936    # volatility
-SPXsigma1 = 0.060996   # gaussmix
-SPXsigma2 = 0.542276   # gaussmix, its magnitude is not a typo.
-SPXq = 0.0699          # probability of sigma2
-SPXN = 16042           # Number of returns
-SPXinprice = 46.20     # initial price
+#  (For version on 2018-07-01, SPX stats from 1957-01-03 to 2018-06-29.)
+#  Changes in specific numerical values are made in fecon236.prob.sim module:
+SPXmean = sim.SPXmean        # Arithmetic (not Geometric mean rate)
+SPXsigma = sim.SPXsigma      # volatility
+SPXsigma1 = sim.SPXsigma1    # gaussmix
+SPXsigma2 = sim.SPXsigma2    # gaussmix, its magnitude is not a typo.
+SPXb = sim.SPXb              # sigma2 = sigma * b
+SPXq = sim.SPXq              # probability of sigma2
+SPXN = sim.SPXN              # Number of returns
+SPXinprice = sim.SPXinprice  # initial price
 
 
 def writefile_normdiflog(df, filename='tmp-fe-normdiflog.csv', lags=1):
@@ -89,6 +95,23 @@ def csv2ret(datafile, mean=SPXmean, sigma=SPXsigma, yearly=256):
     return poparr
 
 
+def hybrid2ret(poparr, mean=SPXmean, sigma=SPXsigma, yearly=256):
+    '''Concatenate synthetic GM(2) returns for DataFrame of hybrid prices.
+       This is a SYNTHESIS between empirical and Gaussian mixture methods.
+       Array poparr is assumed to be constructed from same mean and sigma.
+       This function is OPTIONAL, strictly outside proper bootstrapping.
+    '''
+    poplen = poparr.shape[0]
+    gmarr = sim.gmix2ret(poplen, mean, sigma, yearly)
+    #  gmarr has same length as poparr to maximize the uncertainty
+    #  in distinguishing between population sample and GM(2) origins.
+    poparr2 = np.concatenate([poparr, gmarr])
+    #  We have DOUBLED the population size.
+    #      poparr2 can be used WHEREVER poparr is accepted.  <=!
+    #      poparr2 is intended to be PRE-COMPUTED for further processing.
+    return poparr2
+
+
 def bootstrap(N, poparr, replace=False):
     '''Randomly pick out N items from poparr.
        Default argument, replace=False, means "WITHOUT replacement."
@@ -105,7 +128,7 @@ def bsret2prices(N, poparr, inprice=1.0, replace=False):
     return bsprices
 
 
-def bootshow(N, poparr, yearly=256, repeat=1, visual=True, b=3.5,
+def bootshow(N, poparr, yearly=256, repeat=1, visual=True, b=SPXb,
              inprice=100, replace=False):
     '''Statistical and optional visual SUMMARY: repeat bsret2prices().'''
     #  Also nice template for gathering SMALL-SAMPLE statistics...
@@ -115,7 +138,10 @@ def bootshow(N, poparr, yearly=256, repeat=1, visual=True, b=3.5,
         prices = bsret2prices(N, poparr, inprice=inprice, replace=replace)
         if visual:
             plotn(prices, title='tmp-bootshow-'+istr)
-        gm2gem(prices, yearly=yearly, b=b)
+        try:
+            gm2gem(prices, yearly=yearly, b=b)
+        except OverflowError:
+            system.warn("Excessive kurtosis: Skipping gm2gem() print.")
         print('---------------------------------------' + istr)
     return
 
