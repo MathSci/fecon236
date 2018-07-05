@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-06-03
+#  Python Module for import                           Date : 2018-07-04
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  gaussmix.py :: Gaussian mixture distribution for fecon236
@@ -10,6 +10,7 @@ _______________|  gaussmix.py :: Gaussian mixture distribution for fecon236
 - Tests of this module at tests/test_gaussmix.py
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-07-04  On excessive kurtosis, change system.die to OverflowError.
 2018-06-03  Rename to gaussmix.py, fecon236 fork. Pass flake8, fix imports.
 2017-06-29  ys_gauss_mix.py, fecon235 v5.18.0312, https://git.io/fecon235
                 Fallback clause for gemrate() when log fails (2008Q4).
@@ -86,7 +87,7 @@ def gm2_strategy(kurtosis, b=2):
     if a_solved == sym.S.EmptySet:
         #               ^when no feasible solution was found in domain.
         #                Do not accept imaginary solutions.
-        system.die("Extreme kurtosis: argument b should be increased.")
+        raise OverflowError("Extreme kurtosis: Retry using larger b.")
         #     ^dies when kurtosis > 12 and b=2, for example.
         #           SPX returns since 1957 have kurtosis around 31.6
         #           which is very high, requiring b>3.4 for feasiblity.
