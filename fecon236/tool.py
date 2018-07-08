@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-07-07
+#  Python Module for import                           Date : 2018-07-08
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  tool.py :: Fundamental tools for data analysis.
@@ -18,6 +18,7 @@ causing problems upon: from numpy import *
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-07-08  Modify kurtfun() with population argument.
 2018-07-07  Add std() with population argument for ddof.
 2018-05-11  Rename to tool.py, fix imports.
 2018-05-09  tools.py, fecon236 fork. Pass flake8.
@@ -325,14 +326,14 @@ def regress(dfy, dfx, intercept=True):
     return result
 
 
-def kurtfun(data, raw=False):
+def kurtfun(data, raw=False, population=False):
     '''Compute kurtosis of an array or a single column DataFrame.
        Default uses PEARSON fourth central moment, where kurtosis is 3
        if data is Gaussian. Fischer "excess kurtosis":= k_Pearson-3.
     '''
     arr = toar(data)
     mu = np.mean(arr)
-    sigma = np.std(arr)
+    sigma = std(arr, population=population)
     k_raw = (sum((arr - mu)**4)/len(arr))
     #     ^is sometimes called the "ABSOLUTE fourth central moment"
     #      which the Pearson version will then rescale.
@@ -340,7 +341,8 @@ def kurtfun(data, raw=False):
         return k_raw
     else:
         k_Pearson = k_raw / sigma**4
-        #  Equivalent to: scipy.stats.kurtosis(arr, fisher=False, bias=True)
+        #  Equivalent to: scipy.stats.kurtosis(arr, fisher=False, bias=False)
+        #                 when population=False, i.e. unbiased estimator,
         #  and preferred by Wolfram: http://mathworld.wolfram.com/Kurtosis.html
         #  which includes good references on estimation.
         #  For normality test, see scipy.stats.kurtosistest()
