@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-07-04
+#  Python Module for import                           Date : 2018-07-08
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  gaussmix.py :: Gaussian mixture distribution for fecon236
@@ -10,6 +10,7 @@ _______________|  gaussmix.py :: Gaussian mixture distribution for fecon236
 - Tests of this module at tests/test_gaussmix.py
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-07-08  Change from np.std() to tool.std() for population argument.
 2018-07-04  On excessive kurtosis, change system.die to OverflowError.
 2018-06-03  Rename to gaussmix.py, fecon236 fork. Pass flake8, fix imports.
 2017-06-29  ys_gauss_mix.py, fecon235 v5.18.0312, https://git.io/fecon235
@@ -135,7 +136,7 @@ def gm2_vols_fit(data, b=2.5):
     #  Routine stat calculations on our array:
     N = len(arr)
     mu = np.mean(arr)
-    sigma = np.std(arr)
+    sigma = tool.std(arr)
     k_Pearson = (sum((arr - mu)**4)/N) / sigma**4
     #  For kurtosis details, see our kurtfun().
     #
@@ -265,7 +266,7 @@ def gemrat(data, yearly=256, pc=True):
     #  Routine stat calculations on our array:
     N = len(arr)
     mu = np.mean(arr)
-    sigma = np.std(arr)
+    sigma = tool.std(arr)
     k_Pearson = (sum((arr - mu)**4)/N) / sigma**4
     #  For kurtosis details, see our kurtfun().
     #
