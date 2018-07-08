@@ -149,13 +149,13 @@ def test_gaussmix_fecon236_check_gemrat():
 def test_gaussmix_fecon236_check_gm2gem():
     '''Check on geometric mean rate of data and GM(2) model: print gm2gemrat().
     >>> gmix.gm2gem(xau[:'2013-04-12'], yearly=256, b=2.5, pc=True, n=4)
-    Geometric  mean rate: -31.3826
+    Geometric  mean rate: -31.4216
     Arithmetic mean rate: -30.388
-    sigma: 11.5085
-    kurtosis (Pearson): 3.8787
-    GM(2), sigma1: 11.1829
-    GM(2), sigma2: 28.7713
-    GM(2), q:  0.0105
+    sigma: 11.7458
+    kurtosis (Pearson): 3.5746
+    GM(2), sigma1: 11.5296
+    GM(2), sigma2: 29.3646
+    GM(2), q:  0.0069
     GM(2), b:  2.5
     yearly: 256
     N: 25
