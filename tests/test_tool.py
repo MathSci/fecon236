@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-18
+#  Python Module for import                           Date : 2018-07-08
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  test_tool.py :: Test fecon236 tool module.
@@ -13,12 +13,14 @@ Re pytest:  https://pytest.org/latest/getting-started.html
             or PDF at http://pytest.org/latest/pytest.pdf
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-07-08  Add test for std().
 2018-05-18  fecon236 fork. Pass flake8.
 2016-04-18  fecon235 v5.18.0312, https://git.io/fecon235
 '''
 
 from __future__ import absolute_import, print_function, division
 
+import numpy as np
 import pandas as pd
 from os import sep
 from fecon236 import tool
@@ -151,6 +153,18 @@ def test_tool_fecon236_lagdf_function():
     assert xaufoolag.index[-1] == pd.Timestamp('2013-04-18 00:00:00')
     #                                Timestamp is yet another pandas type.
     #                                Default time is midnight.
+
+
+def test_tool_fecon236_std():
+    '''Test standard deviation on population arg and data formats.'''
+    #  tool.std() should work for both numpy array and pandas DataFrame.
+    darr = np.array([0, 1])
+    data = tool.todf(darr)
+    assert round(tool.std(darr, population=True), 3) == 0.500
+    assert round(tool.std(data, population=True), 3) == 0.500
+    #  When sample size is small, the difference is huge!
+    assert round(tool.std(darr, population=False), 3) == 0.707
+    assert round(tool.std(data, population=False), 3) == 0.707
 
 
 if __name__ == "__main__":
