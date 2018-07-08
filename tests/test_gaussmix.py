@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-06-04
+#  Python Module for import                           Date : 2018-07-08
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  test_gaussmix.py :: Test fecon236 gaussmix module.
@@ -14,6 +14,7 @@ REFERENCE   https://pytest.org/latest/getting-started.html
             or PDF at http://pytest.org/latest/pytest.pdf
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-07-08  Modify values due to change from np.std() to tool.std().
 2018-06-04  test_gaussmix.py, fecon236 fork. Pass flake8, fix imports.
 2017-06-05  test_gauss_mix.py, fecon235 v5.18.0312, https://git.io/fecon235
 '''
@@ -107,11 +108,11 @@ def test_gaussmix_fecon236_check_gm2_vols():
     #                            ^else severe drop in price for small sample.
     mu, sigma1, sigma2, q, k_Pearson, sigma, b, yearly, N = xauvols
     assert round(mu, 4) == -30.3880       # mu annualized
-    assert round(sigma1, 4) == 11.1829    # sigma1 annualized
-    assert round(sigma2, 4) == 28.7713    # sigma2 annualized
-    assert round(q, 4) == 0.0105          # q
-    assert round(k_Pearson, 4) == 3.8787  # kurtosis
-    assert round(sigma, 4) == 11.5085     # sigma
+    assert round(sigma1, 4) == 11.5296    # sigma1 annualized
+    assert round(sigma2, 4) == 29.3646    # sigma2 annualized
+    assert round(q, 4) == 0.0069          # q
+    assert round(k_Pearson, 4) == 3.5746  # kurtosis
+    assert round(sigma, 4) == 11.7458     # sigma
     assert b == 2.5                       # b
     assert yearly == 256                  # yearly
     assert N == 25                        # N, sample size
@@ -137,10 +138,10 @@ def test_gaussmix_fecon236_check_gemrat():
     xaugem = gmix.gemrat(xau[:'2013-04-12'], yearly=256)
     #                         ^else severe drop in price for small sample.
     grate, mu, sigma, k_Pearson, yearly, N = xaugem
-    assert round(grate, 4) == -31.3826    # gemrat annualized
+    assert round(grate, 4) == -31.4216    # gemrat annualized
     assert round(mu, 4) == -30.388        # arithmetic mean annualized
-    assert round(sigma, 4) == 11.5085     # sigma
-    assert round(k_Pearson, 4) == 3.8787  # kurtosis
+    assert round(sigma, 4) == 11.7458     # sigma
+    assert round(k_Pearson, 4) == 3.5746  # kurtosis
     assert yearly == 256                  # yearly
     assert N == 25                        # N, sample size
 
