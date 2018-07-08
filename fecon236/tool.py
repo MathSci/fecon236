@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-11
+#  Python Module for import                           Date : 2018-07-07
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  tool.py :: Fundamental tools for data analysis.
@@ -18,6 +18,7 @@ causing problems upon: from numpy import *
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-07-07  Add std() with population argument for ddof.
 2018-05-11  Rename to tool.py, fix imports.
 2018-05-09  tools.py, fecon236 fork. Pass flake8.
 2017-06-20  yi_1tools.py, fecon235 v5.18.0312, https://git.io/fecon235
@@ -172,6 +173,28 @@ def zeroprice(rate, duration=9, yearly=2, face=100):
     periodrate = rate / float(yearly * 100)
     periods = duration * yearly
     return float(face) / ((1 + periodrate) ** periods)
+
+
+def std(data, population=False):
+    '''Compute standard deviation with delta degrees of freedom, ddof.
+       Default population=False is compatible with pandas and MATLAB
+       since both defaults to SAMPLE standard deviation
+       (using so-called Bessel's correction of N-1).
+    '''
+    #  Ref: https://stackoverflow.com/questions/27600207
+    #  ddof must be integer-valued (not boolean):
+    if population:
+        ddof = 0   # For POPULATION standard deviation: numpy default!
+    else:
+        ddof = 1   # For SAMPLE standard deviation: pandas default.
+    if isinstance(data, pd.DataFrame):
+        #  This case will include ALL columns in the DataFrame.
+        #  Convert to numpy array, then use numpy std() function:
+        return data.values.std(ddof=ddof)
+        #  Cf. pandas awkward method: data.std().tolist()[0]
+    else:
+        #  This case assumes that data is a numpy array:
+        return data.std(ddof=ddof)  # so expect a scalar output.
 
 
 def normalize(dfy):
