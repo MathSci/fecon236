@@ -1,17 +1,23 @@
-#  Python Module for import                           Date : 2018-07-05
+#  Python Module for import                           Date : 2018-07-07
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  bootstrap.py :: Bootstrap module for fecon236
 
-- Design bootstrap to study alternate histories and small-sample statistics.
-- Normalize, but include fat tails, in empirical distributions.
-- Visualize sample price paths.
+- Efficient storage and rescaling of empirical data.
+    - Normalize, but retain features of the empirical distribution.
+- Design bootstrap to study alternate histories.
+    - Visualize sample price paths.
+    - Bootstrap for small-sample statistics.
+    - Bootstrap for determining probabilities of events.
+- Specify hybrid population array using synthetic rates of return
+  from GM(2) Gaussian Mixture model.
 
 USAGE: Two methods to efficiently pre-compute asset returns:
     - writefile_normdiflog(): Create a CSV file of normalized rates of return.
     - Use CSV file in csv2ret() to create "population" array of returns.
-- Bootstrap from poparr to simulate price history by bsret2prices().
-- See [TODO] notebook for concrete usage and studies.
+- Repeatedly bootstrap from population array, poparr, in computer memory
+  to simulate price histories by bsret2prices().
+- See [TO BE ANNOUNCED] notebook in fecon235 for concrete usage and studies.
 
 
 If the data is temporally correlated, bootstrapping will destroy the
@@ -39,6 +45,8 @@ REFERENCES
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-07-07  Add smallsample_gmr() to demo geometric mean rates.
+                Add smallsample_loss() to demo probability of loss.
 2018-07-05  Let replace=True as default argument.
                 The opposite was useful during testing.
 2018-07-04  Add hybrid2ret() for synthesis with Gaussian mixture.
@@ -58,7 +66,7 @@ from fecon236.util import system
 from fecon236.prob import sim
 from fecon236.host.fred import readfile
 from fecon236.visual.plots import plotn
-from fecon236.dst.gaussmix import gm2gem
+from fecon236.dst.gaussmix import gemrat, gm2gem
 
 
 #  (For version on 2018-07-01, SPX stats from 1957-01-03 to 2018-06-29.)
@@ -160,6 +168,33 @@ def bootshow(N, poparr, yearly=256, repeat=1, visual=True, b=SPXb,
             system.warn("Excessive kurtosis: Skipping gm2gem() print.")
         print('---------------------------------------' + istr)
     return
+
+
+def smallsample_gmr(N, poparr, yearly=256, repeat=100,
+                    inprice=1.0, replace=True):
+    '''Demo small sample statistics: repeat geometric mean rates.'''
+    ssarr = np.ones((repeat,))  # small sample array to fill-in.
+    for i in range(repeat):
+        prices = bsret2prices(N, poparr, inprice=inprice, replace=replace)
+        out = gemrat(prices, yearly=yearly, pc=False)
+        ssarr[i] = out[0]
+    #  For user's convenience, we convert array to DataFrame format:
+    return tool.todf(ssarr)
+
+
+def smallsample_loss(N, poparr, yearly=256, repeat=100, level=0.90,
+                     inprice=1.0, replace=True):
+    '''Demo small sample statistics: probability of loss: price < level.
+       Relative to investment at initial price, inprice.
+    '''
+    ssarr = np.ones((repeat,))  # small sample array to fill-in.
+    for i in range(repeat):
+        prices = bsret2prices(N, poparr, inprice=inprice, replace=replace)
+        count = prices[prices < level].dropna().shape[0]
+        prob = count / float(N)
+        ssarr[i] = prob
+    #  For user's convenience, we convert array to DataFrame format:
+    return tool.todf(ssarr)
 
 
 if __name__ == "__main__":
