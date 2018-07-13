@@ -1,4 +1,4 @@
-#  .travis.yml     python 27 to 3, with Miniconda             Date : 2018-06-04
+#  .travis.yml     python 27 to 3, with Miniconda             Date : 2018-07-13
 #  FEATURES: pytest, flake8, pandas, pip and conda.           fecon236
 
 #  By default, Travis uses PIP to manage Python dependencies.
@@ -28,6 +28,7 @@
 
 
 #  CHANGE LOG
+#  2018-07-13  Add notifications for https://gitter.im/MathSci/fecon236
 #  2018-06-04  conda install sympy pandas-datareader [Not pandas_datareader]
 #  2018-05-12  conda install some scientific packages.
 #  2018-05-01  Lower 3.6 env to 3.4.
@@ -135,6 +136,20 @@ script:
     - flake8 fecon236
     #        ^package directory, not tests ...
     # flake8 gives false whitespace errors in DOCTESTS which cannot be ignored.
+
+
+#       __________ GITTER NOTIFICATIONS for https://gitter.im/MathSci/fecon236
+#                  Ref: https://docs.travis-ci.com/user/notifications
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/bb5942f96f76e691a0e3
+    on_success: always  # options: [always|never|change] default: always
+    on_failure: always  # options: [always|never|change] default: always
+    on_start: never     # default: never
+    on_cancel: always   # default: always
+    on_error: always    # default: always
 
 
 # ============================================================ ENDNOTES ========
