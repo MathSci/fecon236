@@ -1,20 +1,18 @@
 ## fecon236 :: PREAMBLE for Jupyter Notebooks
 
-The notebooks for financial economics are based on
-Python source code, e.g. fecon236 at https://git.io/fecon236
+The fecon235 notebooks for financial economics rely on
+Python source code, especially fecon236 at https://git.io/fecon236
 
-To offer additional services, specifically for notebooks,
-and especially for display settings and system details,
-we shall rely on a template to be placed in an input cell.
-
-Such a template will be called the "*preamble*"
-with date-based versions indicated by pNN.yy.mmdd,
-where NN will correspond to major number
-of the source code itself.
+For display settings and system details within the notebooks,
+the template below is very useful, placed in an input cell.
+We will refer to this template as the "**preamble**"
+with date-based versioning written as *pNN.yy.mmdd*,
+where NN is the major version number of fecon236.
 
 
 ```
 CHANGE LOG
+2018-07-14  Change pd import to fe.pd
 2018-06-23  Include self-referential URL.
 2018-05-14  First working version.
 2018-04-21  Preliminary draft for fecon236.
@@ -23,19 +21,20 @@ CHANGE LOG
 
 ### Current preamble
 
-We shall assume the following explicit style:
-`import fecon236 as fe`
+In the first cell, we generally only need to invoke this one-liner
+explicitly: `import fecon236 as fe`
+
+Then for the second cell:
 
 ```python
-#  PREAMBLE-p10.18.0623 :: Settings, https://git.io/236pa
+#  PREAMBLE-p10.18.0714 :: Settings, https://git.io/236pa
 from __future__ import absolute_import, print_function, division
 fe.system.specs()
 %load_ext autoreload
 %autoreload 2
 #       Use 0 to disable autoreload when a module is modified.
 #  NOTEBOOK DISPLAY OPTIONS...
-import pandas as pd
-pd.set_option('display.notebook_repr_html', False)
+fe.pd.set_option('display.notebook_repr_html', False)
 #       Represent pandas DataFrames as text; not HTML representation.
 from IPython.display import HTML  # Useful for snippets from web.
 #  e.g. HTML('<iframe src=http://en.mobile.wikipedia.org/?useformat=mobile \
@@ -56,4 +55,4 @@ get_ipython().set_hook('show_in_pager', page.as_hook(page.display_page), 0)
 
 ---
 
-Short URL, https://git.io/236pa | Last update : 2018-06-23
+Short URL, https://git.io/236pa | Last update : 2018-07-14
