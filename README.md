@@ -10,6 +10,8 @@ The **develop** branch is where pull requests are currently directed.
 [![Gitter](https://badges.gitter.im/MathSci/fecon236.svg)](https://gitter.im/MathSci/fecon236?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) / master [![Build Status](https://travis-ci.org/MathSci/fecon236.svg?branch=master)](https://travis-ci.org/MathSci/fecon236) / develop [![Build Status](https://travis-ci.org/MathSci/fecon236.svg?branch=develop)](https://travis-ci.org/MathSci/fecon236)
 
 
+[![fecon236 logo](https://git.io/fecon236-px200.png)](https://github.com/MathSci/fecon236)
+
 ### What is this repository for?
 
 **fecon236** provides an interface for ***financial economics*** to the Python
@@ -85,8 +87,8 @@ fail, and at that point we expect to require at least Python 3.6.
 Join the chat at [Gitter][236gtt] and ping the lead developer @rsvp.
 Please consider becoming a member of the [Mathematical Sciences Group][MathSci].
 
+[![MathSci logo](https://git.io/MathSci-px200.png)](https://github.com/MathSci)
 
-[![fecon236 logo](https://git.io/fecon236-px200.png)](https://github.com/MathSci/fecon236)
 
 
 ### Appendix 1: fecon236 package map
@@ -137,7 +139,7 @@ Annotated tree map of package directory [with module aliases]
 
 ---
 
-[BSD License and TOS][236li] / This page, last update : 2018-06-24
+[BSD License and TOS][236li] / This page, last update : 2018-07-25
 
 [wiki]: https://git.io/econ "fecon235 wiki Home"
 [readnb]: https://git.io/fecon-intro "fecon235 README notebook"
