@@ -7,16 +7,15 @@ GitHub repository is at [fecon236].
 Documentation is currently in flux, see [issue 4][236is4].
 
 - The `docs` directory is being served from [236docs].
-    - Markdown files there are nicely rendered at https://fecon236.readthedocs.io
+    - Markdown files there are nicely rendered at [https://fecon236.readthedocs.io][rtd]
     - Jupyter notebooks, however, are not rendered by *Read the Docs*.
-- Documentation of the modules and functions is available at
-  https://www.pydoc.io/pypi/fecon236-10.7.0
+- Documentation of the modules and functions is available at [pydoc.io]
   but we prefer working directly with the source code at [fecon236].
 - Please start your orientation with this [README notebook][readnb]
   which shows how most of this project is self-documenting.
 - ***The best way to see [fecon236] in action is to
   run the notebooks in the fecon235 `nb` [directory][235nb].***
-- For installation details and FAQ, please visit our [wiki].
+- For installation details and FAQ, please visit [https://git.io/econ][wiki]
 
 
 [![fecon236 logo](https://git.io/fecon236-px200.png)](https://github.com/MathSci/fecon236)
@@ -114,6 +113,7 @@ Annotated tree map of package directory [with module aliases]
 [BSD License and TOS][236li] / This page, last update : 2018-07-25
 
 
+[pydoc.io]: https://www.pydoc.io/pypi/fecon236-10.7.0 "fecon236 pydoc VERSION <="
 [rtd]: https://fecon236.readthedocs.io "fecon236 Read the Docs"
 [wiki]: https://git.io/econ "fecon235 wiki Home"
 [readnb]: https://git.io/fecon-intro "fecon235 README notebook"
