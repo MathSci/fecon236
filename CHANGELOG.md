@@ -5,6 +5,66 @@ within itself. This file simply gives a grand overview of such details
 and the annotations in the commits and tags.*
 
 
+### 2018-07-31  (tag: 10.7.1)
+
+Default switch from biased to unbiased estimator of standard deviation,
+cf. population vs. sample statistics.
+fecon236/tool.py: Add `std()` with population argument,
+which can make a significant difference for small sample sizes.
+Clarify use of ddof, delta degrees of freedom, and data format cases.
+Modify `kurtfun()` in tool.py with population argument.
+Thus in dst/gaussmix.py, switch from np.std() to tool.std()
+where implicitly population=False by default.
+
+prob/sim.py: Add norat2ret(), ret2prices(),
+gmix2ret(), and gmix2prices(), then for display, gmixshow().
+Generalizing the bootstrap module reveals two new
+primitive functions which can be reused often.
+Replace rates2prices() by zerat2prices() for clarity.
+Rename simshow() to simushow() using replaced function.
+Include the latest SPX constants as default arguments,
+so that the numerical values can be sourced by the bootstrap module.
+
+Total rewrite of boots/bootstrap.py:
+generalization and clarification of logic flow.
+The 2014 code was too SPX specific,
+but this new version can be applied across all asset classes.
+Add hybrid2ret() where hybrid means
+synthesis of bootstrap method with Gaussian mixture.
+
+boots/bootstrap.py: Add smallsample_gmr() to demo
+geometric mean rates, and smallsample_loss() to demo
+probability of loss.
+
+Also for boots/bootstrap.py, let replace=True as default.
+This aligns generally with theoretical bootstrap assumptions.
+The opposite was useful during preliminary testing.
+Add tests/test_bootstrap.py
+where the roundtrip test illustrates overall usage.
+
+We can deprecate `fecon235/nb/SIMU-mn0-sd1pc-d4spx_1957-2014.csv.gz`
+but include recipe for creating similar pre-computed CSV files
+in https://git.io/bootspx notebook.
+
+dst/gaussmix.py: Modify error handling.
+On excessive kurtosis, change `system.die` to OverflowError.
+In such cases, retry with larger argument b.
+
+Add docs/index.md for https://fecon236.readthedocs.io
+thus markdown files in the `docs` directory should be rendered
+automatically by Read the Docs webhooks on fecon236.
+
+Re-establish `.github` directory and revise contents:
+
+```
+.old/235/.github/CODE_OF_CONDUCT.md -> .github/CODE_OF_CONDUCT.md
+.old/235/.github/CONTRIBUTING.md -> .github/CONTRIBUTING.md
+.old/235/.github/PULL_REQUEST_TEMPLATE.md -> .github/PULL_REQUEST_TEMPLATE.md
+.old/235/.github/ISSUE_TEMPLATE.md -> .github/ISSUE_TEMPLATE.md
+.github/ISSUE_TEMPLATE.md -> .github/ISSUE_TEMPLATE/custom.md
+```
+
+
 ### 2018-06-24  (tag: 10.7.0)
 
 **Bump minor to 7 to mark COMPLETION OF REFACTORING.**
