@@ -1,6 +1,6 @@
-#  Python Module for import                           Date : 2018-07-08
+#  Python Module for import                           Date : 2018-11-10
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-'''
+r'''
 _______________|  gaussmix.py :: Gaussian mixture distribution for fecon236
 
 - Refinement of geometric mean computations relies on Jean (1983)
@@ -10,6 +10,7 @@ _______________|  gaussmix.py :: Gaussian mixture distribution for fecon236
 - Tests of this module at tests/test_gaussmix.py
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-11-10  Minor: raw string mode for intro, fix #6 flake8 W605 SyntaxError.
 2018-07-08  Change from np.std() to tool.std() for population argument.
 2018-07-04  On excessive kurtosis, change system.die to OverflowError.
 2018-06-03  Rename to gaussmix.py, fecon236 fork. Pass flake8, fix imports.
