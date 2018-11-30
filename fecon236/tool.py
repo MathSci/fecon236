@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-07-08
+#  Python Module for import                           Date : 2018-11-29
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  tool.py :: Fundamental tools for data analysis.
@@ -18,6 +18,7 @@ causing problems upon: from numpy import *
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-11-29  Add median(), mad(), and madmen() for robust rescaling.
 2018-07-08  Modify kurtfun() with population argument.
 2018-07-07  Add std() with population argument for ddof.
 2018-05-11  Rename to tool.py, fix imports.
@@ -202,6 +203,34 @@ def normalize(dfy):
     '''Center around mean zero and standardize deviation.'''
     centered = dfy - dfy.mean().tolist()[0]
     return centered / float(dfy.std().tolist()[0])
+
+
+def median(dfy, col=0):
+    '''Compute the median (by default, of the first dataframe column).'''
+    return dfy.median().tolist()[col]
+
+
+def mad(dfy):
+    '''Median Absolute Deviation is a robust measure of dispersion:
+    MAD = 0.67449*sigma if distribution is Gaussian, i.e.
+    3*MAD is about 2*sigma; however, MAD is resilient to outliers,
+    thus very useful in non-Gaussian situations.
+    See https://en.wikipedia.org/wiki/Median_absolute_deviation
+    '''
+    dev = dfy - median(dfy)  # Deviations from median.
+    #  MAD is defined as the median (not the mean)
+    #  of absolute deviations from the data's median:
+    return median(abs(dev))
+
+
+def madmen(dfy):
+    '''Rescale data as unitless MAD multiples, after shifting median to zero.
+    The main character in the "Mad Men" series pretending to be Donald Draper
+    is akin to our data pretending to be Gaussian, which we robustly unmask.
+    [Cf. alternative normalize() where large deviations are squared.]
+    '''
+    dev = dfy - median(dfy)  # Deviations from median.
+    return dev / mad(dfy)
 
 
 def correlate(dfy, dfx, type='pearson'):
