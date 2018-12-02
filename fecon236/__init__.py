@@ -112,7 +112,7 @@ map = '''Annotated tree map of package directory [with module aliases]
 '''
 
 
-__version__ = '10.7.1'
+__version__ = '10.8.0'
 #             ^MAJOR.MINOR.MICRO release (updated by ./bin/up-pypi).
 #              The alpha "a" or beta "b" tag is based on Travis build number.
 #              Release candidates will be denoted by "c" (not rc).
