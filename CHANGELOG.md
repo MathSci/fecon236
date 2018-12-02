@@ -5,6 +5,18 @@ within itself. This file simply gives a grand overview of such details
 and the annotations in the commits and tags.*
 
 
+### 2018-12-02  (tag: 10.8.0)
+
+tool.py: Add median(), mad(), and madmen() for robust rescaling
+using MAD, Median Absolute Deviation.
+
+Add module rates/credit.py.
+Derivation in fecon235 notebook, https://git.io/creditprof
+Include rates/credit module in __init__.py,
+specifically for Unified Credit Profile, creditprof(),
+which produces robust MAD rescaling of credit spreads.
+
+
 ### 2018-07-31  (tag: 10.7.1)
 
 Default switch from biased to unbiased estimator of standard deviation,
