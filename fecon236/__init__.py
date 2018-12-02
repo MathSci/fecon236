@@ -1,5 +1,5 @@
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-#  Python package installation                        Date : 2018-06-22
+#  Python package installation                        Date : 2018-11-29
 '''
 _______________|  fecon236/__init__.py :: Project import architecture
 
@@ -16,6 +16,7 @@ References:  https://github.com/kennethreitz/samplemod
              https://github.com/kennethreitz/setup.py
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-11-29  Add creditprof() in new rates/credit module.
 2018-06-22  Annotated TREE "map" for package directory.
 2018-06-21  Include boltzmann module as boltz.
 2018-06-20  Arrange star imports.
@@ -64,6 +65,7 @@ from fecon236.prtf import boltzmann as boltz                             # noqa
 from fecon236.futures.cftc import groupcotr                              # noqa
 from fecon236.econ.infl import foreinfl                                  # noqa
 from fecon236.rates.fedfunds import forefunds                            # noqa
+from fecon236.rates.credit import creditprof                             # noqa
 
 
 map = '''Annotated tree map of package directory [with module aliases]
@@ -98,6 +100,7 @@ map = '''Annotated tree map of package directory [with module aliases]
     ├── prtf   (Porfolio theory)
     │   └── boltzmann.py   [boltz]
     ├── rates  (Fixed Income)
+    │   ├── credit.py
     │   └── fedfunds.py
     ├── tsa    (Time Series Analysis)
     │   └── holtwinters.py   [hw]
