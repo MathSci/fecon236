@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-05-14
+#  Python Module for import                           Date : 2018-12-10
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  fred.py :: FRED database into pandas.
@@ -30,6 +30,7 @@ REFERENCES:
 
 
 CHANGE LOG  For LATEST version, see https://git.io/fecon236
+2018-12-10  Include more fredcodes for Treasury bonds.
 2018-05-14  Gracefully deprecate plotfred().
 2018-05-13  Eliminate lazy abbreviations, clarify comments.
 2018-05-12  Given new division, eliminate float(integer).
@@ -67,9 +68,18 @@ d4libeur = 'EUR3MTD156N'     # 3-m LIBOR EUR, daily
 d4libusd = 'USD3MTD156N'     # 3-m LIBOR USD, daily
 d4ff = 'DFF'                 # Fed Funds, daily since 1954
 d4ff30 = 'd4ff30'            # Fed Funds synthetic, "30-day" exp.mov.avg.
-d4bills = 'DTB3'             # Treasury bills, daily
+d4bills = 'DTB3'             # Treasury bills, daily, 1954 (not DGS3MO, 1982)
+
+d4bond1 = 'DGS1'             # Treasury  1-y constant maturity, daily, 1962
+d4bond2 = 'DGS2'             # Treasury  2-y constant maturity, daily, 1976
+d4bond3 = 'DGS3'             # Treasury  3-y constant maturity, daily, 1962
+d4bond5 = 'DGS5'             # Treasury  5-y constant maturity, daily, 1962
+d4bond7 = 'DGS7'             # Treasury  7-y constant maturity, daily, 1969
+d4bond10 = 'DGS10'           # Treasury 10-y constant maturity, daily, 1962
+d4bond20 = 'DGS20'           # Treasury 20-y constant maturity, daily, 1993*
+d4bond30 = 'DGS30'           # Treasury 30-y constant maturity, daily, 1977
+
 d4zero10 = 'd4zero10'        # Zero-coupon price of Treasury 10-y, daily
-d4bond10 = 'DGS10'           # Treasury 10-y constant, daily
 d4tips10 = 'DFII10'          # TIPS 10-y constant, daily
 d4curve = 'd4curve'          # Treasury 10_y-bills, getfred synthetic
 d4bei = 'd4bei'              # 10_y Break-even inflation, getfred synthetic
