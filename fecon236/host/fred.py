@@ -1,43 +1,55 @@
-#  Python Module for import                           Date : 2018-12-10
+#  Python Module for import                           Date : 2018-05-14
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-'''
-_______________|  fred.py :: FRED database into pandas.
+"""FRED database into pandas.
 
 Functions access data from the Federal Reserve Bank, St. Louis.
 Each economic time series and its frequency has its own "fredcode"
 which is freely available from https://fred.stlouisfed.org
 
-        Usage:  df = getfred(fredcode)
-
 Favorite fredcodes are variables named d4*, m4*, q4*
 which indicate their frequency: daily, monthly, or quarterly.
-
-Principal functions: getfred(), daily(), monthly(), quarterly().
 
 Some series are synthetically created using raw data from FRED.
 Also we may extend their past history, but your working directory
 must contain our supplemental CSV files.
 
-REFERENCES:
 
-- pandas, http://pandas.pydata.org/pandas-docs/stable/computation.html
+Principal Functions
+-------------------
 
-- Wes McKinney, 2013, Python for Data Analysis.
+* ``getfred()``
+* ``daily()``
+* ``monthly()``
+* ``quarterly()``
 
-- Mico Loretan, Federal Reserve Bulletin, Winter 2005,
-       "Indexes of the Foreign Exchange Value of the Dollar",
-       http://www.federalreserve.gov/pubs/bulletin/2005/winter05_index.pdf
+Usage
+-----
 
+    >>> df = getfred(fredcode)
 
-CHANGE LOG  For LATEST version, see https://git.io/fecon236
-2018-12-10  Include more fredcodes for Treasury bonds.
-2018-05-14  Gracefully deprecate plotfred().
-2018-05-13  Eliminate lazy abbreviations, clarify comments.
-2018-05-12  Given new division, eliminate float(integer).
-2018-05-11  Fix imports. Deprecate plotfred().
-2018-05-09  fred.py, fecon236 fork. Pass flake8.
-2018-03-11  yi_fred.py, fecon235 v5.18.0312, https://git.io/fecon235
-'''
+References
+----------
+
+* Mico Loretan, Federal Reserve Bulletin, Winter 2005, "Indexes of the Foreign
+  Exchange Value of the Dollar",
+  http://www.federalreserve.gov/pubs/bulletin/2005/winter05_index.pdf
+* pandas, http://pandas.pydata.org/pandas-docs/stable/computation.html
+* Wes McKinney, 2013, Python for Data Analysis.
+
+Notes
+-----
+For LATEST version, see https://git.io/fecon236
+
+Change Log
+----------
+
+* 2018-05-14  Gracefully deprecate plotfred().
+* 2018-05-13  Eliminate lazy abbreviations, clarify comments.
+* 2018-05-12  Given new division, eliminate float(integer).
+* 2018-05-11  Fix imports. Deprecate plotfred().
+* 2018-05-09  fred.py, fecon236 fork. Pass flake8.
+* 2018-03-11  yi_fred.py, fecon235 v5.18.0312, https://git.io/fecon235
+"""
 
 from __future__ import absolute_import, print_function, division
 
@@ -68,18 +80,9 @@ d4libeur = 'EUR3MTD156N'     # 3-m LIBOR EUR, daily
 d4libusd = 'USD3MTD156N'     # 3-m LIBOR USD, daily
 d4ff = 'DFF'                 # Fed Funds, daily since 1954
 d4ff30 = 'd4ff30'            # Fed Funds synthetic, "30-day" exp.mov.avg.
-d4bills = 'DTB3'             # Treasury bills, daily, 1954 (not DGS3MO, 1982)
-
-d4bond1 = 'DGS1'             # Treasury  1-y constant maturity, daily, 1962
-d4bond2 = 'DGS2'             # Treasury  2-y constant maturity, daily, 1976
-d4bond3 = 'DGS3'             # Treasury  3-y constant maturity, daily, 1962
-d4bond5 = 'DGS5'             # Treasury  5-y constant maturity, daily, 1962
-d4bond7 = 'DGS7'             # Treasury  7-y constant maturity, daily, 1969
-d4bond10 = 'DGS10'           # Treasury 10-y constant maturity, daily, 1962
-d4bond20 = 'DGS20'           # Treasury 20-y constant maturity, daily, 1993*
-d4bond30 = 'DGS30'           # Treasury 30-y constant maturity, daily, 1977
-
+d4bills = 'DTB3'             # Treasury bills, daily
 d4zero10 = 'd4zero10'        # Zero-coupon price of Treasury 10-y, daily
+d4bond10 = 'DGS10'           # Treasury 10-y constant, daily
 d4tips10 = 'DFII10'          # TIPS 10-y constant, daily
 d4curve = 'd4curve'          # Treasury 10_y-bills, getfred synthetic
 d4bei = 'd4bei'              # 10_y Break-even inflation, getfred synthetic
@@ -203,10 +206,23 @@ m4unempfr = 'LRHUTTTTFRM156S'  # FR Unemployment rate, OECD SA monthly
 #          make conversions for numerical work later.
 
 def readfile(filename, separator=',', compress=None):
-    '''Read file (CSV default) as pandas dataframe.'''
-    #  If separator is space, use '\s+' since regex will work.
-    #  compress will take 'gzip' or 'bzip' as value.
-    #
+    """
+    Read file (CSV default) as pandas dataframe.
+
+    Parameters
+    ----------
+    filename: str
+        Name of file to be read
+    separator: str, optional
+        Delimiter to use. Defaults to comma (',')
+    compress: str, optional
+        File format for compressed files. 'gzip' and 'bzip' are supported.
+        Defaults to none.
+
+    Notes
+    -----
+    If separator is space, use '\s+' since regex will work.
+    """  # noqa: W605
     dataframe = pd.read_csv(filename, sep=separator,
                             compression=compress,
                             index_col=0, parse_dates=True,
@@ -236,7 +252,14 @@ def readfile(filename, separator=',', compress=None):
 
 
 def makeURL(fredcode):
-    '''Create http address to access FRED's CSV files.'''
+    """
+    Create http address to access FRED's CSV files.
+
+    Parameters
+    ----------
+    fredcode: str
+        FRED series code
+    """
     #         Validated July 2014.
     return 'http://research.stlouisfed.org/fred2/series/' \
         + fredcode + '/downloaddata/' + fredcode + '.csv'
@@ -246,7 +269,14 @@ def makeURL(fredcode):
 #          It's the best primitive to get raw FRED data.
 
 def getdata_fred(fredcode):
-    '''Download CSV file from FRED and read it as pandas DATAFRAME.'''
+    """
+    Download CSV file from FRED and read it as pandas DATAFRAME.
+
+    Parameters
+    ----------
+    fredcode: str
+        FRED series code
+    """
     #  2014-08-11 former name "getdataframe".
     #  2015-12-05 fredcsv = urllib2.urlopen(makeURL(fredcode))
     #                Change import style for python3 compatibility.
@@ -255,7 +285,49 @@ def getdata_fred(fredcode):
 
 
 def index_delta_secs(dataframe):
-    '''Find minimum in seconds between index values.'''
+    """
+    Find minimum in seconds between index values.
+
+    Parameters
+    ----------
+    dataframe: pandas.DataFrame
+
+    Notes
+    -----
+    There are OTHER METHODS to get the FREQUENCY of a dataframe: e.g.
+    ``df.index.freq``  OR  ``df.index.freqstr``, however, these work only
+    if the frequency was attributed: e.g. '1 Hour' OR  'H' respectively.
+    The fecon235 derived dataframes will usually return None.
+
+    Two ``timedelta64`` units, 'Y' years and 'M' months, are
+    specially treated because the time they represent depends upon
+    their context. While a ``timedelta64`` day unit is equivalent to
+    24 hours, there is difficulty converting a month unit into days
+    because months have varying number of days.
+
+    Other ``numpy`` ``timedelta64`` units can be found here:
+    http://docs.scipy.org/doc/numpy/reference/arrays.datetime.html
+
+    For pandas we could do:  ``pd.infer_freq(df.index)`` which, for example,
+    might output 'B' for business daily series.
+
+    But the STRING representation of index frequency is IMPRACTICAL
+    since we may want to compare two unevenly timed indexes.
+    That comparison is BEST DONE NUMERICALLY in some common unit
+    (we use seconds since that is the Unix epoch convention).
+
+    Such comparison will be crucial for the machine
+    to chose whether downsampling or upsampling is appropriate.
+    The casual user should not be expected to know the functions
+    within ``index_delta_secs`` to smoothly work with a notebook.
+
+    See Also
+    --------
+    For details on frequency conversion, see McKinney 2013,
+      Chp. 10 RESAMPLING, esp. Table 10-5 on downsampling.
+      pandas defaults are:  how='mean', closed='right', label='right'
+
+    """
     nanosecs_timedelta64 = np.diff(dataframe.index.values).min()
     #  Picked min() over median() to conserve memory;      ^^^^^!
     #  also avoids missing values issue,
@@ -269,38 +341,7 @@ def index_delta_secs(dataframe):
     else:
         return secs
 
-    #  There are OTHER METHODS to get the FREQUENCY of a dataframe:
-    #       e.g.  df.index.freq  OR  df.index.freqstr ,
-    #  however, these work only if the frequency was attributed:
-    #       e.g.  '1 Hour'       OR  'H'  respectively.
-    #  The fecon235 derived dataframes will usually return None.
-    #
-    #  Two timedelta64 units, 'Y' years and 'M' months, are
-    #  specially treated because the time they represent depends upon
-    #  their context. While a timedelta64 day unit is equivalent to
-    #  24 hours, there is difficulty converting a month unit into days
-    #  because months have varying number of days.
-    #       Other numpy timedelta64 units can be found here:
-    #  http://docs.scipy.org/doc/numpy/reference/arrays.datetime.html
-    #
-    #  For pandas we could do:  pd.infer_freq(df.index)
-    #  which, for example, might output 'B' for business daily series.
-    #
-    #  But the STRING representation of index frequency is IMPRACTICAL
-    #  since we may want to compare two unevenly timed indexes.
-    #  That comparison is BEST DONE NUMERICALLY in some common unit
-    #  (we use seconds since that is the Unix epoch convention).
-    #
-    #  Such comparison will be crucial for the machine
-    #  to chose whether downsampling or upsampling is appropriate.
-    #  The casual user should not be expected to know the functions
-    #  within index_delta_secs() to smoothly work with a notebook.
 
-
-#  For details on frequency conversion, see McKinney 2013,
-#       Chp. 10 RESAMPLING, esp. Table 10-5 on downsampling.
-#       pandas defaults are:  how='mean', closed='right', label='right'
-#
 #  2014-08-10  closed and label to the 'left' conform to FRED practices.
 #              how='median' since it is more robust than 'mean'.
 #  2014-08-14  If upsampling, interpolate() does linear evenly,
@@ -309,10 +350,17 @@ def index_delta_secs(dataframe):
 
 
 def resample_main(dataframe, rule, secs):
-    '''Generalized resample routine for downsampling or upsampling.'''
-    #  rule is the offset string or object representing target conversion,
-    #       e.g. 'B', 'MS', or 'QS-OCT' to be compatible with FRED.
-    #  secs should be the maximum seconds expected for rule frequency.
+    """
+    Generalized resample routine for downsampling or upsampling.
+
+    Parameters
+    ----------
+    rule: str
+        Offset string or object representing target conversion (e.g. 'B', 'MS',
+        or 'QS-OCT' to be compatible with FRED.)
+    secs: int
+        Maximum seconds expected for rule frequency.
+    """
     if index_delta_secs(dataframe) < secs:
         df = dataframe.resample(rule, closed='left', label='left').median()
         #    how='median' for DOWNSAMPLING deprecated as of pandas 0.18
@@ -327,23 +375,53 @@ def resample_main(dataframe, rule, secs):
 
 
 def daily(dataframe):
-    '''Resample data to daily using only business days.'''
-    #                         'D' is used calendar daily
-    #                         'B' for business daily
+    """
+    Resample data to daily using only business days.
+
+    Parameters
+    ----------
+    dataframe: pandas.DataFrame
+        Dataframe to resample
+    """
     secs1day2hours = 93600.0
     return resample_main(dataframe, 'B', secs1day2hours)
 
 
 def monthly(dataframe):
-    '''Resample data to FRED's month start frequency.'''
-    #  FRED uses the start of the month to index its monthly data.
-    #                         'M'  is used for end of month.
-    #                         'MS' for start of month.
+    """
+    Resample data to FRED's month start frequency. FRED uses the start of the
+    month to index its monthly data.
+
+    Parameters
+    ----------
+    dataframe: pandas.DataFrame
+        Dataframe to resample
+    """
     secs31days = 2678400.0
     return resample_main(dataframe, 'MS', secs31days)
 
 
 def quarterly(dataframe):
+    """
+    Resample data to FRED's quarterly start frequency.
+
+    Parameters
+    ----------
+    dataframe: pandas.DataFrame
+        Dataframe to resample
+
+    Notes
+    -----
+    The quarterly data is
+    indexed as follows:
+
+    +----------+----------+-----------+-----------+
+    | Q1       | Q2       | Q3        | Q4        |
+    +----------+----------+-----------+-----------+
+    | 01-01    | 04-01    | 07-01     | 10-01     |
+    +----------+----------+-----------+-----------+
+
+    """
     '''Resample data to FRED's quarterly start frequency.'''
     #  FRED uses the start of the month to index its monthly data.
     #  Then for quarterly data: 1-01, 4-01, 7-01, 10-01.
@@ -356,10 +434,19 @@ def quarterly(dataframe):
 
 
 def getm4eurusd(fredcode=d4eurusd):
-    '''Make monthly EURUSD, and try to prepend 1971-2002 archive.'''
-    #  Synthetic euro is the average between
-    #                 DEM fixed at 1.95583 and
-    #                 FRF fixed at 6.55957.
+    """
+    Make monthly EURUSD, and try to prepend 1971-2002 archive.
+
+    Parameters
+    ----------
+    fredcode: str, optional
+        FRED series code, defaults to "DEXUSEU"
+
+    Notes
+    -----
+    Synthetic euro is the average between DEM fixed at 1.95583 and FRF fixed at
+    6.55957.
+    """
     eurnow = monthly(getdata_fred(fredcode))
     try:
         eurold = readfile('FRED-EURUSD_1971-2002-ARC.csv.gz', compress='gzip')
@@ -373,9 +460,19 @@ def getm4eurusd(fredcode=d4eurusd):
 
 
 def getspx(fredcode=d4spx):
-    '''Make daily S&P 500 series, and try to prepend 1957-archive.'''
-    #  Fred is currently licensed for only 10 years worth,
-    #  however, we have a local copy of 1957-2014 daily data.
+    """
+    Make daily S&P 500 series, and try to prepend 1957-archive.
+
+    Parameters
+    ----------
+    fredcode: str, optional
+        FRED series code, defaults to "SP500"
+
+    Notes
+    -----
+    Fred is currently licensed for only 10 years worth, however, we have a
+    local copy of 1957-2014 daily data.
+    """
     spnow = getdata_fred(fredcode)
     try:
         spold = readfile('FRED-SP500_1957-2014-ARC.csv.gz', compress='gzip')
@@ -389,9 +486,23 @@ def getspx(fredcode=d4spx):
 
 
 def gethomepx(fredcode=m4homepx):
-    '''Make Case-Shiller 20-city, and try to prepend 1987-2000 10-city.'''
-    #  Fred's licensing may change since source is S&P,
-    #  however, we have a local copy of 1987-2013 monthly SA data.
+    """
+    Make Case-Shiller 20-city, and try to prepend 1987-2000 10-city.
+
+    Parameters
+    ----------
+    fredcode: str, optional
+        FRED series code, defaults to helper m4homepx
+
+    Notes
+    -----
+    Fred's licensing may change since source is S&P, however, we have a local
+    copy of 1987-2013 monthly SA data.
+
+    See Also
+    --------
+    m4homepx: Helper function
+    """
     hpnow = getdata_fred('SPCS20RSA')
     #                          20-city home price index back to 2000-01-01.
     try:
@@ -415,9 +526,15 @@ def gethomepx(fredcode=m4homepx):
 
 
 def getinflations(inflations=ml_infl):
-    '''Normalize and average all inflation measures.'''
-    #  We will take the average of indexes after their
-    #  current value is set to 1 for equal weighting.
+    """
+    Normalize and average all inflation measures. Take the average of indexes
+    after their current value is set to 1 for equal weighting.
+
+    Parameters
+    ----------
+    inflations: list
+        List of inflation measures to normalize
+    """
     inflsum = getdata_fred(inflations[0])
     inflsum = inflsum / float(tool.tailvalue(inflsum))
     for i in inflations[1:]:
@@ -428,11 +545,21 @@ def getinflations(inflations=ml_infl):
 
 
 def getdeflator(inflation=m4infl):
-    '''Construct a de-inflation dataframe suitable as multiplier.'''
-    #  Usually we encounter numbers which have been deflated to dollars
-    #  of some arbitrary year (where the value is probably 100).
-    #  Here we set the present to 1, while past values have increasing
-    #     multiplicative "returns" which will yield current dollars.
+    """
+    Construct a de-inflation dataframe suitable as multiplier.
+
+    Parameters
+    ----------
+    inflation: str, optional
+        Inflation data to use, detaults to synthetic inflation
+
+    Notes
+    -----
+    Usually we encounter numbers which have been deflated to dollars
+    of some arbitrary year (where the value is probably 100).
+    Here we set the present to 1, while past values have increasing
+    multiplicative "returns" which will yield current dollars.
+    """
     infl = getfred(inflation)
     lastin = tool.tailvalue(infl)
     return float(lastin) / infl
@@ -440,9 +567,14 @@ def getdeflator(inflation=m4infl):
 
 
 def getm4infleu():
-    '''Normalize and average Eurozone Consumer Prices.'''
-    #  FRED carries only NSA data from Eurostat,
-    #  so we shall use Holt-Winters levels.
+    """
+    Normalize and average Eurozone Consumer Prices.
+
+    Notes
+    -----
+    FRED carries only NSA data from Eurostat,
+    so we shall use Holt-Winters levels.
+    """
     cpiall = getdata_fred('CP0000EZ17M086NEST')
     #                        ^for 17 countries.
     holtall = hw.holtlevel(cpiall)
@@ -458,8 +590,13 @@ def getm4infleu():
 
 
 def getfred(fredcode):
-    '''Retrieve from FRED in dataframe format, INCL. SPECIAL CASES.'''
-    #    We can SYNTHESIZE a FREDCODE by use of string equivalent arg:
+    """
+    Retrieve from FRED in dataframe format, INCL. SPECIAL CASES.
+
+    Notes
+    -----
+    We can SYNTHESIZE a FREDCODE by use of string equivalent arg
+    """
     if fredcode == m4gdpus:
         df = monthly(getdata_fred(q4gdpus))
     elif fredcode == m4gdpusr:
@@ -570,8 +707,11 @@ def getfred(fredcode):
 
 
 def plotfred(data, title='tmp', maxi=87654321):
-    '''DEPRECATED: Plot data should be given as dataframe or fredcode.'''
-    #  ^2018-05-11. Removal OK after 2020-01-01.
+    """
+    .. deprecated:: 0.18.0
+            Plot data should be given as dataframe or fredcode. `plotfred` will
+            be removed on or after 2020-01-01
+    """
     msg = "plotfred() DEPRECATED. Instead use get() and plot()."
     raise DeprecationWarning(msg)
 
