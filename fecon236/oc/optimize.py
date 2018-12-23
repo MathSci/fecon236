@@ -1,15 +1,11 @@
 #  Python Module for import                           Date : 2018-05-29
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-'''
-_______________|  optimize.py :: Convex optimization given noisy data.
+"""Convex optimization given noisy data.
 
-We smooth some of the rough edges among the "scipy.optimize" algorithms.  Our
-"optimize" algorithm first begins by a coarse grid search, then unconstrained
+We smooth some of the rough edges among the ``scipy.optimize`` algorithms.  Our
+``optimize`` algorithm first begins by a coarse grid search, then unconstrained
 Nelder-Mead simplex method, and finally the refined L-BFGS-B method which
 approximates a low-rank Hessian so that we can work in high (>250) dimensions.
-
-USAGE: please see tests/test_optimize.py which also serves as a TUTORIAL for
-optimization of loss functions, given data and model.
 
 Our selected methods feature the following and their unification:
 
@@ -45,19 +41,33 @@ Suitability: WITHOUT knowledge of the gradient:
         if you have a specific strategy.
 
 General strategy:
-    For scipy.optimize.minimize():
+    For ``scipy.optimize.minimize``:
     http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html
-    a singe method must be selected.  However, our optimize() is a sequence of
-    methods which starts from brute to refined, in above order.
+    a singe method must be selected.  However, our ``optimize`` is a sequence
+    of methods which starts from brute to refined, in above order.
 
-REFERENCES:
+Notes
+-----
+For LATEST version, see https://git.io/fecon236
+
+Usage
+-----
+Please see ``tests/test_optimize.py`` which also serves as a TUTORIAL
+for optimization of loss functions, given data and model.
+
+References
+----------
+
 - Mathematical optimization using scipy
   http://www.scipy-lectures.org/advanced/mathematical_optimization
 
-CHANGE LOG  For LATEST version, see https://git.io/fecon236
-2018-05-29  optimize.py, fecon236 fork. Pass flake8, fix imports.
-2016-04-08  ys_optimize.py, fecon235 v5.18.0312, https://git.io/fecon235
-'''
+Change Log
+----------
+
+* 2018-05-29  ``optimize.py``, ``fecon236`` fork. Pass flake8, fix imports.
+* 2016-04-08  ``ys_optimize.py``, fecon235 v5.18.0312, https://git.io/fecon235
+
+"""
 
 from __future__ import absolute_import, print_function, division
 
@@ -80,13 +90,24 @@ DISPLAY = 0
 
 
 def minBrute(fun, boundpairs, funarg=(), grids=20):
-    '''Minimization by brute force grid search.
-           fun is our function to minimize, given parameters for optimization.
-           boundpairs is a list of (min, max) pairs for fun parameters.
-           funarg is a tuple of supplemental arguments for fun.
-           grids are number of steps are taken in each direction.
-    '''
-    #  http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brute.html
+    """Minimization by brute force grid search.
+
+    Parameters
+    ----------
+    fun: function
+        Function to minimize, given parameters for optimization
+    boundpairs: list
+        List of (min, max) pairs for fun parameters
+    funarg: tuple
+        Supplemental arguments for fun
+    grids: int
+        Number of steps taken in each direction
+
+    References
+    ----------
+    http://docs.scipy.org/doc/scipy/reference/generated/
+    scipy.optimize.brute.html
+    """
     boundpairs = tuple(boundpairs)
     #  boundpairs actually must be a tuple consisting of (min,max) tuples.
     if DISPLAY:
@@ -103,14 +124,26 @@ def minBrute(fun, boundpairs, funarg=(), grids=20):
 
 
 def minNelder(fun, initial, funarg=()):
-    '''Nelder-Mead simplex algorithm.
-       fun is our function to minimize, given parameters for optimization.
-       initial parameter guesses must be an ndarray, i.e. np.array([...])
-       funarg is a tuple of supplemental arguments for fun.
-    '''
-    #  http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin.html
-    #  Nelder, J.A. and Mead, R. (1965), "A simplex method for function
-    #      minimization", The Computer Journal, 7, pp. 308-313
+    """Nelder-Mead simplex algorithm.
+
+    Parameters
+    ----------
+    fun: function
+        Function to minimize, given parameters for optimization
+    initial: numpy.ndarray
+        Initial parameter guesses
+    funarg: tuple
+        Supplemental arguments for fun
+
+    References
+    ----------
+
+    * http://docs.scipy.org/doc/scipy/reference/generated/
+      scipy.optimize.fmin.html
+    * Nelder, J.A. and Mead, R. (1965), "A simplex method for function
+      minimization", The Computer Journal, 7, pp. 308-313
+
+    """
     if DISPLAY:
         print(" ::  Display for minNelder() ... ")
     result = sop.fmin(func=fun, args=funarg, x0=initial, disp=DISPLAY)
@@ -119,20 +152,33 @@ def minNelder(fun, initial, funarg=()):
 
 
 def minBroyden(fun, initial, funarg=(), boundpairs=None):
-    '''Broyden-Fletcher-Goldfarb-Shanno L-BFGS-B algorithm with box boundaries.
-       At each step an approximate low-rank Hessian is refined,
-       so this should work in high (>250) dimensions.
-       fun is our function to minimize, given parameters for optimization.
-       initial parameter guesses must be an ndarray, i.e. np.array([...])
-       funarg is a tuple of supplemental arguments for fun.
-       boundpairs is an OPTIONAL list of (min, max) pairs for fun parameters,
-       where None can be used for either min or max to indicate no bound.
-    '''
-    #  http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_l_bfgs_b.html
-    #  Ref: C. Zhu, R. H. Byrd, J. Nocedal. L-BFGS-B: Algorithm 778: L-BFGS-B,
-    #  FORTRAN routines for large scale bound constrained optimization (1997),
-    #  ACM Transactions on Mathematical Software, 23, 4, pp. 550-560.
-    #      scipy function is actually a Python wrapper around Fortran code.
+    """Broyden-Fletcher-Goldfarb-Shanno L-BFGS-B algorithm with box boundaries.
+
+    At each step an approximate low-rank Hessian is refined,
+    so this should work in high (>250) dimensions.
+
+    Parameters
+    ----------
+    fun: function
+        Function to minimize, given parameters for optimization
+    initial: numpy.ndarray
+        Initial parameter guesses
+    funarg: tuple
+        Supplemental arguments for fun
+    boundpairs: list, optional
+        Pairs for fun parameters, where None can be used for either min or max
+        to indicate no bound
+
+    References
+    ----------
+
+    * http://docs.scipy.org/doc/scipy/reference/generated/
+      scipy.optimize.fmin_l_bfgs_b.html
+    * FORTRAN routines for large scale bound constrained optimization (1997),
+      ACM Transactions on Mathematical Software, 23, 4, pp. 550-560.
+      ``scipy`` function is actually a Python wrapper around Fortran code.
+
+    """
     if DISPLAY:
         print(" ::  Display for minBroyden() ... ")
     result = sop.fmin_l_bfgs_b(func=fun, args=funarg, x0=initial,
@@ -153,20 +199,32 @@ def minBroyden(fun, initial, funarg=(), boundpairs=None):
 
 
 def optimize(fun, initialpairs, funarg=(), grids=20):
-    '''Optimize by grid search, Nelder-Mead simplex, and L-BFGS-B methods.
-       First a broad global search, followed by coarse non-gradient method,
-       then refined quasi-Newton method by approximate low-rank Hessian.
-           fun is our function to minimize, given parameters for optimization.
-           funarg is a tuple of supplemental arguments for fun.
-           initialpairs is a list of (min, max) pairs for fun parameters.
-           grids are number of steps are taken in each direction.
-       However, here we are intentionally NOT CONSTRAINED by initialpairs.
-    '''
-    #  The argument initialpairs can be just our preliminary wild guess.
-    #  minBrute will respect initialpairs as strict boundpairs using grids,
-    #  however, better and better initial point estimates are passed
-    #  along to other algorithms which will ignore any strict bounds
-    #  if the minimization can be improved.
+    """Optimize by grid search, Nelder-Mead simplex, and L-BFGS-B methods.
+
+    First a broad global search, followed by coarse non-gradient method,
+    then refined quasi-Newton method by approximate low-rank Hessian.
+
+    Parameters
+    ----------
+    fun: function
+        Function to minimize, given parameters for optimization
+    initialpairs: list
+        Initial (min, max) pairs for fun parameters
+    funarg: tuple
+        Supplemental arguments for fun
+    grids: int
+        Number of steps are taken in each direction. Defaults to 20
+
+    Notes
+    -----
+    The argument ``initialpairs`` can be just our preliminary wild guess.
+    minBrute will respect ``initialpairs`` as strict boundpairs using grids,
+    however, better and better initial point estimates are passed
+    along to other algorithms which will ignore any strict bounds
+    if the minimization can be improved.
+
+    However, here we are intentionally NOT CONSTRAINED by ``initialpairs``.
+    """
     brute = minBrute(fun=fun, funarg=funarg, boundpairs=initialpairs,
                      grids=grids)
     if DISPLAY:

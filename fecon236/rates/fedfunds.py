@@ -1,15 +1,21 @@
 #  Python Module for import                           Date : 2018-06-17
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-'''
-_______________|  fedfunds.py :: Fed Funds rate module for fecon236
+"""Fed Funds rate module for fecon236
 
-- For derivation of forefunds() which forecasts the Fed Funds rate,
+- For derivation of ``forefunds`` which forecasts the Fed Funds rate,
     see https://git.io/fedfunds
 
-CHANGE LOG  For LATEST version, see https://git.io/fecon236
-2018-06-17  Spin-off forefunds() from top.py.
-'''
+Notes
+-----
+For LATEST version, see https://git.io/fecon236
 
+
+Change Log
+----------
+
+* 2018-06-17  Spin-off ``forefunds`` from ``top.py``.
+
+"""
 from __future__ import absolute_import, print_function, division
 
 from fecon236.util import system
@@ -19,9 +25,12 @@ from fecon236.tsa.holtwinters import ema
 
 
 def forefunds(nearby='16m', distant='17m'):
-    '''Forecast distant Fed Funds rate using Eurodollar futures.'''
-    #  Derivation in fecon235/nb/qdl-libor-fed-funds.ipynb
-    #  See https://git.io/fedfunds
+    """Forecast distant Fed Funds rate using Eurodollar futures.
+
+    Derivation in fecon235/nb/qdl-libor-fed-funds.ipynb
+
+    See https://git.io/fedfunds
+    """
     ffer = get('DFF')
     #      ^Retrieve Fed Funds effective rate, daily since 1954.
     ffer_ema = ema(ffer['1981':], 0.0645)

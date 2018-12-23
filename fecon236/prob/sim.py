@@ -1,24 +1,28 @@
 #  Python Module for import                           Date : 2018-07-04
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-'''
-_______________|  sim.py :: Simulation module for fecon236
+"""Simulation module for fecon236
 
 - Essential probabilistic functions for simulations.
-- Synthesis of prices from Gaussian mixture model GM(2), see gmix2prices().
-- Visualize simulated price paths, see simushow() and gmixshow().
+- Synthesis of prices from Gaussian mixture model GM(2), see ``gmix2prices``.
+- Visualize simulated price paths, see ``simushow`` and ``gmixshow``.
 - Let N be an integer for sample size or length of a series.
 
-CHANGE LOG  For LATEST version, see https://git.io/fecon236
-2018-07-04  Add gmix2ret() and SPX constants for default arguments.
-                Add supplemental gmix2prices() and gmixshow().
-2018-07-01  Add norat2ret() and ret2prices().
-                Replace rates2prices by zerat2prices for clarity.
-                Rename simshow() to simushow() and use new function.
-2018-06-09  Add rates2prices() and summary simshow().
-2018-06-08  Spin-off 2014 bootstrap material to boots/bootstrap.py.
-2018-06-07  Rename to sim.py, fecon236 fork. Pass flake8, fix imports.
-2017-06-29  yi_simulation.py, fecon235 v5.18.0312, https://git.io/fecon235
-'''
+Change Log
+----------
+
+* 2018-07-04  Add ``gmix2ret`` and SPX constants for default arguments. Add
+  supplemental ``gmix2prices`` and ``gmixshow``.
+* 2018-07-01  Add ``norat2ret`` and ``ret2prices``. Replace ``rates2prices`` by
+  ``zerat2prices`` for clarity. Rename ``simshow`` to ``simushow`` and use new
+  function.
+* 2018-06-09  ``Add rates2prices`` and summary ``simshow``.
+* 2018-06-08  Spin-off 2014 bootstrap material to ``boots/bootstrap.py``.
+* 2018-06-07  Rename to ``sim.py``, ``fecon236`` fork. Pass flake8, fix
+  imports.
+* 2017-06-29  ``yi_simulation.py``, fecon235 v5.18.0312,
+  https://git.io/fecon235
+
+"""
 
 from __future__ import absolute_import, print_function, division
 
@@ -41,14 +45,14 @@ SPXinprice = 46.20     # initial price
 
 
 def randou(upper=1.0):
-    '''Single random float, not integer, from Uniform[0.0, upper).'''
+    """Single random float, not integer, from ``Uniform[0.0, upper)``."""
     #  Closed lower bound of zero, and argument for open upper bound.
-    #  To generate arrays, please use np.random.random().
+    #  To generate arrays, please use ``np.random.random``.
     return np.random.uniform(low=0.0, high=upper, size=None)
 
 
 def maybe(p=0.50):
-    '''Uniformly random indicator function such that prob(I=1=True) = p.'''
+    """Uniformly random indicator function such that ``prob(I=1=True) = p``."""
     #  Nice to have for random "if" conditional branching.
     #  Fun note: Python's boolean True is actually mapped to int 1.
     if randou() <= p:
@@ -58,7 +62,7 @@ def maybe(p=0.50):
 
 
 def randog(sigma=1.0):
-    '''Single random float from Gaussian N(0.0, sigma^2).'''
+    """Single random float from Gaussian ``N(0.0, sigma^2)``."""
     #  Argument sigma is the standard deviation, NOT the variance!
     #  For non-zero mean, just add it to randog later.
     #  To generate arrays, please use simug().
@@ -66,10 +70,10 @@ def randog(sigma=1.0):
 
 
 def simug(sigma=SPXsigma/16., N=256):
-    '''Simulate array of shape (N,) from Gaussian Normal(0.0, sigma^2).
-       Argument sigma is the standard deviation, NOT the variance!
-       Note the use of raw sigma, which is not necessarily annualized.
-    '''
+    """Simulate array of shape ``(N,)`` from Gaussian Normal(0.0, sigma^2).
+       Argument ``sigma`` is the standard deviation, NOT the variance!
+       Note the use of raw ``sigma``, which is not necessarily annualized.
+    """
     #  Default sigma is stylized per daily SPX data, see https://git.io/gmix
     ratarr = sigma * np.random.randn(N)
     #  For non-zero mean, simply add it later: mu + simug(sigma)
@@ -77,9 +81,9 @@ def simug(sigma=SPXsigma/16., N=256):
 
 
 def simug_mix(sigma1=SPXsigma1/16., sigma2=SPXsigma2/16., q=SPXq, N=256):
-    '''Simulate array from zero-mean Gaussian mixture GM(2).
+    """Simulate array from zero-mean Gaussian mixture GM(2).
        Note the use of raw sigmas, which are not necessarily annualized.
-    '''
+    """
     #  Default values are stylized per daily SPX data, see https://git.io/gmix
     #  Mathematical details in fecon235/nb/gauss-mix-kurtosis.ipynb
     #     Pre-populate an array of shape (N,) with the FIRST Gaussian,
@@ -96,10 +100,15 @@ def simug_mix(sigma1=SPXsigma1/16., sigma2=SPXsigma2/16., q=SPXq, N=256):
 
 
 def norat2ret(normarr, mean, sigma, yearly=256):
-    '''Reform array of N(0, 1) normalized RATES into array of RETURNS.
-       Arguments mean and sigma should be in decimal form.
-       Argument yearly expresses frequency to be obtained.
-    '''
+    """Reform array of N(0, 1) normalized RATES into array of RETURNS.
+
+    Parameters
+    ----------
+    mean: float
+    sigma: float
+    yearly: int
+       Frequency to be obtained
+    """
     meanly = mean / yearly   # e.g. 256 trading days in a year.
     sigmaly = sigma / (yearly ** 0.5)
     retarr = (1 + meanly) + (sigmaly * normarr)
@@ -109,10 +118,14 @@ def norat2ret(normarr, mean, sigma, yearly=256):
 
 
 def ret2prices(retarr, inprice=1.0):
-    '''Transform array of returns into DataFrame of prices.'''
-    #  For cumulative product of array elements,
-    #  numpy's cumprod is very fast, and records the ongoing results.
-    #  http://docs.scipy.org/doc/numpy/reference/generated/numpy.cumprod.html
+    """Transform array of returns into DataFrame of prices.
+
+    Notes
+    -----
+    For cumulative product of array elements,
+    numpy's ``cumprod`` is very fast, and records the ongoing results.
+    http://docs.scipy.org/doc/numpy/reference/generated/numpy.cumprod.html
+    """
     prices = np.cumprod(retarr)  # prices here is in np.array form.
     #      Initial price implicitly starts at 1 where
     #      the history of prices is just the products of the returns.
@@ -123,7 +136,7 @@ def ret2prices(retarr, inprice=1.0):
 
 
 def zerat2prices(ratarr, mean=0, yearly=256, inprice=1.0):
-    '''Transform array of mean-0 rates into DataFrame of prices with mean.'''
+    """Transform array of mean-0 rates into DataFrame of prices with mean."""
     #  Default inprice means initial price implicitly starts at 1.
     meanly = mean / yearly   # e.g. 256 trading days in a year.
     retarr = (1 + meanly) + ratarr
@@ -132,9 +145,9 @@ def zerat2prices(ratarr, mean=0, yearly=256, inprice=1.0):
 
 def simushow(N=256, mean=0, yearly=256, repeat=1, func=simug_mix, visual=True,
              b=SPXb, inprice=100):
-    '''Statistical and optional visual SUMMARY: repeat simulations of func.
-       Function func shall use all its default arguments, except for N.
-    '''
+    """Statistical and optional visual SUMMARY: repeat simulations of ``func``.
+       Function ``func`` shall use all its default arguments, except for ``N``.
+    """
     for i in range(repeat):
         istr = str(i)
         ratarr = func(N=N)
@@ -150,10 +163,14 @@ def simushow(N=256, mean=0, yearly=256, repeat=1, func=simug_mix, visual=True,
 
 
 def gmix2ret(N=256, mean=SPXmean, sigma=SPXsigma, yearly=256):
-    '''Simulate array of GM(2) returns given arithmetic mean and plain sigma.
-       GAUSSIAN MIXTURE is synthesized through primitive sim functions.
-       Default values are stylized per daily SPX data, see https://git.io/gmix
-    '''
+    """Simulate array of GM(2) returns given arithmetic ``mean`` and plain
+    ``sigma``.
+
+    Notes
+    -----
+    GAUSSIAN MIXTURE is synthesized through primitive sim functions.
+    Default values are stylized per daily SPX data, see https://git.io/gmix
+    """
     sigmaly = SPXsigma / (yearly ** 0.5)
     sigmaly1 = SPXsigma1 / (yearly ** 0.5)
     sigmaly2 = SPXsigma2 / (yearly ** 0.5)
@@ -169,16 +186,19 @@ def gmix2ret(N=256, mean=SPXmean, sigma=SPXsigma, yearly=256):
 
 
 def gmix2prices(N=256, mean=SPXmean, sigma=SPXsigma, yearly=256, inprice=1.0):
-    '''Simulate N prices from GM(2) given arithmetic mean and plain sigma.
-       GAUSSIAN MIXTURE is synthesized through primitive sim functions.
-    '''
+    """Simulate N prices from GM(2) given arithmetic mean and plain sigma.
+
+    Notes
+    -----
+    GAUSSIAN MIXTURE is synthesized through primitive sim functions.
+    """
     retarr = gmix2ret(N, mean, sigma, yearly)
     return ret2prices(retarr, inprice)
 
 
 def gmixshow(N=256, mean=SPXmean, sigma=SPXsigma, yearly=256, repeat=1,
              visual=True, inprice=100, b=SPXb):
-    '''Statistical and optional visual SUMMARY: repeat simulations of GM(2).'''
+    """Statistical and optional visual SUMMARY: repeat simulations of GM(2)."""
     for i in range(repeat):
         istr = str(i)
         prices = gmix2prices(N, mean, sigma, yearly, inprice)
