@@ -70,19 +70,24 @@ def tailvalue(df, pos=0, row=1):
 
 def div(numerator, denominator, floor=False):
     """Division via numpy for pandas, Python 2 and 3 compatibility.
-        Returns a scalar if both inputs are scalar, ndarray otherwise.
-        We shall AVOID the ambiguous python2-like: np.divide()
-    >>> x = np.array([0, 1, 2, 3, 4])
-    >>> div(x, 4, floor=False)
-    array([0.  ,  0.25,  0.5 ,  0.75,  1.])
-    >>> div(x, 4, floor=True)
-    array([0, 0, 0, 0, 1])
-    >>> div(2, 4, floor=True)
-    0
-    >>> div(2, 4)
-    0.5
-    >>> div(2, 0)  # Dividing by zero returns infinity, not error:
-    inf
+
+    Returns a scalar if both inputs are scalar, ``ndarray`` otherwise.
+    We shall AVOID the ambiguous python2-like: ``np.divide``
+
+    .. code-block:: python
+        :flake8-group: Ignore
+
+        >>> x = np.array([0, 1, 2, 3, 4])
+        >>> div(x, 4, floor=False)
+        array([0.  ,  0.25,  0.5 ,  0.75,  1.])
+        >>> div(x, 4, floor=True)
+        array([0, 0, 0, 0, 1])
+        >>> div(2, 4, floor=True)
+        0
+        >>> div(2, 4)
+        0.5
+        >>> div(2, 0)  # Dividing by zero returns infinity, not error:
+        inf
     """
     if floor:
         #      Like python3 "//":
@@ -115,13 +120,21 @@ def pcent(dfx, freq=1):
 
 def retrace(minimum, maximum, percent=50):
     """Compute retracement between minimum and maximum.
-        Noteworthy Fibonacci retracements: 23.6%, 38.2%, 61.8%
-        Set percent as negative for retracement down from maximum,
-        whereas positive percent implies retrace up from the minimum.
-    >>> retrace(10, 110, -20)
-    90.0
-    >>> retrace(10, 110, 20)
-    30.0
+
+    Noteworthy Fibonacci retracements: 23.6%, 38.2%, 61.8%
+    Set percent as negative for retracement down from maximum,
+    whereas positive percent implies retrace up from the minimum.
+
+    Usage
+    -----
+
+    code-block:: python
+        :flake8-group: Ignore
+
+        >>> retrace(10, 110, -20)
+        90.0
+        >>> retrace(10, 110, 20)
+        30.0
     """
     if isinstance(minimum, pd.DataFrame):
         system.die("DataFrame argument UNACCEPTABLE. Try retracedf()")
@@ -175,11 +188,15 @@ def georet(dfx, yearly=256):
 
 
 def zeroprice(rate, duration=9, yearly=2, face=100):
-    """Compute price of zero-coupon bond given its duration."""
-    #  Assume rate is in percentage form, e.g. 2.5% (not 0.025).
-    #         rate could be a dataframe column.
-    #  2014-08-28  duration of 10-y Treasury is 9.1 approx.
-    #  yearly refers to payouts per year, so 2 means semi-annual.
+    """Compute price of zero-coupon bond given its duration.
+
+    Assume ``rate`` is in percentage form, e.g. 2.5% (not 0.025).
+    ``rate`` could be a dataframe column.
+
+    2014-08-28  duration of 10-y Treasury is 9.1 approx.
+
+    ``yearly`` refers to payouts per year, so ``2`` means semi-annual.
+    """
     periodrate = rate / float(yearly * 100)
     periods = duration * yearly
     return float(face) / ((1 + periodrate) ** periods)
@@ -187,12 +204,22 @@ def zeroprice(rate, duration=9, yearly=2, face=100):
 
 def std(data, population=False):
     """Compute standard deviation with delta degrees of freedom, ddof.
-       Default population=False is compatible with pandas and MATLAB
-       since both defaults to SAMPLE standard deviation
-       (using so-called Bessel's correction of N-1).
+
+    Default ``population=False`` is compatible with pandas and MATLAB
+    since both defaults to SAMPLE standard deviation
+    (using so-called Bessel's correction of N-1).
+
+    Notes
+    -----
+
+    * ddof must be integer-valued (not boolean):
+
+    References
+    ----------
+
+    * https://stackoverflow.com/questions/27600207
+
     """
-    #  Ref: https://stackoverflow.com/questions/27600207
-    #  ddof must be integer-valued (not boolean):
     if population:
         ddof = 0   # For POPULATION standard deviation: numpy default!
     else:
@@ -233,47 +260,59 @@ def mad(dfy):
 
 def madmen(dfy):
     """Rescale data as unitless MAD multiples, after shifting median to zero.
+
     The main character in the "Mad Men" series pretending to be Donald Draper
     is akin to our data pretending to be Gaussian, which we robustly unmask.
-    [Cf. alternative normalize() where large deviations are squared.]
+    [Cf. ``alternative normalize`` where large deviations are squared.]
     """
     dev = dfy - median(dfy)  # Deviations from median.
     return dev / mad(dfy)
 
 
 def correlate(dfy, dfx, type='pearson'):
-    """CORRELATION FUNCTION between series using pandas method."""
-    #  N.B. -  must specify column(s) within dataframe(s) !
-    #              Types of correlations:
-    #  'pearson'   Standard correlation coefficient
-    #  'kendall' 	Kendall Tau correlation coefficient
-    #  'spearman' 	Spearman rank correlation coefficient
+    """CORRELATION FUNCTION between series using pandas method.
+
+    Notes
+    -----
+
+    * Must specify column(s) within dataframe(s)
+
+    Parameters
+    ----------
+    type: str, optional
+        Types of correlation coefficient ('pearson' - Standard, 'kendall' -
+        Kendall Tau, 'spearman' - Spearman rank)
+    """
     return dfy.corr(dfx, method=type)
 
 
 def cormatrix(dataframe, type='pearson'):
-    """PAIRWISE CORRELATIONS within a dataframe using pandas method."""
-    #              Types of correlations:
-    #  'pearson'   Standard correlation coefficient
-    #  'kendall' 	Kendall Tau correlation coefficient
-    #  'spearman' 	Spearman rank correlation coefficient
+    """PAIRWISE CORRELATIONS within a dataframe using pandas method
+
+    Parameters
+    ----------
+    type: str, optional
+        Types of correlation coefficient ('pearson' - Standard, 'kendall' -
+        Kendall Tau, 'spearman' - Spearman rank)
+    """
     return dataframe.corr(method=type)
 
 
 def regressformula(df, formula):
-    """Helper function for statsmodel linear regression using formula."""
-    #
-    #  FORMULA is a string like "Y ~ 0 + X + Z"
-    #          where column names of the df dataframe are used.
-    #          Omit the 0 if you want an intercept fitted.
-    #
-    #  USAGE given that: result = regressformula(...)
-    #        - print(result.summary())
-    #        - result.params
-    #        - coeff = result.params.tolist()
-    #        - result.rsquared is also available.
-    #        - result.aic is Akaike Information Criterion AIC.
-    #
+    """Helper function for statsmodel linear regression using formula.
+
+    FORMULA is a string like ``Y ~ 0 + X + Z`` where column names of the df
+    dataframe are used.
+
+    Omit the 0 if you want an intercept fitted.
+
+    USAGE given that: ``result = regressformula(...)``
+       - ``print(result.summary())``
+       - ``result.params``
+       - ``coeff = result.params.tolist()``
+       - ``result.rsquared`` is also available.
+       - ``result.aic`` is Akaike Information Criterion AIC.
+    """
     return smf.ols(formula=formula, data=df).fit()
 
 
@@ -365,8 +404,9 @@ def regress(dfy, dfx, intercept=True):
 
 def kurtfun(data, raw=False, population=False):
     """Compute kurtosis of an array or a single column DataFrame.
-       Default uses PEARSON fourth central moment, where kurtosis is 3
-       if data is Gaussian. Fischer "excess kurtosis":= k_Pearson-3.
+
+    Default uses PEARSON fourth central moment, where kurtosis is 3
+    if data is Gaussian. Fischer "excess kurtosis":= k_Pearson-3.
     """
     arr = toar(data)
     mu = np.mean(arr)
