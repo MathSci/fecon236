@@ -25,7 +25,8 @@ References
 ----------
 
 * ``pandas``, http://pandas.pydata.org/pandas-docs/stable/computation.html
-* ``pandas-datareader``: https://pydata.github.io/pandas-datareader/stable/index.html
+* ``pandas-datareader``:
+  https://pydata.github.io/pandas-datareader/stable/index.html
 
 .. warning:: Package name is ``pandas-datareader``, but it is imported under
    the ``pandas_datareader`` module name.

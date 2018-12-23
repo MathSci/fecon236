@@ -174,13 +174,16 @@ def gm2_vols(data, b=2.5, yearly=256):
     .. code-block:: python
 
         gm2_vols(spx['1957':], b=3.4)
-        # [6.4231, 4.878, 52.8776, 0.07866443, 31.5634, 15.5522, 3.4, 256, 15748]
+        # [6.4231, 4.878, 52.8776, 0.07866443, 31.5634,
+           15.5522, 3.4, 256, 15748]
 
         gm2_vols(spx['1997':], b=2.0)
-        # [5.6690, 5.8802435, 38.5585, 0.232142, 11.1628, 19.2793, 2.0, 256, 5313]
+        # [5.6690, 5.8802435, 38.5585, 0.232142, 11.1628,
+           19.2793, 2.0, 256, 5313]
 
         gm2_vols(spx['2007':], b=2.2)
-        # [4.9873, 5.1699, 44.8882, 0.195946, 13.7804, 20.4037, 2.2, 256, 2705]
+        # [4.9873, 5.1699, 44.8882, 0.195946, 13.7804, 20.4037,
+           2.2, 256, 2705]
 
     So one might suppose a typical set of outputs would look like:
 
@@ -216,7 +219,6 @@ def gm2_vols(data, b=2.5, yearly=256):
     #  ... the mean return mu is still arithmetic, not geometric:
     return [mu*yc, sigma1*ysr, sigma2*ysr, q,
             k_Pearson, sigma*ysr, b, yearly, N]
-
 
 
 #  #  DEPRECATED 2017-05-21: If geometric mean approximation is only a

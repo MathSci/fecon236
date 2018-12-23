@@ -178,7 +178,8 @@ A request with a full list of options would look like the following:
 
 .. code-block:: python
 
-    data = fe.qdl._qget('PRAGUESE/PX', authtoken='xxxxxx', trim_start='2001-01-01',
+    data = fe.qdl._qget('PRAGUESE/PX', authtoken='xxxxxx',
+                        trim_start='2001-01-01',
                         trim_end='2010-01-01', collapse='annual',
                         transformation='rdiff', rows=4, returns='numpy')
 

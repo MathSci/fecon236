@@ -61,7 +61,7 @@ try:
 except ImportError:
     from urllib import urlencode  # Python 2
     from urllib2 import HTTPError, Request, urlopen
-    strings = unicode
+    strings = unicode  # noqa: F821
 
 
 # Base API call URL

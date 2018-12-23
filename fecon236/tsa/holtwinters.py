@@ -234,8 +234,6 @@ def ema(y, alpha=0.20):
     return holtlevel(y, alpha, beta=0)
 
 
-
-
 def loss_holt(params, *args):
     """Loss function for holt() using np.median of absolute errors.
 
@@ -272,8 +270,6 @@ def loss_holt(params, *args):
     #
     #  Ignore the first ten errors due to initialization warm-up:
     return np.median(np.absolute(error[10:]))
-
-
 
 
 def optimize_holt(dataframe, grids=50, alphas=(0.0, 1.0), betas=(0.0, 1.0)):
@@ -353,4 +349,3 @@ def forecast(data, h=12, grids=0, maxi=0):
 
 if __name__ == "__main__":
     system.endmodule()
-

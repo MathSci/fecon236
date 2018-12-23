@@ -112,8 +112,6 @@ def softmax(it, temp=55, n=4):
     return [idmax, hardmax, hardprob, temp, softmax_approx]
 
 
-
-
 def softmax_sort(it, temp=55, n=4, drop=0.00, renorm=False):
     """Softmax results sorted, include index; option to drop and renormalize.
 
