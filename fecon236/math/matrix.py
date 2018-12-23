@@ -80,6 +80,9 @@ def is_singular(mat):
 
     .. code-block:: python
 
+        import numpy as np
+        import sys
+
         np.finfo(np.float32).eps
         # 1.1920929e-07
         sys.float_info.epsilon

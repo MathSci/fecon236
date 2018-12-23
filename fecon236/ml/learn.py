@@ -68,6 +68,8 @@ def softmax(it, temp=55, n=4):
 
     .. code-block:: python
 
+        from fecon236.ml.learn import softmax_sort
+
         softmax_sort([-16, -8, 0, 4, 8, 16], temp=50, drop=0.05, renorm=False)
         # [(0.5733, 5, 16.0), (0.2019, 4, 8.0), (0.1198, 3, 4.0), (0.0711, 2,
         #  0.0)]

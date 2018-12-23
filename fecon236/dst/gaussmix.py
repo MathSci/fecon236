@@ -172,6 +172,7 @@ def gm2_vols(data, b=2.5, yearly=256):
     2017-05-16  Outputs given SPX, informally minimizing b until fatal:
 
     .. code-block:: python
+        :flake8-group: Ignore
 
         gm2_vols(spx['1957':], b=3.4)
         # [6.4231, 4.878, 52.8776, 0.07866443, 31.5634,

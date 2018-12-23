@@ -1,5 +1,6 @@
 #  Python Module for import                           Date : 2018-05-23
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
+
 """Access Quandl data vendors using fecon236.
 
 We define functions to access data from Quandl.  Each time-series and its
@@ -31,6 +32,9 @@ After creating an account at quandl.com, set your authentication token
 by executing this fecon236 function (described in this module):
 
 .. code-block:: python
+    :flake8-group: Ignore
+
+    import fecon236 as fe
 
     fe.qdl.setQuandlToken(API_key)
 
@@ -129,6 +133,7 @@ Usage
 -----
 
 .. code-block:: python
+    :flake8-add-ignore: F821
 
     df = getqdl(quandlcode)
 
@@ -143,14 +148,16 @@ data series ("pandas") and a numpy array ("numpy"). "pandas" is the default.
 One can specify the format explicitly:
 
 .. code-block:: python
+    :flake8-add-ignore: F821
 
     mydata = fe.qdl._qget("WIKI/AAPL", returns="numpy")
 
 You can get multiple datasets in one call by passing an array of Quandl codes:
 
 .. code-block:: python
+    :flake8-add-ignore: F821
 
-    mydata = fe.qdl._qget(["NSE/OIL.4","WIKI/AAPL.1"])
+    mydata = fe.qdl._qget(["NSE/OIL.4", "WIKI/AAPL.1"])
 
 This grabs the 4th column of dataset NSE/OIL and the 1st column of dataset
 WIKI/AAPL, and returns them in a single call.
@@ -158,6 +165,7 @@ WIKI/AAPL, and returns them in a single call.
 We can manipulate or transform the data prior to download [not advised]:
 
 .. code-block:: python
+    :flake8-add-ignore: F821
 
     #  Specific Date Range:
     mydata = fe.qdl._qget("NSE/OIL", trim_start="yyyy-mm-dd",
@@ -177,6 +185,7 @@ We can manipulate or transform the data prior to download [not advised]:
 A request with a full list of options would look like the following:
 
 .. code-block:: python
+    :flake8-add-ignore: F821
 
     data = fe.qdl._qget('PRAGUESE/PX', authtoken='xxxxxx',
                         trim_start='2001-01-01',
@@ -421,6 +430,7 @@ def fut_decode(slang):
     Our short slang must be in all lower case, e.g.
 
     .. code-block:: python
+        :flake8-add-ignore: F821
 
         print(fut_decode('f4xau15z'))
         # CME/GCZ2015

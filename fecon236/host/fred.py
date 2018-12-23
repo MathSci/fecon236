@@ -25,7 +25,10 @@ Principal Functions
 Usage
 -----
 
-    >>> df = getfred(fredcode)
+.. code-block:: python
+    :flake8-add-ignore: F821
+
+    df = getfred(fredcode)
 
 References
 ----------

@@ -1,30 +1,38 @@
 #  Python Module for import                           Date : 2018-11-29
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-'''
-_______________|  tool.py :: Fundamental tools for data analysis.
+"""Fundamental tools for data analysis.
 
-REFERENCES:
+
+Notes
+-----
+For LATEST version, see https://git.io/fecon236
+
+References
+----------
 
 - Data structures, http://pandas.pydata.org/pandas-docs/dev/dsintro.html
-
 - pandas, http://pandas.pydata.org/pandas-docs/stable/computation.html
 
-Note that np.float() is just an alias to Python's float type,
+Note that ``np.float`` is just an alias to Python's ``float`` type,
 which is only exposed for backwards compatibility with a very early
-version of numpy that inappropriately exposed np.float64 as np.float,
-causing problems upon: from numpy import *
-   - np.float() is not a numpy scalar type like np.float64()
-   - Plain float() is fine for our numerical work here.
+version of numpy that inappropriately exposed ``np.float64`` as ``np.float``,
+causing problems upon: ``from numpy import *``
+
+- ``np.float`` is not a ``numpy`` scalar type like ``np.float64``
+- Plain ``float`` is fine for our numerical work here.
 
 
-CHANGE LOG  For LATEST version, see https://git.io/fecon236
-2018-11-29  Add median(), mad(), and madmen() for robust rescaling.
-2018-07-08  Modify kurtfun() with population argument.
-2018-07-07  Add std() with population argument for ddof.
-2018-05-11  Rename to tool.py, fix imports.
-2018-05-09  tools.py, fecon236 fork. Pass flake8.
-2017-06-20  yi_1tools.py, fecon235 v5.18.0312, https://git.io/fecon235
-'''
+Change Log
+----------
+
+* 2018-11-29  Add ``median``, ``mad``, and ``madmen`` for robust rescaling.
+* 2018-07-08  Modify ``kurtfun`` with population argument.
+* 2018-07-07  Add ``std`` with population argument for ddof.
+* 2018-05-11  Rename to ``tool.py``, fix imports.
+* 2018-05-09  ``tools.py``, ``fecon236`` fork. Pass flake8.
+* 2017-06-20  yi_1tools.py, fecon235 v5.18.0312, https://git.io/fecon235
+
+"""
 
 from __future__ import absolute_import, print_function, division
 
@@ -35,7 +43,7 @@ from fecon236.util import system
 
 
 def nona(df):
-    '''Eliminate any row in a dataframe containing NA, NaN nulls.'''
+    """Eliminate any row in a dataframe containing NA, NaN nulls."""
     return df.dropna()
     #  When calculating among dataframes, sometimes null entries
     #  are produced where the indexes are overlapping.
@@ -43,17 +51,17 @@ def nona(df):
 
 
 def head(dfx, n=7):
-    '''Quick look at the INITIAL data point(s).'''
+    """Quick look at the INITIAL data point(s)."""
     return dfx.head(n)
 
 
 def tail(dfx, n=7):
-    '''Quick look at the LATEST data point(s).'''
+    """Quick look at the LATEST data point(s)."""
     return dfx.tail(n)
 
 
 def tailvalue(df, pos=0, row=1):
-    '''Seek (last) row of dataframe, then the element at position pos.'''
+    """Seek (last) row of dataframe, then the element at position pos."""
     #  For pos, the index is not considered.
     return df.tail(row).values.tolist()[0][pos]
     #      values to array to list within list, then the element.
@@ -61,7 +69,7 @@ def tailvalue(df, pos=0, row=1):
 
 
 def div(numerator, denominator, floor=False):
-    '''Division via numpy for pandas, Python 2 and 3 compatibility.
+    """Division via numpy for pandas, Python 2 and 3 compatibility.
         Returns a scalar if both inputs are scalar, ndarray otherwise.
         We shall AVOID the ambiguous python2-like: np.divide()
     >>> x = np.array([0, 1, 2, 3, 4])
@@ -75,7 +83,7 @@ def div(numerator, denominator, floor=False):
     0.5
     >>> div(2, 0)  # Dividing by zero returns infinity, not error:
     inf
-    '''
+    """
     if floor:
         #      Like python3 "//":
         return np.floor_divide(numerator, denominator)
@@ -85,7 +93,7 @@ def div(numerator, denominator, floor=False):
 
 
 def roundit(it, n=4, echo=True):
-    '''Echo or return list from iterable where floats are rounded n places.'''
+    """Echo or return list from iterable where floats are rounded n places."""
     lst = [round(x, n) if isinstance(x, float) else x for x in it]
     #                                           ^e.g. exempt int and strings.
     if echo:
@@ -95,18 +103,18 @@ def roundit(it, n=4, echo=True):
 
 
 def dif(dfx, freq=1):
-    '''Lagged difference for pandas series.'''
+    """Lagged difference for pandas series."""
     #  Thus freq=1 gives so-called "first difference."
     return dfx.diff(periods=freq)
 
 
 def pcent(dfx, freq=1):
-    '''PERCENTAGE CHANGE method for pandas.'''
+    """PERCENTAGE CHANGE method for pandas."""
     return dfx.pct_change(periods=freq) * 100
 
 
 def retrace(minimum, maximum, percent=50):
-    '''Compute retracement between minimum and maximum.
+    """Compute retracement between minimum and maximum.
         Noteworthy Fibonacci retracements: 23.6%, 38.2%, 61.8%
         Set percent as negative for retracement down from maximum,
         whereas positive percent implies retrace up from the minimum.
@@ -114,7 +122,7 @@ def retrace(minimum, maximum, percent=50):
     90.0
     >>> retrace(10, 110, 20)
     30.0
-    '''
+    """
     if isinstance(minimum, pd.DataFrame):
         system.die("DataFrame argument UNACCEPTABLE. Try retracedf()")
     span = maximum - minimum
@@ -127,7 +135,7 @@ def retrace(minimum, maximum, percent=50):
 
 
 def retracedf(dfx, percent=50):
-    '''Compute retracement between minimum and maximum of dataframe.'''
+    """Compute retracement between minimum and maximum of dataframe."""
     #  Set percent as negative for retracement down from maximum,
     #  whereas positive percent implies retrace up from the minimum.
     minimum = dfx.min().iloc[0]
@@ -137,7 +145,7 @@ def retracedf(dfx, percent=50):
 
 
 def georet(dfx, yearly=256):
-    '''Compute geometric mean return in a summary list.'''
+    """Compute geometric mean return in a summary list."""
     #  yearly refers to frequency, e.g. 256 for daily trading days,
     #                                    12 for monthly,
     #                                     4 for quarterly.
@@ -167,7 +175,7 @@ def georet(dfx, yearly=256):
 
 
 def zeroprice(rate, duration=9, yearly=2, face=100):
-    '''Compute price of zero-coupon bond given its duration.'''
+    """Compute price of zero-coupon bond given its duration."""
     #  Assume rate is in percentage form, e.g. 2.5% (not 0.025).
     #         rate could be a dataframe column.
     #  2014-08-28  duration of 10-y Treasury is 9.1 approx.
@@ -178,11 +186,11 @@ def zeroprice(rate, duration=9, yearly=2, face=100):
 
 
 def std(data, population=False):
-    '''Compute standard deviation with delta degrees of freedom, ddof.
+    """Compute standard deviation with delta degrees of freedom, ddof.
        Default population=False is compatible with pandas and MATLAB
        since both defaults to SAMPLE standard deviation
        (using so-called Bessel's correction of N-1).
-    '''
+    """
     #  Ref: https://stackoverflow.com/questions/27600207
     #  ddof must be integer-valued (not boolean):
     if population:
@@ -200,23 +208,23 @@ def std(data, population=False):
 
 
 def normalize(dfy):
-    '''Center around mean zero and standardize deviation.'''
+    """Center around mean zero and standardize deviation."""
     centered = dfy - dfy.mean().tolist()[0]
     return centered / float(dfy.std().tolist()[0])
 
 
 def median(dfy, col=0):
-    '''Compute the median (by default, of the first dataframe column).'''
+    """Compute the median (by default, of the first dataframe column)."""
     return dfy.median().tolist()[col]
 
 
 def mad(dfy):
-    '''Median Absolute Deviation is a robust measure of dispersion:
+    """Median Absolute Deviation is a robust measure of dispersion:
     MAD = 0.67449*sigma if distribution is Gaussian, i.e.
     3*MAD is about 2*sigma; however, MAD is resilient to outliers,
     thus very useful in non-Gaussian situations.
     See https://en.wikipedia.org/wiki/Median_absolute_deviation
-    '''
+    """
     dev = dfy - median(dfy)  # Deviations from median.
     #  MAD is defined as the median (not the mean)
     #  of absolute deviations from the data's median:
@@ -224,17 +232,17 @@ def mad(dfy):
 
 
 def madmen(dfy):
-    '''Rescale data as unitless MAD multiples, after shifting median to zero.
+    """Rescale data as unitless MAD multiples, after shifting median to zero.
     The main character in the "Mad Men" series pretending to be Donald Draper
     is akin to our data pretending to be Gaussian, which we robustly unmask.
     [Cf. alternative normalize() where large deviations are squared.]
-    '''
+    """
     dev = dfy - median(dfy)  # Deviations from median.
     return dev / mad(dfy)
 
 
 def correlate(dfy, dfx, type='pearson'):
-    '''CORRELATION FUNCTION between series using pandas method.'''
+    """CORRELATION FUNCTION between series using pandas method."""
     #  N.B. -  must specify column(s) within dataframe(s) !
     #              Types of correlations:
     #  'pearson'   Standard correlation coefficient
@@ -244,7 +252,7 @@ def correlate(dfy, dfx, type='pearson'):
 
 
 def cormatrix(dataframe, type='pearson'):
-    '''PAIRWISE CORRELATIONS within a dataframe using pandas method.'''
+    """PAIRWISE CORRELATIONS within a dataframe using pandas method."""
     #              Types of correlations:
     #  'pearson'   Standard correlation coefficient
     #  'kendall' 	Kendall Tau correlation coefficient
@@ -253,7 +261,7 @@ def cormatrix(dataframe, type='pearson'):
 
 
 def regressformula(df, formula):
-    '''Helper function for statsmodel linear regression using formula.'''
+    """Helper function for statsmodel linear regression using formula."""
     #
     #  FORMULA is a string like "Y ~ 0 + X + Z"
     #          where column names of the df dataframe are used.
@@ -270,7 +278,7 @@ def regressformula(df, formula):
 
 
 def regressTIME(dfy, col='Y'):
-    '''Regression on time since that index cannot be independent variable.'''
+    """Regression on time since that index cannot be independent variable."""
     #  Assuming time series is evenly-spaced...
     df = dfy.dropna()
     #        ^insures proper alignment with timer:
@@ -291,7 +299,7 @@ def regressTIME(dfy, col='Y'):
 
 
 def regresstime(dfy, col='Y'):
-    '''Regression on time since that index cannot be independent variable.'''
+    """Regression on time since that index cannot be independent variable."""
     #  Return just the fitted dataframe with original time intact.
     results = regressTIME(dfy, col)
     c, slope = results[1]
@@ -300,7 +308,7 @@ def regresstime(dfy, col='Y'):
 
 
 def regresstimeforecast(dfy, h=24, col='Y'):
-    '''Forecast h-periods ahead based on linear regression on time.'''
+    """Forecast h-periods ahead based on linear regression on time."""
     c, slope = regressTIME(dfy, col)[1]
     forecast = [c + (slope * i) for i in range(h+1)]
     #  h=0 corresponds to the latest fitted point by design,
@@ -316,26 +324,26 @@ foretrend = regresstimeforecast
 
 
 def detrend(dfy, col='Y'):
-    '''Detread using linear regression on time.'''
+    """Detread using linear regression on time."""
     trend = regresstime(dfy, col)
     return dfy - trend
 
 
 def detrendpc(dfy, col='Y'):
-    '''Detread using linear regression on time; percent deviation.'''
+    """Detread using linear regression on time; percent deviation."""
     trend = regresstime(dfy, col)
     #  return ((dfy - trend) * 100.00) / trend  #-X 2015-12-28
     return div((dfy - trend)*100, trend)
 
 
 def detrendnorm(dfy, col='Y'):
-    '''Detread using linear regression on time, then normalize.'''
+    """Detread using linear regression on time, then normalize."""
     trend = regresstime(dfy, col)
     return normalize(dfy - trend)
 
 
 def regress(dfy, dfx, intercept=True):
-    '''Perform LINEAR REGRESSION, a.k.a. Ordinary Least Squares.'''
+    """Perform LINEAR REGRESSION, a.k.a. Ordinary Least Squares."""
     #  2016-04-28  DEPRECATED ols from pandas.stats.api as of pandas 0.18,
     #                 so use regressformula() instead.
     #                 Add intercept option as boolean.    <= New feature!
@@ -356,10 +364,10 @@ def regress(dfy, dfx, intercept=True):
 
 
 def kurtfun(data, raw=False, population=False):
-    '''Compute kurtosis of an array or a single column DataFrame.
+    """Compute kurtosis of an array or a single column DataFrame.
        Default uses PEARSON fourth central moment, where kurtosis is 3
        if data is Gaussian. Fischer "excess kurtosis":= k_Pearson-3.
-    '''
+    """
     arr = toar(data)
     mu = np.mean(arr)
     sigma = std(arr, population=population)
@@ -379,7 +387,7 @@ def kurtfun(data, raw=False, population=False):
 
 
 def stat2(dfy, dfx, intercept=True):
-    '''Quick STATISTICAL SUMMARY and regression on two variables'''
+    """Quick STATISTICAL SUMMARY and regression on two variables"""
     print(" ::  FIRST variable:")
     now = dfy.describe()
     print(now)
@@ -397,7 +405,7 @@ def stat2(dfy, dfx, intercept=True):
 
 
 def stat(data, pctiles=[0.25, 0.50, 0.75]):
-    '''QUICK summary statistics on given dataframe.'''
+    """QUICK summary statistics on given dataframe."""
     dataframe = todf(data)
     print(dataframe.describe(percentiles=pctiles))
     #  excludes NaN values. Percentiles can be customized,
@@ -409,7 +417,7 @@ def stat(data, pctiles=[0.25, 0.50, 0.75]):
 
 
 def stats(dataframe, n=3):
-    '''VERBOSE statistics on dataframe; CORRELATIONS without regression.'''
+    """VERBOSE statistics on dataframe; CORRELATIONS without regression."""
     print(dataframe.describe())
     print()
     print(" ::  Index on min:")
@@ -429,7 +437,7 @@ def stats(dataframe, n=3):
 
 
 def df2a(dataframe):
-    '''Convert single column dataframe to pure np.ndarray type.'''
+    """Convert single column dataframe to pure np.ndarray type."""
     #     After numpy operations, avoids getting single-value array,
     #     rather than the single-value itself which one would be expecting.
     #  Suppose len(dataframe) is m, then after dropna(),
@@ -443,9 +451,9 @@ def df2a(dataframe):
 #  TIP:  After operating between dataframes, USE todf FOR CLARITY:
 
 def todf(data, col='Y'):
-    '''CONVERT (list, Series, or DataFrame) TO DataFrame, NAMING single column.
+    """CONVERT (list, Series, or DataFrame) TO DataFrame, NAMING single column.
            Also from np.ndarray of shapes (N,) or (N,1).
-    '''
+    """
     #
     #  Operating among dataframes often produces a SERIES.
     #  We need CONVERSION for possible "paste" later,
@@ -467,7 +475,7 @@ def todf(data, col='Y'):
 
 
 def toar(data):
-    '''General converter to pure np.ndarray type.'''
+    """General converter to pure np.ndarray type."""
     #  Examples of data input types: list, Series, or single-column DataFrame,
     #           but also np.ndarray of shapes (N,) or (N,1).
     #  Why? Because some numerical packages ONLY work with arrays,
@@ -483,7 +491,7 @@ def toar(data):
 #  as part of getqdl() and getstocks().
 
 def names(data, col='Y', idx='T'):
-    '''Give names to single column of a dataframe and its index.'''
+    """Give names to single column of a dataframe and its index."""
     #  pandas has a confusing history of using .reindex and .rename
     #  but this works as of v5 (expect changes later from upstream):
     if isinstance(data, pd.DataFrame):
@@ -496,7 +504,7 @@ def names(data, col='Y', idx='T'):
 
 
 def paste(df_list):
-    '''Merge dataframes (not Series) across their common index values.'''
+    """Merge dataframes (not Series) across their common index values."""
     #  N.B. -  paste for pandas < 0.14 will fail
     #          if column names are not unique
     #          (newer pandas append _x to non-unique names).
@@ -516,7 +524,7 @@ def paste(df_list):
 
 
 def pastear(array_list):
-    '''Merge arrays as columns (like paste for dataframes).'''
+    """Merge arrays as columns (like paste for dataframes)."""
     #  N.B. -  To concatenate arrays horizontally, use np.hstack().
     #          To merge arrays as rows, use np.vstack().
     arr_tup = tuple(array_list)
@@ -524,7 +532,7 @@ def pastear(array_list):
 
 
 def lagdf(df, lags=1):
-    '''Create dataframe with lagged columns (labeled with underscore_lag).'''
+    """Create dataframe with lagged columns (labeled with underscore_lag)."""
     #  Argument df may have single or mutiple column(s).
     #  Argument lags can be any positive integer.
     #  N.B. -  useful data structure for vector autoregression of AR(lags).
@@ -541,7 +549,7 @@ def lagdf(df, lags=1):
 
 
 def diflog(data, lags=1):
-    '''Difference between lagged log(data).'''
+    """Difference between lagged log(data)."""
     #  If data is a DataFrame, it must be given as SINGLE-COLUMN.
     logged = np.log(todf(data))
     lagged = lagdf(logged, lags)
@@ -552,7 +560,7 @@ def diflog(data, lags=1):
 
 
 def writefile(dataframe, filename='tmp-fe-tool.csv', separator=','):
-    '''Write dataframe to disk file using UTF-8 encoding.'''
+    """Write dataframe to disk file using UTF-8 encoding."""
     #  For tab delimited, use '\t' as separator.
     dataframe.to_csv(filename, sep=separator, encoding='utf-8')
     print(' ::  Dataframe written to file: ' + filename)

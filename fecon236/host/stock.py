@@ -12,6 +12,8 @@ Usage
 
 .. code-block:: python
 
+    from fecon236.host.stock import getstock
+
     df = getstock('s4code', 7)
     #                       ^one week.
     #             ^begin with s4, then

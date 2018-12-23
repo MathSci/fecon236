@@ -189,11 +189,11 @@ def boltzportfolio(dataframe, yearly=256, temp=55, floor=0.01, level=0, n=4):
     .. code-block:: python
 
         [2.7833,
-        [[0.6423, 2.05, 'America'],
-         [0.0, -11.17, 'Emerging'],
-         [0.0, -10.47, 'Europe'],
-         [0.3577, 4.1, 'Gold'],
-         [0.0, -4.99, 'Japan']]]
+         [[0.6423, 2.05, 'America'],
+          [0.0, -11.17, 'Emerging'],
+          [0.0, -10.47, 'Europe'],
+          [0.3577, 4.1, 'Gold'],
+          [0.0, -4.99, 'Japan']]]
 
     The portfolio's geometric mean rate is included first.
     Each sub-sublist will consist of weight, rate, and key.
