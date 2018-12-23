@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# Test formatting of fecon236
+# REQUIRES: flake8, flake8-rst
+
+cd ..
+echo "$(pwd)"
+
+# Ensure required dependencies are installed
+flake8 > /dev/null 2>&1
+rc=$?; if [[ $rc != 0 ]]; then
+    echo >&2 "I require flake8. Use 'pip install flake8' to install"
+fi
+
+flake8-rst > /dev/null 2>&1
+rc=$?; if [[ $rc != 0 ]]; then
+    echo >&2 "I require flake8-rst. Use 'pip install flake8-rst' to install"
+fi
+
+echo "flake8 check..."
+flake8 .
+rc=$?; if [[ $rc != 0 ]]; then
+    echo >&2 "flake8 check failed."
+fi
+echo "PASSED"
+
+echo "flake8-rst check..."
+flake8-rst .
+rc=$?; if [[ $rc != 0 ]]; then
+    echo >&2 "flake8-rst check failed."
+fi
+echo "PASSED"
+
+echo "ALL FORMATTING CHECKS PASSED"
