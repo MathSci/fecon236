@@ -1,6 +1,6 @@
 #  Python Module for import                           Date : 2018-11-10
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-r"""Gaussian mixture distribution for fecon236
+r"""Gaussian mixture distribution for ``fecon236``
 
 - Refinement of geometric mean computations relies on Jean (1983)
   which derives an exact infinite series of higher moments, wherein

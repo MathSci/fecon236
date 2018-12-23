@@ -200,15 +200,15 @@ References
                    GitHub repo: https://github.com/quandl/quandl-python
 * Complete Quandl API documentation: https://www.quandl.com/docs/api
   including error codes.
-* [RESTful interface introduction:  https://www.quandl.com/help/api
-    Not needed here, but it's available for their API version 3.]
+* RESTful interface introduction:  https://www.quandl.com/help/api
+  Not needed here, but it's available for their API version 3.
 * CFTC Commitments of Traders Report, explanatory notes:
   http://www.cftc.gov/MarketReports/CommitmentsofTraders/ExplanatoryNotes
     - Traders' option positions are computed on a futures-equivalent basis
        using delta factors supplied by the exchanges.
 * Computational tools for pandas
        http://pandas.pydata.org/pandas-docs/stable/computation.html
-* Wes McKinney, 2013, _Python for Data Analysis_.
+* Wes McKinney, 2013, *Python for Data Analysis*.
 
 
 Notes

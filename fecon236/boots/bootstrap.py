@@ -1,6 +1,6 @@
 #  Python Module for import                           Date : 2018-07-07
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-"""Bootstrap module for fecon236
+"""Bootstrap module for ``fecon236``
 
 - Efficient storage and rescaling of empirical data.
     - Normalize, but retain features of the empirical distribution.
@@ -8,8 +8,8 @@
     - Visualize sample price paths.
     - Bootstrap for small-sample statistics.
     - Bootstrap for determining probabilities of events.
-- Specify hybrid population array using synthetic rates of return
-  from GM(2) Gaussian Mixture model.
+- Specify hybrid population array using synthetic rates of return from GM(2)
+  Gaussian Mixture model.
 
 
 Usage
@@ -157,15 +157,16 @@ def hybrid2ret(poparr, mean=SPXmean, sigma=SPXsigma, yearly=256):
 
 
 def bootstrap(N, poparr, replace=True):
-    """Randomly pick out N items from poparr.
+    """Randomly pick out ``N`` items from ``poparr``.
 
     Notes
     -----
-    Default argument, replace=True, means "WITH replacement."
+    Default argument, ``replace=True``, means "WITH replacement."
+
+    Note that ``replace=False`` is useful during testing to replicate
+    the entire population if necessary (e.g. to check terminal price).
+    The theory on bootstrap generally assumes ``replace=True``.
     """
-    #  Note that replace=False is useful during testing to replicate
-    #  the entire population if necessary (e.g. to check terminal price).
-    #  The theory on bootstrap generally assumes replace=True.
     bsarr = np.random.choice(poparr, size=N, replace=replace)
     #      BOOTSTRAPPED array
     return bsarr

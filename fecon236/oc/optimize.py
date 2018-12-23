@@ -28,11 +28,10 @@ Suitability: if data is NOISY:
     minimum, or how fast it will if it does.
 
 Suitability: WITH knowledge of the gradient: quasi-Newton methods:
-      BFGS   (scipy.optimize.fmin_bfgs()), or
-    L-BFGS-B (scipy.optimize.fmin_l_bfgs_b())
-        where the former has larger computational overhead.
-        Knowledge here means analytical representation.
-        BFGS abbreviates Broyden-Fletcher-Goldfarb-Shanno.
+    BFGS   (scipy.optimize.fmin_bfgs()), or
+    L-BFGS-B (scipy.optimize.fmin_l_bfgs_b()) where the former has larger
+    computational overhead. Knowledge here means analytical representation.
+    BFGS abbreviates Broyden-Fletcher-Goldfarb-Shanno.
 
 Suitability: WITHOUT knowledge of the gradient:
     L-BFGS-B (scipy.optimize.fmin_l_bfgs_b())

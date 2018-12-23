@@ -1,23 +1,28 @@
 #  Python Module for import                           Date : 2018-06-12
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-'''
-_______________|  sec.py :: Parse SEC, U.S. Securities and Exchange Commission
+"""Parse SEC, U.S. Securities and Exchange Commission
 
-For BEST results via pandas: install lxml,
-            and as fallback:         bs4 and html5lib.
+For BEST results via pandas: install ``lxml``,and as fallback: ``bs4`` and
+``html5lib``.
 
-REFERENCES:
+Notes
+-----
+For LATEST version, see https://git.io/fecon236
+
+References
+----------
 
 - SEC form 13F, http://www.sec.gov/answers/form13f.htm
-
 - fecon235 notebook SEC-13F-parse.ipynb derives and debugs this module.
   For static view, see https://git.io/13F
 
-CHANGE LOG  For LATEST version, see https://git.io/fecon236
-2018-05-29  sec.py, fecon236 fork. Fix imports, pass flake8.
-                Fix internal doctest: usd "nnn" expressed now as "nnn.0".
-2016-02-22  yi_secform.py, fecon235 v5.18.0312, https://git.io/fecon235
-'''
+Change Log
+----------
+
+* 2018-05-29  ``sec.py``, ``fecon236`` fork. Fix imports, pass flake8.
+  Fix internal doctest: usd "nnn" expressed now as "nnn.0".
+* 2016-02-22  ``yi_secform.py``, fecon235 v5.18.0312, https://git.io/fecon235
+"""
 
 from __future__ import absolute_import, print_function, division
 
@@ -31,7 +36,7 @@ druck150814 = 'http://www.sec.gov/Archives/edgar/data/1536411/000153641115000006
 
 
 def parse13f(url=druck150814):
-    '''Parse SEC form 13F into a pandas dataframe.'''
+    """Parse SEC form 13F into a pandas dataframe."""
     #     url should be for so-called Information Table in html/xml format.
     url = url.replace('https://', 'http://')
     #                  https cannot be read by lxml, surprisingly!
@@ -60,17 +65,23 @@ def parse13f(url=druck150814):
 
 
 def pcent13f(url=druck150814, top=7654321):
-    '''Prune, then sort SEC 13F by percentage allocation, showing top N.
-    >>> pcent13f(top= 7)
-                          stock      cusip       usd putcall  pcent
-    27          SPDR Gold Trust  78463V907  323626.0     NaN  21.81
-    15             Facebook Inc  30303M102  160612.0     NaN  10.82
-    29         Wells Fargo & Co  949746101   94449.0     NaN   6.36
-    31  LyondellBasell Ind's NV  N53745100   74219.0     NaN   5.00
-    18           Halliburton Co  406216101   66629.0     NaN   4.49
-    16     Freeport-McMoRan Inc  35671D857   66045.0     NaN   4.45
-    8             Citigroup Inc  172967424   64907.0     NaN   4.37
-    '''
+    """Prune, then sort SEC 13F by percentage allocation, showing top N.
+
+    Usage
+    -----
+
+    ::
+
+        >>> pcent13f(top= 7)
+                              stock      cusip       usd putcall  pcent
+        27          SPDR Gold Trust  78463V907  323626.0     NaN  21.81
+        15             Facebook Inc  30303M102  160612.0     NaN  10.82
+        29         Wells Fargo & Co  949746101   94449.0     NaN   6.36
+        31  LyondellBasell Ind's NV  N53745100   74219.0     NaN   5.00
+        18           Halliburton Co  406216101   66629.0     NaN   4.49
+        16     Freeport-McMoRan Inc  35671D857   66045.0     NaN   4.45
+        8             Citigroup Inc  172967424   64907.0     NaN   4.37
+    """
     df = parse13f(url)
     #    Drop irrevelant COLUMNS:
     df.drop(df.columns[[1, 4, 5, 7, 8, 9, 10, 11]], axis=1, inplace=True)

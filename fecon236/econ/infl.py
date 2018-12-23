@@ -1,6 +1,6 @@
 #  Python Module for import                           Date : 2018-06-17
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-"""Inflation module for fecon236
+"""Inflation module for ``fecon236``
 
 - "Unified" inflation is a sythesis of CPI, CPIc, PCE, PCEc.
 - For derivation of ``foreinfl`` see fecon235/nb/fred-inflation.ipynb,

@@ -185,11 +185,9 @@ def run(command, xnl=True, errf=None):
     """RUN **quote and space insensitive** SYSTEM-LEVEL command.
 
     OTHERWISE: use ``check_output`` directly and list component
-    parts of the command, e.g.
-       ``check_output(["git", "describe", "--abbrev=0"])``
-    then generally use our ``utf`` since check_output
-    usually does not return utf-8, so be prepared to
-    receive bytes and also new line.
+    parts of the command, e.g. ``check_output(["git", "describe",
+    "--abbrev=0"])`` then generally use our ``utf`` since check_output usually
+    does not return utf-8, so be prepared to receive bytes and also new line.
 
     Notes
     -----

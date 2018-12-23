@@ -75,7 +75,7 @@ References
 
 - Spyros Makridakis, 1978, *FORECASTING*, pp. 64-66.
    H-W does extremely well against ARIMA models in competitions.
-- Rob Hyndman, 2008, *Forecasting with Exponential Smoothing*,
+- Rob Hyndman, 2008, Forecasting with Exponential Smoothing,
    discusses level, growth (linear), and seasonal variants.
 - Sarah Gelper, 2007, *Robust Forecasting with Exponential
    and Holt-Winters smoothing*, useful for parameter values.
