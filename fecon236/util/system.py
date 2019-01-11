@@ -1,4 +1,4 @@
-#  Python Module for import                           Date : 2018-06-20
+#  Python Module for import                           Date : 2019-01-11
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
 '''
 _______________|  system.py :: system and date functions including specs.
@@ -18,6 +18,7 @@ REFERENCES:
 
 
 CHANGE LOG  For latest version, see https://git.io/fecon236
+2019-01-11  Fix versionstr(): python3 dislikes import using exec().
 2018-06-20  Update specs(), include version for statsmodels.
 2018-05-15  Include version("fecon236") to specs.
 2018-04-25  Ignore "raw_input" < python3 flake8.
@@ -122,9 +123,11 @@ def versionstr(module="IPython"):
         return str(ver[0]) + '.' + str(ver[1]) + '.' + str(ver[2])
     else:
         try:
-            vermod = None
-            exec("import " + module)
-            exec("vermod = " + module + ".__version__")
+            #  2019-01-11 Fix: python3 dislikes import using exec().
+            #  exec("import " + module)
+            #  exec("vermod = " + module + ".__version__")
+            mod = __import__(module)
+            vermod = mod.__version__
             return vermod
         except Exception:
             return None
@@ -205,7 +208,8 @@ def specs():
         print(" !:  Code for this project straddles python27 and python3.")
     version("Python")
     version("IPython")
-    version("jupyter_core")
+    version("jupyter_core")         # Common functionality of Jupyter projects.
+    version("jupyter_client")       # Jupyter client libraries and protocol.
     version("notebook")             # Worked for Jupyter notebook 4.0.6
     version("matplotlib")
     version("numpy")
