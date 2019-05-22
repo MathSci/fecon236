@@ -1,70 +1,80 @@
 #  Python Module for import                           Date : 2018-11-10
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-r'''
-_______________|  gaussmix.py :: Gaussian mixture distribution for fecon236
+r"""Gaussian mixture distribution for `fecon236`
 
 - Refinement of geometric mean computations relies on Jean (1983)
   which derives an exact infinite series of higher moments, wherein
   the premature truncation in the classic paper Young (1969) is corrected.
 
-- Tests of this module at tests/test_gaussmix.py
+Notes
+-----
 
-CHANGE LOG  For LATEST version, see https://git.io/fecon236
-2018-11-10  Minor: raw string mode for intro, fix #6 flake8 W605 SyntaxError.
-2018-07-08  Change from np.std() to tool.std() for population argument.
-2018-07-04  On excessive kurtosis, change system.die to OverflowError.
-2018-06-03  Rename to gaussmix.py, fecon236 fork. Pass flake8, fix imports.
-2017-06-29  ys_gauss_mix.py, fecon235 v5.18.0312, https://git.io/fecon235
-                Fallback clause for gemrate() when log fails (2008Q4).
-2017-05-21  Deprecate gm2_georet() and georet_gm2() due to math proof.
-                For geometric mean computations, add gemreturn_Jean(),
-                gemrate(), and for data: georat().
+- Tests of this module at `tests/test_gaussmix.py`
+- For LATEST version, see https://git.io/fecon236
 
 
-_______________ STRUCTURED zero-mean GM(2), from https://git.io/gmix
+Structured Zero Mean GM(2)
+--------------------------
 
-Given data set {$x$}, we can compute its variance and kurtosis.
-Thus, $\sigma$ and $\rm K$ are observable.
-Corollary 1.2 says that GM(2) parameters can indeed synthesize $\rm K$,
+Given data set {:math:`x`}, we can compute its variance and kurtosis.
+Thus, :math:`\sigma` and :math:`\rm K` are observable.
+Corollary 1.2 says that GM(2) parameters can indeed synthesize :math:`\rm K`,
 but its messiness suggests that we impose further structure for clarity.
 A sensible requirement is a strict ordering,
-$\sigma_1 < \sigma < \sigma_2$
-in consideration of the weighted equation for $\sigma^2$.
-We can impose this ordering by constrained constants $a$ and $b$.
+:math:`\sigma_1 < \sigma < \sigma_2`
+in consideration of the weighted equation for :math:`\sigma^2`.
+We can impose this ordering by constrained constants :math:`a` and :math:`b`.
 
-PROPOSITION 2: Let $\sigma_1 = a\sigma$ and $b\sigma = \sigma_2$
-such that $0<a<1<b$, then for zero-mean GM(2)
+PROPOSITION 2: Let :math:`\sigma_1 = a\sigma` and :math:`b\sigma = \sigma_2`
+such that :math:`0<a<1<b`, then for zero-mean GM(2)
 the following satisfies conditions for both kurtosis and variance:
 
-$$\frac{\rm K - b^4}{a^4 - b^4} = \frac{1 - b^2}{a^2 - b^2}$$
+.. math::
 
-This shows how constants $a$ and $b$ are jointly constrained
+    \frac{\rm K - b^4}{a^4 - b^4} = \frac{1 - b^2}{a^2 - b^2}
+
+This shows how constants :math:`a` and :math:`b` are jointly constrained
 by the moments of the Gaussian mixture.
 
-Our STRATEGY will be to choose $b>1$, then use the kurtosis $\kappa$
-to compute $a$. Probability $p$ can then be computed using
-Lemma 2.2, for which $q=1-p$ follows.
-Since $\sigma_1 = a\sigma$ and $b\sigma = \sigma_2$
+Our STRATEGY will be to choose :math:`b>1`, then use the kurtosis $\kappa$
+to compute :math:`a`. Probability :math:`p` can then be computed using
+Lemma 2.2, for which :math:`q=1-p` follows.
+Since :math:`\sigma_1 = a\sigma` and :math:`b\sigma = \sigma_2`
 the components of our zero-mean GM(2) are fully resolved,
-given specific $\sigma$.
+given specific :math:`\sigma`.
 
-From two observable statistics $\sigma$ and $\kappa$,
+From two observable statistics :math:`\sigma` and :math:`\kappa`,
 we have deduced, not fitted, the parameters of a zero-mean GM(2).
-An observable mean $\mu$ which is non-zero can be added to
+An observable mean :math:`\mu` which is non-zero can be added to
 our model to obtain a zero-skew GM(2).
 
-REFERENCES:
+References
+----------
 
 - Gaussian Mixture and Leptokurtotic Assets, 2017, Jupyter notebook,
   https://github.com/rsvp/fecon235/blob/master/nb/gauss-mix-kurtosis.ipynb
-
 - William H. JEAN and Billy P. Helms, 1983, Geometric Mean Approximations,
   J. Financial and Quantitative Analysis, 18:3:287-293.
-
 - William E. YOUNG and Robert H. Trent, 1969, Geometric Mean Approximations
   of Individual Security and Portfolio Performance,
   J. Financial and Quantitative Analysis, 4:2:179-199.
-'''
+
+Change Log
+----------
+
+* 2018-11-10  Minor: raw string mode for intro, fix #6 flake8 W605 SyntaxError.
+* 2018-07-08  Change from `np.std` to `tool.std` for population argument.
+* 2018-07-04  On excessive kurtosis, change `system.die` to
+  `OverflowError`.
+* 2018-06-03  Rename to `gaussmix.py`, `fecon236` fork. Pass flake8, fix
+  imports.
+* 2017-06-29  `ys_gauss_mix.py`, fecon235 v5.18.0312, https://git.io/fecon235
+  Fallback clause for `gemrate` when log fails (2008Q4).
+* 2017-05-21  Deprecate `gm2_georet` and `georet_gm2` due to math proof.
+  For geometric mean computations, add `gemreturn_Jean`, `gemrate`, and for
+  data: `georat`.
+
+"""
 
 from __future__ import absolute_import, print_function, division
 
@@ -75,7 +85,7 @@ from fecon236.util import system
 
 
 def gm2_strategy(kurtosis, b=2):
-    '''Use sympy to solve for "a" in Proposition 2 numerically.'''
+    """Use sympy to solve for "a" in Proposition 2 numerically."""
     #  sym.init_printing(use_unicode=True)
     #  #        ^required if symbolic output is desired.
     a = sym.symbols('a')
@@ -100,7 +110,7 @@ def gm2_strategy(kurtosis, b=2):
 
 
 def gm2_main(kurtosis, sigma, b=2):
-    '''Compute specs for GM(2) given observable statistics and b.'''
+    """Compute specs for GM(2) given observable statistics and b."""
     a = gm2_strategy(kurtosis, b)
     #  Probability p as given in Lemma 2.2:
     p = float((1 - (b**2)) / ((a**2) - (b**2)))
@@ -115,7 +125,7 @@ def gm2_main(kurtosis, sigma, b=2):
 
 
 def gm2_print(kurtosis, sigma, b=2):
-    '''Print specs for GM(2) given observable statistics and b.'''
+    """Print specs for GM(2) given observable statistics and b."""
     specs = gm2_main(kurtosis, sigma, b)
     print("Constants a, b:", specs[0])
     print("GM(2), p: ", specs[1][0])
@@ -128,8 +138,14 @@ def gm2_print(kurtosis, sigma, b=2):
 
 
 def gm2_vols_fit(data, b=2.5):
-    '''Estimate GM(2) VOLATILITY parameters including mu, given b.'''
-    #  Our data is presumed to be prices of some financial asset.
+    """Estimate GM(2) VOLATILITY parameters including mu, given b.
+
+    Notes
+    -----
+
+    * Our data is presumed to be prices of some financial asset.
+
+    """
     rat = tool.diflog(data, lags=1)
     #          ^First difference of log(data).
     arr = tool.df2a(rat)
@@ -150,9 +166,53 @@ def gm2_vols_fit(data, b=2.5):
 
 
 def gm2_vols(data, b=2.5, yearly=256):
-    '''Compute GM(2) ANNUALIZED VOLATILITY in percentage form, given b.'''
-    #  Our data is presumed to be prices of some financial asset.
-    #  Argument yearly expresses frequency of data, default is business daily.
+    """Compute GM(2) ANNUALIZED VOLATILITY in percentage form, given b.
+
+
+    2017-05-16  Outputs given SPX, informally minimizing b until fatal:
+
+    .. code-block:: python
+        :flake8-group: Ignore
+
+        gm2_vols(spx['1957':], b=3.4)
+        # [6.4231, 4.878, 52.8776, 0.07866443, 31.5634,
+           15.5522, 3.4, 256, 15748]
+
+        gm2_vols(spx['1997':], b=2.0)
+        # [5.6690, 5.8802435, 38.5585, 0.232142, 11.1628,
+           19.2793, 2.0, 256, 5313]
+
+        gm2_vols(spx['2007':], b=2.2)
+        # [4.9873, 5.1699, 44.8882, 0.195946, 13.7804, 20.4037,
+           2.2, 256, 2705]
+
+    So one might suppose a typical set of outputs would look like:
+
+    .. csv-table:: Outputs
+
+        Annualized mean return,  5.69%
+        Annualized sigma1,  5.30938
+        Annualized sigma2, 45.44142
+        Probability sigma2,  0.1689
+        kurtosis, 18.8355
+        Annualized sigma, 18.411734
+
+    where b around 2.533 might work, but not always.
+
+    Our sigma2 guess is interesting since "double or nothing"
+    is just 2.2 standard deviations away. The probability of
+    drawing from the second Gaussian with the higher volatility
+    of 45% is about 0.17. The compensation for such risks taken
+    is the annual mean return of 5.7%, plus dividends collected.
+
+
+    Notes
+    -----
+
+    * Our data is presumed to be prices of some financial asset.
+    * Argument yearly expresses frequency of data, default is business daily.
+
+    """
     mu, sigma1, sigma2, q, k_Pearson, sigma, b, N = gm2_vols_fit(data, b)
     #  ANNUALIZE appropriately in "percentage" form...
     yc = 100 * yearly
@@ -161,32 +221,6 @@ def gm2_vols(data, b=2.5, yearly=256):
     return [mu*yc, sigma1*ysr, sigma2*ysr, q,
             k_Pearson, sigma*ysr, b, yearly, N]
 
-    #  2017-05-16  Outputs given SPX, informally minimizing b until fatal:
-    #
-    #  >>> gm2_vols(spx['1957':], b=3.4)
-    #  [6.4231, 4.878, 52.8776, 0.07866443, 31.5634, 15.5522, 3.4, 256, 15748]
-    #
-    #  >>> gm2_vols(spx['1997':], b=2.0)
-    #  [5.6690, 5.8802435, 38.5585, 0.232142, 11.1628, 19.2793, 2.0, 256, 5313]
-    #
-    #  >>> gm2_vols(spx['2007':], b=2.2)
-    #  [4.9873, 5.1699, 44.8882, 0.195946, 13.7804, 20.4037, 2.2, 256, 2705]
-    #
-    #  So one might suppose a typical set of outputs would look like:
-    #      Annualized mean return:  5.69%
-    #           Annualized sigma1:  5.30938
-    #           Annualized sigma2: 45.44142
-    #          Probability sigma2:  0.1689
-    #                    kurtosis: 18.8355
-    #            Annualized sigma: 18.411734
-    #                where b around 2.533 might work, but not always.
-    #
-    #  Our sigma2 guess is interesting since "double or nothing"
-    #  is just 2.2 standard deviations away. The probability of
-    #  drawing from the second Gaussian with the higher volatility
-    #  of 45% is about 0.17. The compensation for such risks taken
-    #  is the annual mean return of 5.7%, plus dividends collected.
-
 
 #  #  DEPRECATED 2017-05-21: If geometric mean approximation is only a
 #  #             function of mu and sigma, then the probabilistic
@@ -194,7 +228,7 @@ def gm2_vols(data, b=2.5, yearly=256):
 #  #             does not mathematically refine the approximation!
 #
 #  def gm2_georet(mu, sigma1, sigma2, q=0.10, yearly=1):
-#      '''Define GEOMETRIC mean return for GM(2) Gaussian mixture model.'''
+#      """Define GEOMETRIC mean return for GM(2) Gaussian mixture model."""
 #      #  Argument q is the probability of the second Gaussian.
 #      #  Argument yearly is a scale parameter to express frequency of data.
 #      #   Default yearly=1 produces a plain unscaled geometric mean return.
@@ -209,10 +243,13 @@ def gm2_vols(data, b=2.5, yearly=256):
 
 
 def gemreturn_Jean(mu_return, sigma, k_Pearson=3):
-    '''Approximation for geometric mean RETURN via Jean (1983) infinite series.
-       Important definition: "financial return":= 1 + "rate"
-       where rate is expressed in decimal form.
-    '''
+    """Approximation for geometric mean RETURN via Jean (1983) infinite series.
+
+    Notes
+    -----
+    Important definition: "financial return":= 1 + "rate" where rate is
+    expressed in decimal form.
+    """
     #  Jean (1983) derived the exact infinite series for geometric mean return
     #  around a reference point (the arithmetic mean return worked out best).
     #  Here we code an approximation by the first five terms of that series:
@@ -231,10 +268,13 @@ def gemreturn_Jean(mu_return, sigma, k_Pearson=3):
 
 
 def gemrate(mu_rate, sigma, kurtosis=3, yearly=1):
-    '''Approximation for annualized geometric mean RATE by preferred method.
-       Important definition: "financial return":= 1 + "rate"
-       where rate is expressed in decimal form.
-    '''
+    """Approximation for annualized geometric mean RATE by preferred method.
+
+    Notes
+    -----
+    Important definition: "financial return":= 1 + "rate" where rate is
+    expressed in decimal form.
+    """
     mu_return = 1 + mu_rate
     k_Pearson = kurtosis
     #           ^MUST be expressed as Pearson kurtosis here, see kurtfun().
@@ -255,11 +295,14 @@ def gemrate(mu_rate, sigma, kurtosis=3, yearly=1):
 
 
 def gemrat(data, yearly=256, pc=True):
-    '''Compute annualized geometric mean rate for given data.
-       Output will be more accurate than the method implicit in georet()
-       since the kurtosis of differenced log data matters.
-       Argument pc will present appropriate output in percentage form.
-    '''
+    """Compute annualized geometric mean rate for given data.
+
+    Notes
+    -----
+    Output will be more accurate than the method implicit in georet() since the
+    kurtosis of differenced log data matters. Argument pc will present
+    appropriate output in percentage form.
+    """
     rat = tool.diflog(data, lags=1)
     #          ^First difference of log(data).
     arr = tool.df2a(rat)
@@ -292,9 +335,12 @@ def gemrat(data, yearly=256, pc=True):
 
 
 def gm2gemrat(data, yearly=256, b=2.5, pc=True):
-    '''Compute annualized geometric mean rate and GM(2) parameters.
-       Argument pc will present appropriate output in percentage form.
-    '''
+    """Compute annualized geometric mean rate and GM(2) parameters.
+
+    Notes
+    -----
+    Argument pc will present appropriate output in percentage form.
+    """
     #                 k is Pearson kurtosis.
     grate, mu, sigma, k, yearly, N = gemrat(data, yearly, False)
     b = 2 if b <= 1.0 else b
@@ -319,7 +365,7 @@ def gm2gemrat(data, yearly=256, b=2.5, pc=True):
 
 
 def gm2gem(data, yearly=256, b=2.5, pc=True, n=4):
-    '''Print annualized specs from gm2gemrat() with n decimal places.'''
+    """Print annualized specs from gm2gemrat() with n decimal places."""
     specs = tool.roundit(gm2gemrat(data, yearly, b, pc), n, echo=False)
     print("Geometric  mean rate:", specs[0])
     print("Arithmetic mean rate:", specs[1])
