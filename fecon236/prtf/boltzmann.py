@@ -1,14 +1,10 @@
 #  Python Module for import                           Date : 2018-06-20
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-'''
-_______________|  boltzmann.py :: Boltzmann portfolio for fecon236
+"""Boltzmann portfolio for fecon236
 
 Alternative to Markowitz portfolio. Usage demonstrated in notebook, see
 fecon235/nb/prtf-boltzmann-1.ipynb for explicit details and derivation,
 or Part 1: https://git.io/boltz1 and Part 2: https://git.io/boltz2
-
-    The softmax() function is in fecon236/ml/learn.py since it applies
-    more widely in machine learning.
 
 One virtually has no control over how the assets perform and interact. Only
 the portfolio allocation over time is in our decision set. Let's recast the
@@ -32,6 +28,7 @@ Those weights depend on the covariance structure of the agents' performance
 which is unfortunately not stable over time. There may be some information
 which can be exploited to tilt our bets favorably.
 
+::
 
     prices ---> cov ---> globalw
       |                    |
@@ -56,7 +53,7 @@ To summarize the information set so far, we cast the agents in a game, each
 with some score. When the game consists of multiple rounds, we can use tools
 from reinforcement learning to help us make the best sequential decisions.
 
-The softmax function is fed the scores to compute the probability of a
+The ``softmax`` function is fed the scores to compute the probability of a
 particular agent being the expert. This function takes temperature as a
 diffusion parameter, that is, an optimal way to diversify our bets across
 possible experts. The theory here is due to Ludwig Boltzmann and his work
@@ -67,15 +64,24 @@ estimating the various measures.
 Finally, those probabilities are combined with our renormalized weights to
 arrive at "pweights," our portfolio weights.
 
+Notes
+-----
+* The ``softmax`` function is in ``fecon236/ml/learn.py`` since it applies
+  more widely in machine learning.
+* For LATEST version, see https://git.io/fecon236
 
-REFERENCES
+References
+----------
 
 - John H. Cochrane, 2005, Asset Pricing, Princeton U. Press.
 
-CHANGE LOG  For LATEST version, see https://git.io/fecon236
-2018-06-20  boltzmann.py, fecon236 fork. Fix imports, pass flake8.
-2017-07-08  ys_prtf_boltzmann.py, fecon235 v5.18.0312, https://git.io/fecon235
-'''
+Change Log
+----------
+
+* 2018-06-20  ``boltzmann.py``, ``fecon236`` fork. Fix imports, pass flake8.
+* 2017-07-08  ``ys_prtf_boltzmann.py``, fecon235 v5.18.0312,
+  https://git.io/fecon235
+"""
 
 from __future__ import absolute_import, print_function, division
 
@@ -89,7 +95,7 @@ from fecon236.ml import learn
 
 
 def weighcov(cov):
-    '''WEIGHT array (N,1) for Global Min Var Portfolio, given cov.'''
+    """WEIGHT array (N,1) for Global Min Var Portfolio, given cov."""
     #  Derived in Cochrane (2005), chp. 5, p.83.
     Viv = matrix.invert_pseudo(cov)
     #                  ^in case covariance matrix is ill-conditioned.
@@ -100,13 +106,13 @@ def weighcov(cov):
 
 
 def weighcovdata(dataframe):
-    '''WEIGHT array (N,1) for Global Min Var Portfolio, given data.'''
+    """WEIGHT array (N,1) for Global Min Var Portfolio, given data."""
     V = matrix.covdiflog(dataframe)
     return weighcov(V)
 
 
 def trimit(it, floor, level):
-    '''For an iterable, accept values > floor, else set to level.'''
+    """For an iterable, accept values > floor, else set to level."""
     try:
         #  ... in case "it" array elements are integers,
         #  else we cannot assign floats later when enumerating:
@@ -121,10 +127,11 @@ def trimit(it, floor, level):
 
 
 def renormalize(it):
-    '''Let elements of an iterable proportionally abs(sum) to 1.
-       Renormalization of portfolio weights is treated differently
-       than probabilities which cannot be negative.
-    '''
+    """Let elements of an iterable proportionally abs(sum) to 1.
+
+    Renormalization of portfolio weights is treated differently
+    than probabilities which cannot be negative.
+    """
     #  Remember that a list is an iterable, too.
     arr = np.array([float(x) for x in it])
     sumit = float(np.sum(arr))
@@ -143,19 +150,19 @@ def renormalize(it):
 
 
 def rentrim(weights, floor, level):
-    '''Accept weight > floor, else set to level, then renormalize.'''
+    """Accept weight > floor, else set to level, then renormalize."""
     trimmed = trimit(weights, floor, level)
     return renormalize(trimmed)
 
 
 def gemratarr(dataframe, yearly=256):
-    '''Extract geometric mean rate of each column into an array.'''
+    """Extract geometric mean rate of each column into an array."""
     gems = group.groupgemrat(dataframe, yearly, order=False, n=8)
     return np.array([item[0] for item in gems]).reshape(len(gems), 1)
 
 
 def weighsoft(weights, rates, temp, floor, level):
-    '''Given weights, compute pweights as array by softmax transform.'''
+    """Given weights, compute pweights as array by softmax transform."""
     scores = weights * rates
     problist = learn.softmax(scores, temp)[-1]
     probs = np.array(problist).reshape(len(problist), 1)
@@ -166,7 +173,7 @@ def weighsoft(weights, rates, temp, floor, level):
 
 
 def boltzweigh(dataframe, yearly=256, temp=55, floor=0.01, level=0):
-    '''Given data, compute pweights as array by softmax transform.'''
+    """Given data, compute pweights as array by softmax transform."""
     rates = gemratarr(dataframe, yearly)
     globalw = weighcovdata(dataframe)
     weights = rentrim(globalw, floor, level)
@@ -175,18 +182,23 @@ def boltzweigh(dataframe, yearly=256, temp=55, floor=0.01, level=0):
 
 
 def boltzportfolio(dataframe, yearly=256, temp=55, floor=0.01, level=0, n=4):
-    '''MAIN: SUMMARY of Boltzmann portfolio, rounded to n-decimal places.
-       Return list where values are Python floats, not array type, e.g.
-           [2.7833,
-            [[0.6423, 2.05, 'America'],
-             [0.0, -11.17, 'Emerging'],
-             [0.0, -10.47, 'Europe'],
-             [0.3577, 4.1, 'Gold'],
-             [0.0, -4.99, 'Japan']]]
-       The portfolio's geometric mean rate is included first.
-       Each sub-sublist will consist of weight, rate, and key.
-       The order of keys from the dataframe is preserved.
-    '''
+    """SUMMARY of Boltzmann portfolio, rounded to n-decimal places.
+
+    Return list where values are Python floats, not array type, e.g.
+
+    .. code-block:: python
+
+        [2.7833,
+         [[0.6423, 2.05, 'America'],
+          [0.0, -11.17, 'Emerging'],
+          [0.0, -10.47, 'Europe'],
+          [0.3577, 4.1, 'Gold'],
+          [0.0, -4.99, 'Japan']]]
+
+    The portfolio's geometric mean rate is included first.
+    Each sub-sublist will consist of weight, rate, and key.
+    The order of keys from the dataframe is preserved.
+    """
     rates = gemratarr(dataframe, yearly)
     globalw = weighcovdata(dataframe)
     weights = rentrim(globalw, floor, level)
