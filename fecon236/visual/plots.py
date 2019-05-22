@@ -1,7 +1,6 @@
 #  Python Module for import                           Date : 2018-06-08
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-'''
-_______________|  plots.py :: Plot functions using matplotlib.
+"""Plot functions using matplotlib.
 
 Functions to plot data look routine, but in actuality specifying
 the details can be a huge hassle involving lots of trial and error.
@@ -13,24 +12,30 @@ conserving disk space. Specifying a title NOT starting with 'tmp'
 will produce a PNG image file. Moreover, it is possible to
 suppress screen show by adding a leading blank space to the title.
 
-REFERENCES:
+Notes
+-----
+For LATEST version, see https://git.io/fecon236
+
+References
+----------
 
 - matplotlib, http://matplotlib.org/api/pyplot_api.html
-
 - pandas, http://pandas.pydata.org/pandas-docs/stable/computation.html
 
 
-CHANGE LOG  For LATEST version, see https://git.io/fecon236
-2018-06-08  Clarify plotn() usage.
-2018-05-20  Use functools.wraps within saveImage decorator.
-2018-05-17  Suppress show screen via leading space in title.
-                Fix boxplot() by removing NaN from data.
-2018-05-16  MAJOR refactoring using decorator saveImage().
-2018-05-14  Transplant plot() but deprecate use of symbol code as argument.
-2018-05-11  Fix imports.
-2018-05-09  plots.py, fecon236 fork. Pass flake8.
-2017-05-15  yi_plot.py, fecon235 v5.18.0312, https://git.io/fecon235
-'''
+Change Log
+----------
+
+* 2018-06-08  Clarify `plotn` usage.
+* 2018-05-20  Use `functools.wraps` within saveImage decorator.
+* 2018-05-17  Suppress show screen via leading space in title.
+  Fix `boxplot` by removing NaN from data.
+* 2018-05-16  MAJOR refactoring using decorator `saveImage`.
+* 2018-05-14  Transplant `plot` but deprecate use of symbol code as argument.
+* 2018-05-11  Fix imports.
+* 2018-05-09  `plots.py`, `fecon236` fork. Pass flake8.
+* 2017-05-15  `yi_plot.py`, fecon235 v5.18.0312, https://git.io/fecon235
+"""
 
 from __future__ import absolute_import, print_function, division
 
@@ -53,13 +58,13 @@ dotsperinch = 140
 
 
 def saveImage(func):
-    '''Decorator to save plot image to disk, option to suppress screen show.'''
+    """Decorator to save plot image to disk, option to suppress screen show."""
     #  The underlying func MUST "return [title, fig]".
     #  Image saved to file ONLY if title string does NOT start with 'tmp'.
     #  Screen show can be suppressed by a leading blank space in title arg.
     @wraps(func)
     def saveimage(*args, **kwargs):
-        '''Wrapper for the decorator saveImage.'''
+        """Wrapper for the decorator saveImage."""
         title, fig = func(*args, **kwargs)
         if not title.startswith(' '):
             plt.show()
@@ -78,7 +83,7 @@ def saveImage(func):
 
 @saveImage
 def plotdf(dataframe, title='tmp'):
-    '''Plot dataframe where its index are dates.'''
+    """Plot dataframe where its index are dates."""
     dataframe = tool.todf(dataframe)
     #                ^todf must dropna(),
     #                 otherwise index of last point plotted may be wrong.
@@ -101,10 +106,11 @@ def plotdf(dataframe, title='tmp'):
 
 #  saveImage decorator not needed here.
 def plot(data, title='tmp', maxi=87654321):
-    '''Wrapper around plotdf() which accepts DataFrame with date index.
-       For list or numbered index, use plotn() instead.
-       Backwards-compatible maxi is maximum number of most recent data.
-    '''
+    """Wrapper around `plotdf` which accepts DataFrame with date index.
+
+    For list or numbered index, use `plotn` instead.
+    Backwards-compatible maxi is maximum number of most recent data.
+    """
     if isinstance(data, pd.DataFrame):
         plotdf(tool.tail(data, maxi), title)
     else:
@@ -117,7 +123,7 @@ def plot(data, title='tmp', maxi=87654321):
 
 @saveImage
 def plotn(data, title='tmp'):
-    '''Plot list, array, Series, or DataFrame where the index is numbered.'''
+    """Plot list, array, Series, or DataFrame where the index is numbered."""
     #  With todf: list, array, or Series will be converted to DataFrame.
     dataframe = tool.todf(data)
     #               ^todf must dropna(),
@@ -139,7 +145,7 @@ def plotn(data, title='tmp'):
 
 @saveImage
 def boxplot(data, title='tmp', labels=[]):
-    '''Make boxplot from data which could be a dataframe.'''
+    """Make boxplot from data which could be a dataframe."""
     #  - Use list of strings for labels,
     #       since we presume data has no column names,
     #       unless data is a dataframe.
@@ -179,7 +185,7 @@ def boxplot(data, title='tmp', labels=[]):
 
 @saveImage
 def scatter(dataframe, title='tmp', col=[0, 1]):
-    '''Scatter plot for dataframe by zero-based column positions.'''
+    """Scatter plot for dataframe by zero-based column positions."""
     #  First in col is x-axis, second is y-axis.
     #  Index itself is excluded from position numbering.
     dataframe = dataframe.dropna()
@@ -214,7 +220,7 @@ def scatter(dataframe, title='tmp', col=[0, 1]):
 
 #  saveImage decorator not needed here.
 def scats(dataframe, title='tmp'):
-    '''All pair-wise scatter plots for dataframe.'''
+    """All pair-wise scatter plots for dataframe."""
     #  Renaming title will result in file output.
     ncol = dataframe.shape[1]
     #                ^number of columns
@@ -233,7 +239,7 @@ def scats(dataframe, title='tmp'):
 
 #  saveImage decorator not needed here.
 def scat(dfx, dfy, title='tmp', col=[0, 1]):
-    '''Scatter plot between two pasted dataframes.'''
+    """Scatter plot between two pasted dataframes."""
     #  Renaming title will result in file output.
     scatter(tool.paste([dfx, dfy]), title, col)
     return
@@ -249,10 +255,16 @@ def scat(dfx, dfy, title='tmp', col=[0, 1]):
 
 @saveImage
 def plotqq(data, title='tmp', dist='norm', fitLS=True):
-    '''Display/save quantile-quantile Q-Q probability plot.
+    """Display/save quantile-quantile Q-Q probability plot.
+
     Q–Q plot here is used to compare data to a theoretical distribution.
-    Ref: https://en.wikipedia.org/wiki/Q–Q_plot
-    '''
+
+    References
+    ----------
+
+    * https://en.wikipedia.org/wiki/Q–Q_plot
+
+    """
     #     Assume "data" to be np.ndarray or single-column DataFrame.
     #  Theoretical quantiles on horizontal x-axis estimated by Filliben method.
     #  Green line depicits theoretical distribution; fitLS computes R^2:
