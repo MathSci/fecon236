@@ -1,19 +1,30 @@
 #  Python Module for import                           Date : 2018-06-17
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-'''
-_______________|  cftc.py :: For futures markets under CFTC
+"""Futures markets under CFTC
 
-- CFTC:= Commodity Futures Trading Commission, a US government agency
-- COTR:= Commitment of Traders Report
+Definitions
+-----------
 
-REFERENCE
+CFTC
+  Commodity Futures Trading Commission, a US government agency
+COTR
+  Commitment of Traders Report
+
+References
+----------
+
 - "Market position indicators using CFTC COTR", https://git.io/cotr
     A fecon235 Jupyter notebook illustrating derivation and usage.
 
+Notes
+-----
+For LATEST version, see https://git.io/fecon236
 
-CHANGE LOG  For LATEST version, see https://git.io/fecon236
-2018-06-17  First version: groupcotr() spin-off from util.group module.
-'''
+Change Log
+----------
+
+* 2018-06-17  First version: `groupcotr` spin-off from util.group module.
+"""
 
 from __future__ import absolute_import, print_function, division
 
@@ -32,11 +43,12 @@ cotr4w = {'Bonds': qdl.w4cotr_bonds, 'Equities': qdl.w4cotr_equities,
 
 
 def groupcotr(group=cotr4w, alpha=0):
-    '''Compute latest normalized CFTC COTR position indicators.
-       COTR is the Commitment of Traders Report from US gov agency.
-       Optionally specify alpha for Exponential Moving Average
-       which is a smoothing parameter: 0 < alpha < 1 (try 0.26).
-    '''
+    """Compute latest normalized CFTC COTR position indicators.
+
+    COTR is the Commitment of Traders Report from US gov agency.
+    Optionally specify alpha for Exponential Moving Average
+    which is a smoothing parameter: 0 < alpha < 1 (try 0.26).
+    """
     #  For detailed derivation, see https://git.io/cotr
     positions = groupget(group)
     norpositions = groupfun(tool.normalize, positions)
