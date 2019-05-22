@@ -1,7 +1,6 @@
 #  Python Module for import                           Date : 2018-05-23
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-'''
-_______________|  _ex_Quandl.py :: fecon236 fork of Quandl API 2.8.9.
+"""fecon236 fork of Quandl API 2.8.9.
 
 Currently supports getting and searching datasets.
 
@@ -12,34 +11,38 @@ https://github.com/quandl/quandl-python/blob/master/2_SERIES_UPGRADE.md
 
 Their version 2.8.9, however, had the virtue of being just a *single* module,
 and has been battle-tested in fecon235 notebooks since 2015-08-03.
-That module has been forked at fecon236 and renamed _ex_Quandl.py.
-The fecon236 qdl module is a wrapper around _ex_Quandl.py.
+That module has been forked at fecon236 and renamed `_ex_Quandl.py`.
+The fecon236 qdl module is a wrapper around `_ex_Quandl.py`.
 
 
-REFERENCES:
+References
+----------
 
-- Using Quandl's Python module: https://www.quandl.com/tools/python
+* Using Quandl's Python module: https://www.quandl.com/tools/python
                    GitHub repo: https://github.com/quandl/quandl-python
-
-- Source code for Quandl.py version 2.8.9:
+* Source code for Quandl.py version 2.8.9:
   https://github.com/quandl/quandl-python/blob/v2.8.9/Quandl/Quandl.py
-
-- Complete Quandl API documentation: https://www.quandl.com/docs/api
+* Complete Quandl API documentation: https://www.quandl.com/docs/api
   including error codes.
-
-- RESTful interface introduction:  https://www.quandl.com/help/api
+* RESTful interface introduction:  https://www.quandl.com/help/api
   Not needed here, but it's available for their API version 3.
 
+Notes
+-----
+For LATEST version, see https://git.io/fecon236
 
-CHANGE LOG  For LATEST version, see https://git.io/fecon236
-2018-05-23  _ex_Quandl.py, fecon236 fork of Quandl.py version 2.8.9.
+Change Log
+----------
+
+* 2018-05-23  _ex_Quandl.py, fecon236 fork of Quandl.py version 2.8.9.
                 Fix over 80 flake8 violations. Pass test_qdl.py.
-2016-04-22  [Ignore newly introduced complex Quandl package version 3.]
-2016-02-23  [Quandl.py API version 2.8.9 removes push() to upload data.]
-2015-08-03  Quandl.py API version 2.8.7 adopted as yi_quandl_api.py
+* 2016-04-22  [Ignore newly introduced complex Quandl package version 3.]
+* 2016-02-23  [Quandl.py API version 2.8.9 removes push() to upload data.]
+* 2015-08-03  Quandl.py API version 2.8.7 adopted as yi_quandl_api.py
                 in fecon235, unchanged and operative through
                 2018-03-12, v5.18.0312, https://git.io/fecon235
-'''
+
+"""
 
 from __future__ import (print_function, division, absolute_import,
                         unicode_literals)
@@ -58,7 +61,7 @@ try:
 except ImportError:
     from urllib import urlencode  # Python 2
     from urllib2 import HTTPError, Request, urlopen
-    strings = unicode
+    strings = unicode  # noqa: F821
 
 
 # Base API call URL
@@ -70,27 +73,43 @@ VERSION = '2.8.7'
 def get(dataset, **kwargs):
     """Return dataframe of requested dataset from Quandl.
 
-    :param dataset: str or list, depending on single or multiset dataset usage
-            Dataset codes are available on the Quandl website
-    :param str authtoken: Downloads are limited to 10 unless token is specified
-    :param str trim_start, trim_end: Optional datefilers, otherwise entire
-           dataset is returned
-    :param str collapse: Options are daily, weekly, monthly, quarterly, annual
-    :param str transformation: options are diff, rdiff, cumul, and normalize
-    :param int rows: Number of rows which will be returned
-    :param str sort_order: options are asc, desc. Default: `asc`
-    :param str returns: specify what format you wish your dataset returned as,
-        either `numpy` for a numpy ndarray or `pandas`. Default: `pandas`
-    :param bool verbose: print output text to stdout? Default is False.
-    :param str text: Deprecated. Use `verbose` instead.
-    :returns: :class:`pandas.DataFrame` or :class:`numpy.ndarray`
+    Parameters
+    ----------
+    dataset: str or list
+        Single or multiset dataset usage. Dataset codes are available on the
+        Quandl website
+    authtoken: str, optional
+        Downloads are limited to 10 unless token is specified
+    trim_start: datefiler, optional
+        Start date
+    trim_end: datefiler, optional
+        End date
+    collapse: str, optional
+        Daily, weekly, monthly, quarterly, annual
+    transformation: str, optional
+        Options are diff, rdiff, cumul, normalize
+    rows: int, optional
+        Number of rows which will be returned
+    sort_order: str, optional
+        Sorting order, `asc` or `desc`. Defaults to `asc`
+    returns: str, optional
+        Dataset output format. Options are `pandas` (default) or `numpy` for
+        an `ndarray`
+    verbose: bool, optional
+        Toggle printing of output text to stdout. Defaults to False.
 
-    Note that Pandas expects timeseries data to be sorted ascending for most
+    Notes
+    -----
+
+    Pandas expects timeseries data to be sorted ascending for most
     timeseries functionality to work.
 
     Any other `kwargs` passed to `get` are sent as field/value params to Quandl
     with no interference.
 
+    Returns
+    -------
+    `pandas.DataFrame` or `numpy.ndarray`
     """
     # Check whether dataset is given as a string (for a single dataset)
     # or an array (for a multiset call)
@@ -184,11 +203,21 @@ def get(dataset, **kwargs):
 def search(query, source=None, page=1, authtoken=None,
            verbose=True, prints=None):
     """Return array of dictionaries of search results.
-    :param str query: (required), query to search with
-    :param str source: (optional), source to search
-    :param +'ve int: (optional), page number of search
-    :param str authotoken: (optional) Quandl auth token for extended API access
-    :returns: :array: search results
+
+    Parameters
+    ----------
+    query: str
+        Query to search with
+    source: str, optional
+        Source to search with
+    page: int, optional
+        Page number to search
+    authtoken: str, optional
+        Quandl auth token for extended API access
+
+    Returns
+    -------
+    `list` search results
     """
     if prints is not None:
         print('Deprecated: "prints", use "verbose" instead.')

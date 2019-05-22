@@ -1,7 +1,7 @@
 #  Python Module for import                           Date : 2018-05-23
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-'''
-_______________|  qdl.py :: Access Quandl data vendors using fecon236.
+
+"""Access Quandl data vendors using fecon236.
 
 We define functions to access data from Quandl.  Each time-series and its
 frequency has its own "quandlcode" available at: https://www.quandl.com
@@ -12,11 +12,6 @@ grabs the 4th column of NSE/OIL.
 Favorite quandlcodes are variables named d4*, m4*, q4*
 which indicate their frequency: daily, monthly, or quarterly.
 
-USAGE:  df = getqdl(quandlcode)
-
-
-_______________ SYNOPSIS
-
 On 2016-04-22 Quandl released version 3 of their API which was a "drop-in"
 replacement of version 2, but a very complex *package* which has not seen
 any substantive improvement since that date -- see
@@ -24,16 +19,22 @@ https://github.com/quandl/quandl-python/blob/master/2_SERIES_UPGRADE.md
 
 Their version 2.8.7, however, had the virtue of being just a *single* module,
 and has been battle-tested in fecon235 notebooks since 2015-08-03.
-That module has been forked at fecon236 and renamed _ex_Quandl.py.
-This qdl module is a wrapper around _ex_Quandl.py, and
-as of 2018-05-22 has passed tests/test_qdl.py.
+That module has been forked at fecon236 and renamed `_ex_Quandl.py`.
+This qdl module is a wrapper around `_ex_Quandl.py`, and
+as of 2018-05-22 has passed `tests/test_qdl.py`.
 
 
-        _____ API Key
+API Key
+-------
 
 You will need an API Key UNLESS you are doing fewer than 50 calls per day.
 After creating an account at quandl.com, set your authentication token
 by executing this fecon236 function (described in this module):
+
+.. code-block:: python
+    :flake8-group: Ignore
+
+    import fecon236 as fe
 
     fe.qdl.setQuandlToken(API_key)
 
@@ -43,7 +44,8 @@ so it is unnecessary to enter them more than once, unless you change your
 working directory.
 
 
-        _____ Usage Rules
+Usage Rules
+-----------
 
 API usage is free for registered users. Registered users have a limit of 2,000
 calls per 10 minutes, and a limit of 50,000 calls per day. Premium data
@@ -53,7 +55,8 @@ calls per day.  Dataset calls are rate-limited to 2,000 calls per 10 minutes.
 All API requests must be made using HTTPS. Requests made over HTTP will fail.
 
 
-        _____ Quandl Codes
+Quandl Codes
+------------
 
 To use the API to download a dataset, you will need to know the dataset's
 "quandlcode".  Each dataset on Quandl has a unique Quandl code, comprising a
@@ -66,7 +69,8 @@ is not the same as MCX/CUG2014. You need both the database_code and the
 dataset_code to fully identify a dataset.
 
 
-        _____ Pre-calculations
+Pre-calculations
+----------------
 
 In general, we suggest downloading the data in raw format in the highest
 frequency possible and preforming any data manipulation in pandas itself.
@@ -75,57 +79,93 @@ Quandl allows you to perform certain elementary calculations on your data
 prior to downloading. The transformations currently availabe are row-on-row
 change, percentage change, cumulative sum, and normalize (set starting value
 at 100).  If a datapoint for time t is denoted as y[t] and the transformed
-data as y'[t], the available transformations are defined as below:
+data as y'[t], the available transformations are defined as below.
 
-Transformation      Parameter     Effect
-Row-on-row change   diff          y'[t] = y[t] - y[t-1]
-Row-on-row % change rdiff         y'[t] = (y[t] - y[t-1])/y[t-1]
-Cumulative sum      cumul         y'[t] = y[t] +y[t-1] + ... + y[0]
-Start at 100        normalize     y'[t] = (y[t]/y[0]) * 100
++---------------------+---------------+-----------------------------------+
+| Transformation      | Parameter     | Effect                            |
++=====================+===============+===================================+
+| Row-on-row change   | `diff`      | y'[t] = y[t] - y[t-1]               |
++---------------------+---------------+-----------------------------------+
+| Row-on-row % change | `rdiff`     | y'[t] = (y[t] - y[t-1])/y[t-1]      |
++---------------------+---------------+-----------------------------------+
+| Cumulative sum      | `cumul`     | y'[t] = y[t] +y[t-1] + ... + y[0]   |
++---------------------+---------------+-----------------------------------+
+| Start at 100        | `normalize` | y'[t] = (y[t]/y[0]) * 100           |
++---------------------+---------------+-----------------------------------+
 
 Note that y[0] in the above table refers to the starting date for the API
 call, i.e., the date specified by trim_start= or rows=, NOT the starting date
 of the entire dataset.
 
 
-        _____ Specific API Guides
+API Guides
+----------
 
-Economics:     https://www.quandl.com/resources/api-for-economic-data
-Stocks:        https://www.quandl.com/resources/api-for-stock-data
-Earnings:      https://www.quandl.com/resources/api-for-earnings-data
-Futures:       https://www.quandl.com/resources/api-for-futures-data
-Currencies:    https://www.quandl.com/resources/api-for-currency-data
-Bitcoin:       https://www.quandl.com/resources/api-for-bitcoin-data
-Commodities:   https://www.quandl.com/resources/api-for-commodity-data
-Housing:       https://www.quandl.com/resources/api-for-housing-data
-International: https://www.quandl.com/resources/api-for-country-data
++---------------+---------------------------------------------------------+
+| Economics     | https://www.quandl.com/resources/api-for-economic-data  |
++---------------+---------------------------------------------------------+
+| Stocks        | https://www.quandl.com/resources/api-for-stock-data     |
++---------------+---------------------------------------------------------+
+| Earnings      | https://www.quandl.com/resources/api-for-earnings-data  |
++---------------+---------------------------------------------------------+
+| Futures       | https://www.quandl.com/resources/api-for-futures-data   |
++---------------+---------------------------------------------------------+
+| Currencies    | https://www.quandl.com/resources/api-for-currency-data  |
++---------------+---------------------------------------------------------+
+| Bitcoin       | https://www.quandl.com/resources/api-for-bitcoin-data   |
++---------------+---------------------------------------------------------+
+| Commodities   | https://www.quandl.com/resources/api-for-commodity-data |
++---------------+---------------------------------------------------------+
+| Housing       | https://www.quandl.com/resources/api-for-housing-data   |
++---------------+---------------------------------------------------------+
+| International | https://www.quandl.com/resources/api-for-country-data   |
++---------------+---------------------------------------------------------+
 
-
-        _____ Contact
+Contact
+-------
 
 Reach out to Quandl for direct support at connect@quandl.com
 Inquires about the Python API package to    Chris@quandl.com
 
 
-    __________ Using low-level API
 
-A fecon236 user would normally just employ high-level wrapper getqdl(),
+Usage
+-----
+
+.. code-block:: python
+    :flake8-add-ignore: F821
+
+    df = getqdl(quandlcode)
+
+Low-level API
+~~~~~~~~~~~~~
+
+A `fecon236` user would normally just employ high-level wrapper getqdl(),
 not _qget(), but for the developer the following may be interesting:
 
 The module named as quandlapi is able to return data in 2 formats: a pandas
 data series ("pandas") and a numpy array ("numpy"). "pandas" is the default.
 One can specify the format explicitly:
 
+.. code-block:: python
+    :flake8-add-ignore: F821
+
     mydata = fe.qdl._qget("WIKI/AAPL", returns="numpy")
 
 You can get multiple datasets in one call by passing an array of Quandl codes:
 
-    mydata = fe.qdl._qget(["NSE/OIL.4","WIKI/AAPL.1"])
+.. code-block:: python
+    :flake8-add-ignore: F821
+
+    mydata = fe.qdl._qget(["NSE/OIL.4", "WIKI/AAPL.1"])
 
 This grabs the 4th column of dataset NSE/OIL and the 1st column of dataset
 WIKI/AAPL, and returns them in a single call.
 
 We can manipulate or transform the data prior to download [not advised]:
+
+.. code-block:: python
+    :flake8-add-ignore: F821
 
     #  Specific Date Range:
     mydata = fe.qdl._qget("NSE/OIL", trim_start="yyyy-mm-dd",
@@ -144,45 +184,49 @@ We can manipulate or transform the data prior to download [not advised]:
 
 A request with a full list of options would look like the following:
 
-data = fe.qdl._qget('PRAGUESE/PX', authtoken='xxxxxx', trim_start='2001-01-01',
-                    trim_end='2010-01-01', collapse='annual',
-                    transformation='rdiff', rows=4, returns='numpy')
+.. code-block:: python
+    :flake8-add-ignore: F821
+
+    data = fe.qdl._qget('PRAGUESE/PX', authtoken='xxxxxx',
+                        trim_start='2001-01-01',
+                        trim_end='2010-01-01', collapse='annual',
+                        transformation='rdiff', rows=4, returns='numpy')
 
 
-        _____ Low-level push() [deprecated in Quandl API 2.8.9]
+References
+----------
 
-You can no longer upload your own data to Quandl using version 2.
-
-
-REFERENCES:
-
-- Using Quandl's Python module: https://www.quandl.com/help/python
+* Using Quandl's Python module: https://www.quandl.com/help/python
                    GitHub repo: https://github.com/quandl/quandl-python
-
-- Complete Quandl API documentation: https://www.quandl.com/docs/api
+* Complete Quandl API documentation: https://www.quandl.com/docs/api
   including error codes.
-
-- [RESTful interface introduction:  https://www.quandl.com/help/api
-    Not needed here, but it's available for their API version 3.]
-
-- CFTC Commitments of Traders Report, explanatory notes:
+* RESTful interface introduction:  https://www.quandl.com/help/api
+  Not needed here, but it's available for their API version 3.
+* CFTC Commitments of Traders Report, explanatory notes:
   http://www.cftc.gov/MarketReports/CommitmentsofTraders/ExplanatoryNotes
-
     - Traders' option positions are computed on a futures-equivalent basis
        using delta factors supplied by the exchanges.
-
-- Computational tools for pandas
+* Computational tools for pandas
        http://pandas.pydata.org/pandas-docs/stable/computation.html
+* Wes McKinney, 2013, *Python for Data Analysis*.
 
-- Wes McKinney, 2013, _Python for Data Analysis_.
+
+Notes
+-----
+* For LATEST version, see https://git.io/fecon236
+* Low-level push() [deprecated in Quandl API 2.8.9]
+* You can no longer upload your own data to Quandl using version 2.
 
 
-CHANGE LOG  For LATEST version, see https://git.io/fecon236
-2018-05-23  qdl.py, fecon236 fork. Edit intro. Pass flake8 and test_qdl.
+Change Log
+----------
+
+* 2018-05-23  qdl.py, fecon236 fork. Edit intro. Pass flake8 and test_qdl.
                 Fix imports. Deprecate plotqdl() and holtqdl.
                 Rename quandl() as _qget() for future clarity.
-2017-02-07  yi_quandl.py, fecon235 v5.18.0312, https://git.io/fecon235
-'''
+* 2017-02-07  yi_quandl.py, fecon235 v5.18.0312, https://git.io/fecon235
+
+"""
 
 from __future__ import absolute_import, print_function, division
 
@@ -238,9 +282,13 @@ m4spx_1871_d = 'm4spx_1871_d'    # Shiller S&P500 nominal dividends 12-month
 
 
 def setQuandlToken(API_key):
-    '''Generate authtoken.p in the local directory for API access.'''
-    #  Must have API key which is free by creating a Quandl account,
-    #  however, this is not necessary for limited usage.
+    """Generate authtoken.p in the local directory for API access.
+
+    Notes
+    -----
+    Must have API key which is free by creating a Quandl account,
+    however, this is not necessary for limited usage.
+    """
     _ = _qget("NSE/OIL", authtoken=API_key, rows=1)   # noqa
     #  This dummy request creates your token file "authtoken.p"
     #  in your current working directory.
@@ -253,22 +301,30 @@ def setQuandlToken(API_key):
 
 
 def cotr_get(futures='GC', type='FO'):
-    '''Get CFTC Commitment of Traders Report COTR.'''
-    #  Report for futures only requested by type "F".
-    #  Report for both futures and options requested by type "FO".
-    #  e.g. 'CFTC/GC_FO_ALL' for CFTC COTR: Gold futures and options.
-    #
-    #  Traders' option positions are computed on a futures-equivalent basis
-    #  using delta factors supplied by the exchanges.
+    """Get CFTC Commitment of Traders Report COTR.
+
+    Notes
+    -----
+
+    Report for futures only requested by type "F".
+    Report for both futures and options requested by type "FO".
+    e.g. 'CFTC/GC_FO_ALL' for CFTC COTR: Gold futures and options.
+
+    Traders' option positions are computed on a futures-equivalent basis
+    using delta factors supplied by the exchanges.
+    """
     quandlcode = 'CFTC/' + futures + '_' + type + '_ALL'
     return _qget(quandlcode)
 
 
 def cotr_position(futures='GC'):
-    '''Extract market position from CFTC Commitment of Traders Report.'''
+    """Extract market position from CFTC Commitment of Traders Report.
+
+    Notes
+    -----
+    Report for both futures and options requested by implicit "FO".
+    """
     cotr = cotr_get(futures)
-    #  Report for both futures and options requested by implicit "FO".
-    #
     #  For directionality we use these categories:
     try:
         longs = cotr['Asset Manager Longs']
@@ -286,7 +342,7 @@ def cotr_position(futures='GC'):
 
 
 def cotr_position_usd():
-    '''Market position for USD from COTR of JY and EC.'''
+    """Market position for USD from COTR of JY and EC."""
     #  We ignore USD index DX from ICE.
     pos1 = cotr_position('JY')
     #                      JPY futures.
@@ -299,7 +355,7 @@ def cotr_position_usd():
 
 
 def cotr_position_metals():
-    '''Market position for precious metals from COTR of GC and SI.'''
+    """Market position for precious metals from COTR of GC and SI."""
     pos1 = cotr_position('GC')
     #                      Gold Comex
     pos2 = cotr_position('SI')
@@ -310,7 +366,7 @@ def cotr_position_metals():
 
 
 def cotr_position_bonds():
-    '''Market position for bonds from COTR of TY and ED.'''
+    """Market position for bonds from COTR of TY and ED."""
     pos1 = cotr_position('TY')
     #                      TY is 10-years.
     pos2 = cotr_position('ED')
@@ -321,7 +377,7 @@ def cotr_position_bonds():
 
 
 def cotr_position_equities():
-    '''Market position for equities from COTR of both SP and ES.'''
+    """Market position for equities from COTR of both SP and ES."""
     pos1 = cotr_position('SP')
     #                      SP better for options reading.
     pos2 = cotr_position('ES')
@@ -359,20 +415,27 @@ fut_dict = {
 
 
 def fut_decode(slang):
-    '''Validate and translate slang string into vendor futures code.
+    """Validate and translate slang string into vendor futures code.
 
-    Quandl uses format: {EXCHANGE}/{CODE}{MONTH}{YEAR}
-         {EXCHANGE} is the acronym for the futures exchange
-         {CODE} is the futures ticker code
-         {MONTH} is the single-letter month code
-         {YEAR} is a 4-digit year
+    Quandl uses format: `{EXCHANGE}/{CODE}{MONTH}{YEAR}`
+         `{EXCHANGE}` is the acronym for the futures exchange
+         `{CODE}` is the futures ticker code
+         `{MONTH}` is the single-letter month code
+         `{YEAR}` is a 4-digit year
     So for COMEX Gold Dec 2015: 'CME/GCZ2015' [note: CAPITALIZATION]
 
-    !!  Our short slang must be in all lower case, e.g.
+    Notes
+    -----
 
-    >>> print(fut_decode('f4xau15z'))
-    CME/GCZ2015
-    '''
+    Our short slang must be in all lower case, e.g.
+
+    .. code-block:: python
+        :flake8-add-ignore: F821
+
+        print(fut_decode('f4xau15z'))
+        # CME/GCZ2015
+
+    """
     if slang.isupper():
         #  So if given argument is in all CAPS...
         raise ValueError('Futures slang argument is invalid.')
@@ -393,7 +456,7 @@ def fut_decode(slang):
 
 
 def getfut(slang, maxi=512, col='Settle'):
-    '''slang string retrieves single column for one futures contract.
+    """slang string retrieves single column for one futures contract.
 
     The string consists of a key from fut_dict concatenated with
     'yym' where yy is shorthand for year and m is the month symbol
@@ -401,10 +464,16 @@ def getfut(slang, maxi=512, col='Settle'):
 
     Available col are: Open, High, Low, Last, Change, Settle,
                         Volume, 'Open Interest'
-    '''
-    #  Other than Eurodollars, we should not need more than 512 days
-    #  of data due to finite life of a futures contract.
-    #  2015-09-11  quandl default seems to be maxi around 380.
+
+    Notes
+    -----
+
+    * Other than Eurodollars, we should not need more than 512 days of data due
+    to finite life of a futures contract.
+    * 2015-09-11  quandl default seems to be maxi around 380.
+
+    """
+
     #
     fut = _qget(fut_decode(slang), rows=maxi)
     #      return just a single column dataframe:
@@ -433,9 +502,13 @@ def getfut(slang, maxi=512, col='Settle'):
 
 
 def freqM2MS(dataframe):
-    '''Change Monthly dates to (FRED-compatible) Month Start frequency.'''
-    #  FRED uses first day of month 'MS' to index that month's data,
-    #  whereas Quandl data *may* use varying end of month dates.
+    """Change Monthly dates to (FRED-compatible) Month Start frequency.
+
+    Notes
+    -----
+    FRED uses first day of month 'MS' to index that month's data, whereas
+    Quandl data *may* use varying end of month dates.
+    """
     df = dataframe.set_index(pd.DatetimeIndex(
                              [i.replace(day=1) for i in dataframe.index]))
     df.index = df.index.normalize()
@@ -453,7 +526,7 @@ def freqM2MS(dataframe):
 
 
 def getm4spx_1871_p():
-    '''Retrieve nominal monthly Shiller S&P500 price, starting 1871.'''
+    """Retrieve nominal monthly Shiller S&P500 price, starting 1871."""
     price = freqM2MS(_qget('MULTPL/SP500_REAL_PRICE_MONTH'))
     #                           ^But they meant NOMINAL!
     #  Their inflation-adjusted monthly series is called
@@ -463,7 +536,7 @@ def getm4spx_1871_p():
 
 
 def getm4spx_1871_e():
-    '''Retrieve nominal monthly Shiller S&P500 earnings, starting 1871.'''
+    """Retrieve nominal monthly Shiller S&P500 earnings, starting 1871."""
     ratio = freqM2MS(_qget('MULTPL/SP500_PE_RATIO_MONTH'))
     #  Gets price/earnings ratio, so solve for 12-month earnings.
     #  Alternative: official YALE/SPCOMP, but 9 months latency!
@@ -473,7 +546,7 @@ def getm4spx_1871_e():
 
 
 def getm4spx_1871_d():
-    '''Retrieve nominal monthly Shiller S&P500 dividends, starting 1871.'''
+    """Retrieve nominal monthly Shiller S&P500 dividends, starting 1871."""
     dyield = freqM2MS(_qget('MULTPL/SP500_DIV_YIELD_MONTH'))
     #  Gets dividend yield in percentage form,
     #  but we want just plain dividends over previous 12 months.
@@ -484,13 +557,17 @@ def getm4spx_1871_d():
 
 
 def getqdl(quandlcode, maxi=87654321):
-    '''Retrieve from Quandl in dataframe format, INCL. SPECIAL CASES.
-            maxi is just arbitrarily large as default,
-                 useful to limit data to last maxi rows,
-                 e.g. maxi=1 for most recent row only,
-                 but NOT used in all cases below.
-    We can SYNTHESIZE a quandlcode by use of string equivalent arg.
-    '''
+    """Retrieve from Quandl in dataframe format, INCL. SPECIAL CASES.
+
+    Notes
+    -----
+
+    * `maxi` is just arbitrarily large as default, useful to limit data to
+      last maxi rows, e.g. maxi=1 for most recent row only, but NOT used in all
+      cases below.
+    * We can SYNTHESIZE a quandlcode by use of string equivalent arg.
+
+    """
     if quandlcode == w4cotr_xau:
         df = cotr_position(f4xau)
     elif quandlcode == w4cotr_metals:
@@ -527,14 +604,14 @@ def getqdl(quandlcode, maxi=87654321):
 
 
 def plotqdl(data, title='tmp', maxi=87654321):
-    '''DEPRECATED: Plot data should be it given as dataframe or quandlcode.'''
+    """DEPRECATED: Plot data should be it given as dataframe or quandlcode."""
     #  ^2018-05-22. Removal OK after 2020-01-01.
     msg = "plotqdl() DEPRECATED. Instead use get() and plot()."
     raise DeprecationWarning(msg)
 
 
 def holtqdl(data, h=24, alpha=0.26, beta=0.19):
-    '''DEPRECATED: Holt-Winters forecast h-periods ahead (quandlcode aware).'''
+    """DEPRECATED: Holt-Winters forecast h-periods ahead (quandlcode aware)."""
     #  ^2018-05-22. Removal OK after 2020-01-01.
     msg = "holtqdl() DEPRECATED. Instead use get(), holt(), holtforecast()."
     raise DeprecationWarning(msg)
