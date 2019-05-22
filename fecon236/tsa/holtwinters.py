@@ -1,52 +1,97 @@
 #  Python Module for import                           Date : 2018-06-16
 #  vim: set fileencoding=utf-8 ff=unix tw=78 ai syn=python : per PEP 0263
-'''
-_______________|  holtwinters.py :: Holt-Winters time-series functions.
+"""Holt-Winters time-series functions.
 
 Holt-Winters is two-parameter linear growth exponential smoothing model.
 It has many uses, for example, stabilizing a time-series.
-For forecasting, the results are distilled in the forecast() function
+For forecasting, the results are distilled in the `forecast` function
 which features robust parameter optimization in the background.
 
-TESTS for this module are carried out in tests/test_holtwinters.py
+TESTS for this module are carried out in `tests/test_holtwinters.py`
 and the doctests there show numerical examples of how some of our
 time-series algorithms are built.
 
 To optimally ESTIMATE Holt-Winters parameters alpha and beta,
 conditional on a particular dataset, for forecasting purposes
-(rather than smoothing), opt_holt.py was absorbed here on 2018-05-31.
+(rather than smoothing), `opt_holt.py` was absorbed here on 2018-05-31.
 
 USAGE of the code for the Holt-Winters time-series model is illustrated
 in the Jupyter notebook at https://git.io/gdpspx which is a rendering of
 nb/fred-gdp-spx.ipynb in the fecon235 repository.
 
-Note: rolling_* methods, including rolling_apply, only work on one-dimensional
-array, thus we may work outside pandas in numpy, then bring back the results.
-See pandas, http://pandas.pydata.org/pandas-docs/stable/computation.html
-and compare holt_winters_growth() vs. holt().
+Note: rolling_* methods, including `rolling_apply`, only work on
+one-dimensional array, thus we may work outside pandas in numpy, then bring
+back the results.
+
+See `pandas`, http://pandas.pydata.org/pandas-docs/stable/computation.html
+and compare `holt_winters_growth` vs. `holt`.
 
 Details in comments: 2*sigma can be approximated by 3*(median_absolute_error).
 
 
-REFERENCES:
+Notes
+-----
 
-  - Spyros Makridakis, 1978, _FORECASTING_, pp. 64-66.
-       H-W does extremely well against ARIMA models in competitions.
-  - Rob Hyndman, 2008, _Forecasting with Exponential Smoothing_,
-       discusses level, growth (linear), and seasonal variants.
-  - Sarah Gelper, 2007, _Robust Forecasting with Exponential
-       and Holt-Winters smoothing_, useful for parameter values.
+For LATEST version, see https://git.io/fecon236
 
+Robust Optimal Estimation of alpha and beta
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-CHANGE LOG  For LATEST version, see https://git.io/fecon236
-2018-06-16  Absort Holt-Winters functions from top.py, esp. forecast().
-2018-05-31  ABSORB opt_holt module to estimate optimal alpha and beta.
-2018-05-11  Fix imports.
-2018-05-10  holtwinters.py, fecon236 fork. Pass flake8.
-2016-12-20  yi_timeseries.py, fecon235 v5.18.0312, https://git.io/fecon235
-2016-12-14  Fix initial guess of b[0] for holt_winters_growth(),
-                especially critical when beta=0 e.g. in new ema().
-'''
+We shall rely on `optimize.minBrute` to find optimal alpha and beta:
+
+- `minBrute` from optimize module: non-convex problem: GLOBAL optimizers:
+    If your problem does NOT admit a unique local minimum (which can be hard
+    to test unless the function is convex), and you do not have prior
+    information to initialize the optimization close to the solution: Brute
+    force uses a grid search: `scipy.optimize.brute` evaluates the function
+    on a given grid of parameters and returns the parameters corresponding to
+    the minimum value.
+
+    See `oc/optimize.py` for implementation details and references.
+    Also `tests/test_optimize.py` is intended as a TUTORIAL for USAGE.
+
+- GOAL: given some data and a MODEL, we want to MINIMIZE the LOSS FUNCTION
+    over possible values of the model's PARAMETERS.
+    Parameters which satisfy that goal are called BEST estimates
+    for the specified functional form.
+
+    Loss function should DISTINGUISH between parameters to be optimized,
+    and other supplemental arguments. The latter is introduced
+    via a tuple called funarg, frequently used to inject data.
+
+- We forego using RMSE (root mean squared errors) in favor of a more
+    ROBUST loss function since the squaring magnifies large errors.
+
+STATISTICAL NOTE: if L is the median absolute error, then by definition,
+`prob(-L <= error <= L) = 0.5`
+
+If we assume the errors are Gaussian centered around zero,
+then L = 0.675*sigma (by table look-up), thus sigma = 1.48*L.
+
+RULE of thumb: Two sigma confidence can be approximated by 3*L.
+
+References
+----------
+
+- Spyros Makridakis, 1978, *FORECASTING*, pp. 64-66.
+   H-W does extremely well against ARIMA models in competitions.
+- Rob Hyndman, 2008, Forecasting with Exponential Smoothing,
+   discusses level, growth (linear), and seasonal variants.
+- Sarah Gelper, 2007, *Robust Forecasting with Exponential
+   and Holt-Winters smoothing*, useful for parameter values.
+
+Change Log
+----------
+
+* 2018-06-16  Absort Holt-Winters functions from `top.py`, esp. `forecast`.
+* 2018-05-31  ABSORB `opt_holt` module to estimate optimal alpha and beta.
+* 2018-05-11  Fix imports.
+* 2018-05-10  `holtwinters.py`, `fecon236` fork. Pass flake8.
+* 2016-12-20  `yi_timeseries.py`, fecon235 v5.18.0312,
+  https://git.io/fecon235
+* 2016-12-14  Fix initial guess of b[0] for `holt_winters_growth`,
+  especially critical when `beta=0` e.g. in new `ema`.
+"""
 
 from __future__ import absolute_import, print_function, division
 
@@ -66,7 +111,7 @@ hw_beta = 0.19       # for Gaussian, fat tail, and outlier data.
 
 
 def holt_winters_growth(y, alpha=hw_alpha, beta=hw_beta):
-    '''Helper for Holt-Winters growth (linear) model using numpy arrays.'''
+    """Helper for Holt-Winters growth (linear) model using numpy arrays."""
     #  N.B. -  SEASONAL variant of Holt-Winters is omitted.
     N = y.size             # y should be a numpy array.
     #                        0 < alpha and beta < 1
@@ -90,7 +135,7 @@ def holt_winters_growth(y, alpha=hw_alpha, beta=hw_beta):
 
 
 def holt(data, alpha=hw_alpha, beta=hw_beta):
-    '''Holt-Winters growth (linear) model outputs workout dataframe.'''
+    """Holt-Winters growth (linear) model outputs workout dataframe."""
     #  holt is an EXPENSIVE function, so retain its output for later.
     holtdf = todf(data).dropna()
     #              'Y'    ^else:
@@ -106,20 +151,22 @@ def holt(data, alpha=hw_alpha, beta=hw_beta):
 
 
 def holtlevel(data, alpha=hw_alpha, beta=hw_beta):
-    '''Just smoothed Level dataframe from Holt-Winters growth model.'''
-    #  Useful to filter out seasonals, e.g. see X-11 method:
-    #     http://www.sa-elearning.eu/basic-algorithm-x-11
+    """Just smoothed Level dataframe from Holt-Winters growth model.
+
+    Useful to filter out seasonals, e.g. see X-11 method:
+    http://www.sa-elearning.eu/basic-algorithm-x-11
+    """
     return todf(holt(data, alpha, beta)['Level'])
 
 
 def holtgrow(data, alpha=hw_alpha, beta=hw_beta):
-    '''Just the Growth dataframe from Holt-Winters growth model.'''
+    """Just the Growth dataframe from Holt-Winters growth model."""
     #  In terms of units expressed in data.
     return todf(holt(data, alpha, beta)['Growth'])
 
 
 def holtpc(data, yearly=256, alpha=hw_alpha, beta=hw_beta):
-    '''Annualized percentage growth dataframe from H-W growth model.'''
+    """Annualized percentage growth dataframe from H-W growth model."""
     #  yearly is the multiplier to annualize Growth.
     #
     #       MOST VALUABLE H-W function              <= !!
@@ -133,10 +180,14 @@ def holtpc(data, yearly=256, alpha=hw_alpha, beta=hw_beta):
 
 
 def holtforecast(holtdf, h=12):
-    '''Given a dataframe from holt, forecast ahead h periods.'''
-    #  N.B. -  holt forecasts by multiplying latest growth
-    #          by the number of periods ahead. Somewhat naive...
-    #          notice that the growth is based on smoothed levels.
+    """Given a dataframe from holt, forecast ahead h periods.
+
+    Notes
+    -----
+    N.B. -  holt forecasts by multiplying latest growth by the number of
+    periods ahead. Somewhat naive... notice that the growth is based on
+    smoothed levels.
+    """
     last = holtdf[-1:]
     y, l, b = last.values.tolist()[0]
     #         df to array to list, but extract first element:-(
@@ -146,10 +197,11 @@ def holtforecast(holtdf, h=12):
 
 
 def foreholt(data, h=12, alpha=hw_alpha, beta=hw_beta, maxi=0):
-    '''Data slang aware Holt-Winters holtforecast(), h-periods ahead.
-       Thus "data" can be a fredcode, quandlcode, stock slang,
-       OR a DataFrame should be detected.
-    '''
+    """Data slang aware Holt-Winters `holtforecast`, h-periods ahead.
+
+    Thus "data" can be a fredcode, quandlcode, stock slang,
+    OR a DataFrame should be detected.
+    """
     if not isinstance(data, pd.DataFrame):
         try:
             data = get(data, maxi)
@@ -160,68 +212,41 @@ def foreholt(data, h=12, alpha=hw_alpha, beta=hw_beta, maxi=0):
 
 
 def holtfred(data, h=24, alpha=hw_alpha, beta=hw_beta):
-    '''Holt-Winters forecast h-periods ahead (fredcode aware).'''
+    """Holt-Winters forecast h-periods ahead (fredcode aware)."""
     #  Retained for backward compatibility, esp. pre-2016 notebooks.
     return foreholt(data, h, alpha, beta)
 
 
 def plotholt(holtdf, h=12):
-    '''Given a dataframe from holt, plot forecasts h periods ahead.'''
+    """Given a dataframe from holt, plot forecasts `h` periods ahead."""
     #  plotdf will not work since index there is assumed to be dates.
     holtforecast(holtdf, h).plot(title='Holt-Winters linear forecast')
     return
 
 
 def ema(y, alpha=0.20):
-    '''EXPONENTIAL MOVING AVERAGE using traditional weight arg.'''
-    #  y could be a dataframe.
-    #  ema is mathematically equivalent to holtlevel with beta=0,
-    #  thus issue #5 can be easily resolved for all pandas versions.
+    """EXPONENTIAL MOVING AVERAGE using traditional weight arg.
+
+    `y` could be a dataframe.
+    ema is mathematically equivalent to holtlevel with beta=0,
+    thus issue #5 can be easily resolved for all pandas versions.
+    """
     return holtlevel(y, alpha, beta=0)
 
 
-# ============================= ROBUST OPTIMAL ESTIMATION of alpha and beta ===
-'''
-We shall rely on optimize.minBrute() to find optimal alpha and beta:
-
-- minBrute() from optimize module: non-convex problem: GLOBAL optimizers:
-    If your problem does NOT admit a unique local minimum (which can be hard
-    to test unless the function is convex), and you do not have prior
-    information to initialize the optimization close to the solution: Brute
-    force uses a grid search: scipy.optimize.brute() evaluates the function on
-    a given grid of parameters and returns the parameters corresponding to the
-    minimum value.
-
-    See oc/optimize.py for implementation details and references.
-    Also tests/test_optimize.py is intended as a TUTORIAL for USAGE.
-
-- GOAL: given some data and a MODEL, we want to MINIMIZE the LOSS FUNCTION
-    over possible values of the model's PARAMETERS.
-    Parameters which satisfy that goal are called BEST estimates
-    for the specified functional form.
-
-    Loss function should DISTINGUISH between parameters to be optimized,
-    and other supplemental arguments. The latter is introduced
-    via a tuple called funarg, frequently used to inject data.
-
-- We forego using RMSE (root mean squared errors) in favor of a more
-    ROBUST loss function since the squaring magnifies large errors.
-
-STATISTICAL NOTE: if L is the median absolute error, then by definition,
-                  prob(-L <= error <= L) = 0.5
-    If we assume the errors are Gaussian centered around zero,
-    then L = 0.675*sigma (by table look-up), thus sigma = 1.48*L.
-
-    RULE of thumb: Two sigma confidence can be approximated by 3*L.
-'''
-
-
 def loss_holt(params, *args):
-    '''Loss function for holt() using np.median of absolute errors.
-       This is much more robust than using np.sum or np.mean
-       (and perhaps better than editing "outliers" out of data).
-       The error array will consist of 1-step ahead prediction errors.
-    '''
+    """Loss function for holt() using np.median of absolute errors.
+
+    This is much more robust than using np.sum or `np.mean` (and perhaps
+    better than editing "outliers" out of data). The error array will consist
+    of 1-step ahead prediction errors.
+
+    Notes
+    -----
+    TUPLE `funarg` is used to specify arguments to function `fun` which are
+    NOT the parameters to be optimized (e.g. data). Gotcha: Remember a
+    single-element tuple must include that mandatory comma: (alone,)
+    """
     alpha, beta = params  # Must specify arguments.
     data = args[0]        # Primary data assumed to be single column.
     #
@@ -247,19 +272,15 @@ def loss_holt(params, *args):
     return np.median(np.absolute(error[10:]))
 
 
-#  NOTICE: TUPLE "funarg" is used to specify arguments to function "fun"
-#          which are NOT the parameters to be optimized (e.g. data).
-#          Gotcha: Remember a single-element tuple must include
-#          that mandatory comma: (alone,)
-
-
 def optimize_holt(dataframe, grids=50, alphas=(0.0, 1.0), betas=(0.0, 1.0)):
-    '''Optimize Holt-Winters parameters alpha and beta for given data.
-       The alphas and betas are boundaries of respective explored regions.
-       Function interpolates "grids" from its low bound to its high bound,
-       inclusive. Final output: [alpha, beta, losspc, median absolute loss]
-       TIP: narrow down alphas and betas using optimize_holt iteratively.
-    '''
+    """Optimize Holt-Winters parameters alpha and beta for given data.
+
+    The `alphas` and `betas` are boundaries of respective explored regions.
+    Function interpolates `grids` from its low bound to its high bound,
+    inclusive. Final output: `[alpha, beta, losspc, median absolute loss]`
+    TIP: narrow down `alphas` and `betas` using `optimize_holt`
+    iteratively.
+    """
     if grids > 49:
         system.warn("Optimizing Holt-Winters alphabetaloss may take TIME!")
         #  Exploring loss at all the grids is COMPUTATIONALLY INTENSE
@@ -279,9 +300,13 @@ def optimize_holt(dataframe, grids=50, alphas=(0.0, 1.0), betas=(0.0, 1.0)):
 
 
 def optimize_holtforecast(dataframe, h=12, grids=50):
-    '''Forecast ahead h periods using optimized Holt-Winters parameters.'''
-    #  Note: default hw_alpha and hw_beta from yi_timeseries module
-    #        are NOT necessarily optimal given specific data.
+    """Forecast ahead h periods using optimized Holt-Winters parameters.
+
+    Notes
+    -----
+    Default `hw_alpha` and `hw_beta` from `yi_timeseries` module are NOT
+    necessarily optimal given specific data.
+    """
     alphabetaloss = optimize_holt(dataframe, grids=grids)
     #  alphabetaloss will be a list: [alpha, beta, losspc, loss]
     #     computed from default boundpairs: alphas=(0.0, 1.0), betas=(0.0, 1.0)
@@ -297,13 +322,15 @@ def optimize_holtforecast(dataframe, h=12, grids=50):
 
 
 def forecast(data, h=12, grids=0, maxi=0):
-    '''h-period ahead forecasts by holtforecast or optimize_holtforecast,
-       where "data" may be fredcode, quandlcode, stock slang, or DataFrame.
-       Given default grids argument, forecast is very QUICK since we use
-       FIXED parameters implicitly: alpha=hw_alpha and beta=hw_beta.
-       Recommend grids=50 for reasonable results, but it is TIME-CONSUMING
-       for search grids > 49 to find OPTIMAL alpha and beta.
-    '''
+    """h-period ahead forecasts by holtforecast or optimize_holtforecast.
+
+
+    `data` may be fredcode, quandlcode, stock slang, or DataFrame.
+    Given default grids argument, forecast is very QUICK since we use
+    FIXED parameters implicitly: `alpha=hw_alpha` and `beta=hw_beta`.
+    Recommend `grids=50` for reasonable results, but it is TIME-CONSUMING
+    for search `grids > 49` to find OPTIMAL alpha and beta.
+    """
     if not isinstance(data, pd.DataFrame):
         try:
             data = get(data, maxi)
@@ -322,11 +349,3 @@ def forecast(data, h=12, grids=0, maxi=0):
 
 if __name__ == "__main__":
     system.endmodule()
-
-
-# ======================================================= ENDNOTES ============
-
-#  #  Table 3-8 from Makridakis 1978:
-#  makridakis_p65 = np.array([143, 152, 161, 139, 137, 174, 142, 141, 162,
-#                            180, 164, 171, 206, 193, 207, 218, 229, 225, 204,
-#                            227, 223, 242, 239, 266])
