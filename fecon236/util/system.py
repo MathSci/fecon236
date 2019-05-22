@@ -25,10 +25,10 @@ References
 Change Log
 ----------
 
-* 2018-06-20  Update ``specs``, include version for ``statsmodels``.
-* 2018-05-15  Include ``version("fecon236")`` to ``specs``.
-* 2018-04-25  Ignore ``raw_input`` < python3 flake8.
-* 2018-04-21  ``yi_0sys`` module from fecon235 renamed to system.
+* 2018-06-20  Update `specs`, include version for `statsmodels`.
+* 2018-05-15  Include `version("fecon236")` to `specs`.
+* 2018-04-25  Ignore `raw_input` < python3 flake8.
+* 2018-04-21  `yi_0sys` module from fecon235 renamed to system.
   Major flake8 fixes. Move notebook preamble to docs.
 """
 
@@ -72,7 +72,7 @@ def program():
 
     Notes
     -----
-    ``__file__`` can get only the name of this module.
+    `__file__` can get only the name of this module.
     """
     return os.path.basename(sys.argv[0])
 
@@ -96,9 +96,9 @@ def die(message, errcode=1, prefix=" !! "):
 def date(hour=True, utc=True, localstr=' Local'):
     """Get date, and optionally time, as ISO string representation.
 
-    Boolean ``hour`` variable also gives minutes and seconds.
-    Setting ``utc`` to ``False`` will give local time instead of UTC,
-    then ``localstr`` can be used to indicate location.
+    Boolean `hour` variable also gives minutes and seconds.
+    Setting `utc` to `False` will give local time instead of UTC,
+    then `localstr` can be used to indicate location.
     """
     if hour:
         form = "%Y-%m-%d, %H:%M:%S"
@@ -171,7 +171,7 @@ def utf(immigrant, xnl=True):
 
     Notes
     -----
-    ``xnl`` means "delete new line"
+    `xnl` means "delete new line"
     """
     if xnl:
         #                Decodes to utf-8, plus deletes new line.
@@ -184,15 +184,15 @@ def utf(immigrant, xnl=True):
 def run(command, xnl=True, errf=None):
     """RUN **quote and space insensitive** SYSTEM-LEVEL command.
 
-    OTHERWISE: use ``check_output`` directly and list component
-    parts of the command, e.g. ``check_output(["git", "describe",
-    "--abbrev=0"])`` then generally use our ``utf`` since check_output usually
+    OTHERWISE: use `check_output` directly and list component
+    parts of the command, e.g. `check_output(["git", "describe",
+    "--abbrev=0"])` then generally use our `utf` since check_output usually
     does not return utf-8, so be prepared to receive bytes and also new line.
 
     Notes
     -----
 
-    - ``errf=None`` means the usual error transmittal.
+    - `errf=None` means the usual error transmittal.
     - Cross-platform /dev/stdout is STDOUT
     - Cross-platform /dev/null   is our dev_null above.
 
@@ -210,7 +210,7 @@ def gitinfo():
 
     Notes
     -----
-    Suppressing error messages by ``os.devnull`` seems cross-platform,
+    Suppressing error messages by `os.devnull` seems cross-platform,
     but it is just a string, so use our open file dev_null instead.
     """
     try:
@@ -257,7 +257,7 @@ def specs():
 
 
 def endmodule():
-    """Procedure after ``__main__`` conditional in modules."""
+    """Procedure after `__main__` conditional in modules."""
     die("is a MODULE for import, not for direct execution.", 113)
 
 
